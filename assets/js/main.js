@@ -31,7 +31,8 @@
     typedTarget.textContent = current.slice(0, j) + (Math.floor(Date.now()/500)%2 ? '|' : '');
     if(!isDeleting){ j++; if(j > current.length + 8) isDeleting = true; }
     else { j--; if(j === 0){ isDeleting = false; i++; } }
-    requestAnimationFrame(type);
+    setTimeout(type, 300); // kecepatan animasi tulisan
+    // requestAnimationFrame(type);
   }
   type();
 
