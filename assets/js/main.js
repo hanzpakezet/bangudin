@@ -28,7 +28,7 @@
   let i = 0, j = 0, isDeleting = false;
   function type(){
     const current = roles[i % roles.length];
-    typedTarget.textContent = current.slice(0, j) + (Math.floor(Date.now()/200)%2 ? '|' : '');
+    typedTarget.textContent = current.slice(0, j) + (Math.floor(Date.now()/100)%2 ? '|' : '');
     if(!isDeleting){ j++; if(j > current.length + 8) isDeleting = true; }
     else { j--; if(j === 0){ isDeleting = false; i++; } }
     requestAnimationFrame(type);
