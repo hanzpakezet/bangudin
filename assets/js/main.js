@@ -24,7 +24,7 @@
 
   // Simple typewriter
   const typedTarget = document.getElementById('typed');
-  const roles = ["Web Developer", "UI/UX Enthusiast", "Freelancer", "Open-Source Contributor"];
+  const roles = ["Jasa Percetakan, Desain Grafis, Microsoft Office Advanced"];
   let i = 0, j = 0, isDeleting = false;
   function type(){
     const current = roles[i % roles.length];
