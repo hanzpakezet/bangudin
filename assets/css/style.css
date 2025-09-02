@@ -23,6 +23,7 @@ body{font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-se
 footer a{text-decoration:none}
 .socials a{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:999px;background:#fff;border:1px solid #eee;margin-right:10px;color:#444;transition:.2s}
 .socials a:hover{transform:translateY(-3px);color:var(--primary);border-color:var(--primary)}
+.skill{margin-bottom: 1.5rem;}
 /* Small tweaks */
 @media (max-width: 991.98px){
   .hero{padding-bottom:2rem}
