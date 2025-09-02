@@ -20,7 +20,7 @@ body{font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-se
 /* .timeline-item::before{content:'';position:absolute;left:-11px;top:6px;width:12px;height:12px;background:var(--primary);border-radius:50%} */
 .timeline {
   border-left: 2px solid #eee;
-  padding-left: 20px; /* biarkan default supaya teks tidak terlalu jauh */
+  padding-left: 20px; /* jarak teks dari garis */
   position: relative;
 }
 
@@ -32,15 +32,13 @@ body{font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-se
 .timeline-item::before {
   content: '';
   position: absolute;
-  left: -7px;       /* ini harus pas di tengah border-left (2px) */
+  left: -26px;       /* geser lebih jauh ke kiri */
   top: 6px;
   width: 12px;
   height: 12px;
   background: var(--primary);
   border-radius: 50%;
-  border: 2px solid #fff; /* opsional, biar lingkaran terlihat rapi di atas garis */
 }
-
 
 .filters .btn{margin:.25rem}
 .card-img-top{aspect-ratio:3/2;object-fit:cover}
