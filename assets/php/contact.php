@@ -13,7 +13,7 @@ if(!$name || !$email || !$message){
   exit;
 }
 
-$to = 'you@example.com'; // TODO: change to your email
+$to = 'saya@bangudin.my.id'; // TODO: change to your email
 $subject = "New message from $name";
 $body = "Name: $name\nEmail: $email\n\nMessage:\n$message\n";
 $headers = "From: $name <$email>\r\nReply-To: $email\r\n";
