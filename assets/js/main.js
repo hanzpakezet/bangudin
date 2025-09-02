@@ -65,7 +65,7 @@
       if(data.ok) form.reset();
       alertBox.className = 'form-alert mt-3 alert ' + (data.ok ? 'alert-success' : 'alert-warning');
     }catch(err){
-      alertBox.textContent = 'Failed to send. You can email me at hello@example.com';
+      alertBox.textContent = 'Failed to send. You can email me at saya@bangudin.my.id';
       alertBox.className = 'form-alert mt-3 alert alert-danger';
     }
   });
