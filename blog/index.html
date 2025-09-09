@@ -1,139 +1,137 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blog - Bangudin</title>
-  <link rel="stylesheet" href="../style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-    }
-    .container {
-      max-width: 1000px;
-      margin: auto;
-      padding: 20px;
-    }
-    h1 {
-      margin-bottom: 30px;
-    }
-    .blog-item {
-      display: flex;
-      gap: 20px;
-      background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      margin-bottom: 20px;
-      transition: 0.3s;
-    }
-    .blog-item:hover {
-      transform: translateY(-3px);
-    }
-    .blog-item img {
-      width: 200px;
-      height: 130px;
-      object-fit: cover;
-      border-radius: 6px;
-    }
-    .blog-content h3 {
-      margin: 0 0 10px;
-      font-size: 20px;
-    }
-    .blog-content p {
-      color: #555;
-      font-size: 15px;
-      margin-bottom: 10px;
-    }
-    .meta {
-      font-size: 13px;
-      color: #888;
-      margin-bottom: 8px;
-    }
-    .read-more {
-      font-weight: bold;
-      font-size: 14px;
-      color: var(--primary, #007BFF);
-      text-decoration: none;
-    }
-    .read-more:hover {
-      text-decoration: underline;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Bang Udin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Header -->
-  <header class="navbar">
-    <div class="container d-flex justify-content-between align-items-center">
-      <a href="../index.html" class="logo">Bangudin</a>
-      <nav>
-        <a href="../index.html">Home</a>
-        <a href="index.html" class="active">Blog</a>
-        <a href="../contact.html">Contact</a>
-      </nav>
-    </div>
-  </header>
 
-  <!-- Blog List -->
-  <main class="container">
-    <h1>Blog</h1>
+    <main class="container py-5">
+        <header class="text-center mb-5">
+            <h1 class="display-4">Blog Bang Udin</h1>
+            <p class="lead">Artikel seputar agama, teknologi, dan kehidupan.</p>
+        </header>
 
-    <!-- Artikel 1 -->
-    <div class="blog-item">
-      <img src="https://source.unsplash.com/400x300/?mosque" alt="Bahaya Meninggalkan Sholat">
-      <div class="blog-content">
-        <h3><a href="bahaya-sholat.html">Bahaya Meninggalkan Sholat</a></h3>
-        <div class="meta">By Bangudin • 5 min read</div>
-        <p>Sholat adalah tiang agama, meninggalkannya termasuk dosa besar. Artikel ini membahas akibat duniawi dan ukhrawi bagi yang meninggalkan sholat.</p>
-        <a href="bahaya-sholat.html" class="read-more">Baca selengkapnya →</a>
-      </div>
-    </div>
+        <section id="blog-posts">
+            <div class="row g-4">
 
-    <!-- Artikel 2 -->
-    <div class="blog-item">
-      <img src="https://source.unsplash.com/400x300/?quran" alt="Keutamaan Membaca Al-Qur’an">
-      <div class="blog-content">
-        <h3><a href="#">Keutamaan Membaca Al-Qur’an</a></h3>
-        <div class="meta">By Bangudin • 4 min read</div>
-        <p>Al-Qur’an adalah pedoman hidup umat Islam. Membacanya mendatangkan ketenangan hati dan pahala yang berlipat.</p>
-        <a href="#" class="read-more">Baca selengkapnya →</a>
-      </div>
-    </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <img src="https://via.placeholder.com/600x400.png?text=Ilmu+Agama" class="card-img-top" alt="Ilmu Agama">
+                        <div class="card-body">
+                            <h5 class="card-title">Pentingnya Belajar Ilmu Agama di Usia Muda</h5>
+                            <p class="card-text">Mempelajari ilmu agama sejak dini dapat membentuk karakter dan moral yang kuat...</p>
+                            <a href="#" class="btn btn-primary btn-sm w-100">Baca Selengkapnya</a>
+                        </div>
+                    </div>
+                </div>
 
-    <!-- Artikel 3 -->
-    <div class="blog-item">
-      <img src="https://source.unsplash.com/400x300/?prayer" alt="Sabar dalam Menghadapi Ujian">
-      <div class="blog-content">
-        <h3><a href="#">Menghadapi Ujian Hidup dengan Sabar</a></h3>
-        <div class="meta">By Bangudin • 6 min read</div>
-        <p>Sabar adalah kunci melewati kesulitan. Dengan sabar, seseorang bisa lebih kuat menghadapi ujian hidup.</p>
-        <a href="#" class="read-more">Baca selengkapnya →</a>
-      </div>
-    </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <img src="https://via.placeholder.com/600x400.png?text=Open+Source" class="card-img-top" alt="Open Source">
+                        <div class="card-body">
+                            <h5 class="card-title">Mengenal Perbedaan Software Open Source dan Berbayar</h5>
+                            <p class="card-text">Artikel ini akan membahas keunggulan dan kekurangan dari software open source dan berbayar...</p>
+                            <a href="#" class="btn btn-primary btn-sm w-100">Baca Selengkapnya</a>
+                        </div>
+                    </div>
+                </div>
 
-    <!-- Artikel 4 -->
-    <div class="blog-item">
-      <img src="https://source.unsplash.com/400x300/?islam" alt="Menjaga Silaturahmi">
-      <div class="blog-content">
-        <h3><a href="#">Menjaga Silaturahmi</a></h3>
-        <div class="meta">By Bangudin • 3 min read</div>
-        <p>Silaturahmi membuka pintu rezeki dan memperpanjang umur. Islam sangat menekankan pentingnya menjaga hubungan sesama.</p>
-        <a href="#" class="read-more">Baca selengkapnya →</a>
-      </div>
-    </div>
-  </main>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <img src="https://via.placeholder.com/600x400.png?text=Aplikasi+Catatan" class="card-img-top" alt="Aplikasi Catatan">
+                        <div class="card-body">
+                            <h5 class="card-title">Tips Produktif Menggunakan Aplikasi Catatan Digital</h5>
+                            <p class="card-text">Pelajari cara memaksimalkan penggunaan aplikasi catatan digital seperti Notion atau Evernote...</p>
+                            <a href="#" class="btn btn-primary btn-sm w-100">Baca Selengkapnya</a>
+                        </div>
+                    </div>
+                </div>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; <span id="year"></span> Bangudin — All rights reserved.</p>
-    </div>
-  </footer>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <img src="https://via.placeholder.com/600x400.png?text=Pemrograman+Web" class="card-img-top" alt="Pemrograman Web">
+                        <div class="card-body">
+                            <h5 class="card-title">Memahami Konsep Dasar Pemrograman Web</h5>
+                            <p class="card-text">Panduan singkat untuk pemula yang ingin terjun ke dunia pengembangan web...</p>
+                            <a href="#" class="btn btn-primary btn-sm w-100">Baca Selengkapnya</a>
+                        </div>
+                    </div>
+                </div>
 
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <img src="https://via.placeholder.com/600x400.png?text=Adab+Sholat" class="card-img-top" alt="Adab Sholat">
+                        <div class="card-body">
+                            <h5 class="card-title">Adab dan Khusyuk dalam Sholat</h5>
+                            <p class="card-text">Meningkatkan kualitas ibadah sholat dengan memahami adab dan cara meraih kekhusyukan...</p>
+                            <a href="#" class="btn btn-primary btn-sm w-100">Baca Selengkapnya</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <img src="https://via.placeholder.com/600x400.png?text=Linux+Untuk+Pemula" class="card-img-top" alt="Linux">
+                        <div class="card-body">
+                            <h5 class="card-title">Mengenal Linux untuk Pemula</h5>
+                            <p class="card-text">Panduan lengkap bagi Anda yang ingin beralih ke sistem operasi Linux...</p>
+                            <a href="#" class="btn btn-primary btn-sm w-100">Baca Selengkapnya</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <img src="https://via.placeholder.com/600x400.png?text=Pentingnya+Sabar" class="card-img-top" alt="Pentingnya Sabar">
+                        <div class="card-body">
+                            <h5 class="card-title">Keutamaan dan Manfaat Bersabar dalam Kehidupan</h5>
+                            <p class="card-text">Sabar adalah kunci keberhasilan di dunia dan akhirat. Mari kita dalami maknanya...</p>
+                            <a href="#" class="btn btn-primary btn-sm w-100">Baca Selengkapnya</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <img src="https://via.placeholder.com/600x400.png?text=Keamanan+Siber" class="card-img-top" alt="Keamanan Siber">
+                        <div class="card-body">
+                            <h5 class="card-title">Tips Praktis Menjaga Keamanan Data Pribadi Anda</h5>
+                            <p class="card-text">Lindungi diri Anda dari ancaman siber dengan tips-tips keamanan yang mudah dilakukan...</p>
+                            <a href="#" class="btn btn-primary btn-sm w-100">Baca Selengkapnya</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <img src="https://via.placeholder.com/600x400.png?text=Pola+Hidup+Sehat" class="card-img-top" alt="Pola Hidup Sehat">
+                        <div class="card-body">
+                            <h5 class="card-title">Menjalani Pola Hidup Sehat Sesuai Sunnah</h5>
+                            <p class="card-text">Memadukan ajaran agama dengan ilmu kesehatan modern untuk hidup lebih baik...</p>
+                            <a href="#" class="btn btn-primary btn-sm w-100">Baca Selengkapnya</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <img src="https://via.placeholder.com/600x400.png?text=Belajar+Koding" class="card-img-top" alt="Belajar Koding">
+                        <div class="card-body">
+                            <h5 class="card-title">Membangun Portofolio Koding Pertama Anda</h5>
+                            <p class="card-text">Langkah-langkah praktis untuk membuat portofolio yang menarik perhatian recruiter...</p>
+                            <a href="#" class="btn btn-primary btn-sm w-100">Baca Selengkapnya</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
