@@ -7,71 +7,59 @@
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    .blog-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 24px;
-      margin-top: 40px;
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
     }
-    .blog-card {
-      background: #fff;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-      transition: transform 0.2s;
-    }
-    .blog-card:hover {
-      transform: translateY(-5px);
-    }
-    .blog-card img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-    }
-    .blog-card-content {
+    .container {
+      max-width: 1000px;
+      margin: auto;
       padding: 20px;
     }
-    .blog-card-content h3 {
+    h1 {
+      margin-bottom: 30px;
+    }
+    .blog-item {
+      display: flex;
+      gap: 20px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+      transition: 0.3s;
+    }
+    .blog-item:hover {
+      transform: translateY(-3px);
+    }
+    .blog-item img {
+      width: 200px;
+      height: 130px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+    .blog-content h3 {
       margin: 0 0 10px;
       font-size: 20px;
     }
-    .blog-card-content p {
-      font-size: 15px;
+    .blog-content p {
       color: #555;
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+    .meta {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 8px;
     }
     .read-more {
-      display: inline-block;
-      margin-top: 10px;
-      color: var(--primary, #007BFF);
       font-weight: bold;
+      font-size: 14px;
+      color: var(--primary, #007BFF);
       text-decoration: none;
     }
     .read-more:hover {
       text-decoration: underline;
-    }
-    .recent-posts {
-      margin-top: 60px;
-      background: #f9f9f9;
-      padding: 20px;
-      border-radius: 8px;
-    }
-    .recent-posts h3 {
-      margin-bottom: 15px;
-    }
-    .recent-posts ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .recent-posts li {
-      margin-bottom: 10px;
-    }
-    .recent-posts a {
-      text-decoration: none;
-      color: #333;
-    }
-    .recent-posts a:hover {
-      color: var(--primary, #007BFF);
     }
   </style>
 </head>
@@ -91,49 +79,50 @@
   <!-- Blog List -->
   <main class="container">
     <h1>Blog</h1>
-    <p>Kumpulan artikel inspiratif seputar Islam, kehidupan, dan motivasi.</p>
 
-    <div class="blog-list">
-      <!-- Artikel 1 -->
-      <div class="blog-card">
-        <img src="../assets/img/sholat.jpg" alt="Bahaya Meninggalkan Sholat">
-        <div class="blog-card-content">
-          <h3>Bahaya Meninggalkan Sholat</h3>
-          <p>Sholat adalah tiang agama. Meninggalkannya dengan sengaja termasuk dosa besar yang berdampak pada dunia dan akhirat.</p>
-          <a href="bahaya-meninggalkan-sholat.html" class="read-more">Read more →</a>
-        </div>
-      </div>
-
-      <!-- Artikel 2 -->
-      <div class="blog-card">
-        <img src="../assets/img/quran.jpg" alt="Keutamaan Membaca Al-Qur’an">
-        <div class="blog-card-content">
-          <h3>Keutamaan Membaca Al-Qur’an</h3>
-          <p>Membaca Al-Qur’an setiap hari mendatangkan ketenangan hati dan pahala yang berlipat ganda dari Allah.</p>
-          <a href="#" class="read-more">Read more →</a>
-        </div>
-      </div>
-
-      <!-- Artikel 3 -->
-      <div class="blog-card">
-        <img src="../assets/img/sabar.jpg" alt="Menghadapi Ujian dengan Sabar">
-        <div class="blog-card-content">
-          <h3>Menghadapi Ujian Hidup dengan Sabar</h3>
-          <p>Sabar adalah kunci menghadapi ujian hidup. Allah selalu bersama orang-orang yang sabar.</p>
-          <a href="#" class="read-more">Read more →</a>
-        </div>
+    <!-- Artikel 1 -->
+    <div class="blog-item">
+      <img src="https://source.unsplash.com/400x300/?mosque" alt="Bahaya Meninggalkan Sholat">
+      <div class="blog-content">
+        <h3><a href="bahaya-sholat.html">Bahaya Meninggalkan Sholat</a></h3>
+        <div class="meta">By Bangudin • 5 min read</div>
+        <p>Sholat adalah tiang agama, meninggalkannya termasuk dosa besar. Artikel ini membahas akibat duniawi dan ukhrawi bagi yang meninggalkan sholat.</p>
+        <a href="bahaya-sholat.html" class="read-more">Baca selengkapnya →</a>
       </div>
     </div>
 
-    <!-- Sidebar Recent Posts -->
-    <aside class="recent-posts">
-      <h3>Recent Posts</h3>
-      <ul>
-        <li><a href="bahaya-sholat.html">Bahaya Meninggalkan Sholat</a></li>
-        <li><a href="#">Keutamaan Membaca Al-Qur’an</a></li>
-        <li><a href="#">Menghadapi Ujian Hidup dengan Sabar</a></li>
-      </ul>
-    </aside>
+    <!-- Artikel 2 -->
+    <div class="blog-item">
+      <img src="https://source.unsplash.com/400x300/?quran" alt="Keutamaan Membaca Al-Qur’an">
+      <div class="blog-content">
+        <h3><a href="#">Keutamaan Membaca Al-Qur’an</a></h3>
+        <div class="meta">By Bangudin • 4 min read</div>
+        <p>Al-Qur’an adalah pedoman hidup umat Islam. Membacanya mendatangkan ketenangan hati dan pahala yang berlipat.</p>
+        <a href="#" class="read-more">Baca selengkapnya →</a>
+      </div>
+    </div>
+
+    <!-- Artikel 3 -->
+    <div class="blog-item">
+      <img src="https://source.unsplash.com/400x300/?prayer" alt="Sabar dalam Menghadapi Ujian">
+      <div class="blog-content">
+        <h3><a href="#">Menghadapi Ujian Hidup dengan Sabar</a></h3>
+        <div class="meta">By Bangudin • 6 min read</div>
+        <p>Sabar adalah kunci melewati kesulitan. Dengan sabar, seseorang bisa lebih kuat menghadapi ujian hidup.</p>
+        <a href="#" class="read-more">Baca selengkapnya →</a>
+      </div>
+    </div>
+
+    <!-- Artikel 4 -->
+    <div class="blog-item">
+      <img src="https://source.unsplash.com/400x300/?islam" alt="Menjaga Silaturahmi">
+      <div class="blog-content">
+        <h3><a href="#">Menjaga Silaturahmi</a></h3>
+        <div class="meta">By Bangudin • 3 min read</div>
+        <p>Silaturahmi membuka pintu rezeki dan memperpanjang umur. Islam sangat menekankan pentingnya menjaga hubungan sesama.</p>
+        <a href="#" class="read-more">Baca selengkapnya →</a>
+      </div>
+    </div>
   </main>
 
   <!-- Footer -->
