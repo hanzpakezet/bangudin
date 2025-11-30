@@ -1,12 +1,60 @@
+/* --- 1. RESET DAN DASAR --- */
 body {
     background-color: #f8f9fa;
+    font-family: Arial, sans-serif; /* Ganti dengan font yang Anda inginkan */
+    color: #333;
+    margin: 0;
+    padding: 0;
 }
 
+.container {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* --- 2. HEADER/NAVBAR (Diasumsikan dari HTML Anda) --- */
+.navbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e9ecef;
+    padding: 15px 0;
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #007bff; /* Warna biru untuk logo */
+    text-decoration: none;
+}
+
+.navbar nav a {
+    margin-left: 20px;
+    color: #495057;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.navbar nav a:hover,
+.navbar nav a.active {
+    color: #007bff;
+}
+
+/* --- 3. GAYA POSTINGAN DAFTAR (CSS Anda yang sudah ada) --- */
 .card {
     border: none;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,.05);
     transition: transform 0.3s ease;
+    margin-bottom: 30px; /* Tambahkan jarak antar kartu */
 }
 
 .card:hover {
@@ -32,9 +80,167 @@ body {
     background-color: #007bff;
     color: white;
     border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
     transition: background-color 0.3s ease;
 }
 
 .read-more-btn:hover {
     background-color: #0056b3;
+}
+
+/* --- 4. TAMPILAN DETAIL BLOG BARU (Layout 2 Kolom) --- */
+
+/* TATA LETAK DASAR (GRID/FLEXBOX) */
+.row {
+    display: flex; /* Menggunakan flexbox untuk layout kolom */
+    flex-wrap: wrap;
+    margin-left: -15px; /* Kompensasi padding kolom */
+    margin-right: -15px;
+}
+
+.col-lg-9, .col-lg-3 {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.col-lg-9 {
+    flex: 0 0 75%;
+    max-width: 75%;
+}
+
+.col-lg-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+}
+
+/* Responsivitas */
+@media (max-width: 992px) {
+    .col-lg-9, .col-lg-3 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    .col-lg-3 {
+        margin-top: 30px; 
+    }
+}
+
+.blog-pages-wrapper {
+    padding: 60px 0; 
+}
+
+/* Konten Artikel */
+.blog-post-detail {
+    background-color: #ffffff; 
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+}
+
+.blog-post-title {
+    font-size: 2.2rem;
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.blog-post-meta {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee; 
+    padding-bottom: 10px;
+}
+
+.meta-item {
+    margin-right: 15px;
+}
+
+.blog-post-image img {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 30px;
+}
+
+.blog-post-content p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #495057;
+    margin-bottom: 20px;
+    text-align: justify;
+}
+
+/* Share Buttons */
+.blog-share {
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.share-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 1rem;
+    margin-left: 10px;
+    text-decoration: none;
+}
+
+/* Warna untuk Share Button */
+.fa-facebook-f { background-color: #3b5998; }
+.fa-twitter { background-color: #00acee; }
+.fa-whatsapp { background-color: #25d366; }
+
+
+/* Sidebar */
+.widget {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+.widget-title {
+    font-size: 1.3rem;
+    color: #333;
+    border-bottom: 2px solid #007bff; 
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.widget-list {
+    list-style: none;
+    padding: 0;
+}
+
+.widget-list li a {
+    display: block;
+    padding: 8px 0;
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.widget-list li a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* --- 5. FOOTER --- */
+.footer {
+    background-color: #343a40; /* Warna gelap */
+    color: #ffffff;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 0.9rem;
 }
