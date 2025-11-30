@@ -1,3 +1,9 @@
+body{font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);}
+.navbar .nav-link{font-weight:500}
+.navbar .nav-link.active{color:var(--primary) !important}
+.hero{padding-top:6rem;padding-bottom:4rem;background:linear-gradient(180deg,#f8f9ff,transparent)}
+.hero-avatar{width:350px;height:350px;object-fit:cover;border:10px solid #fff}
+.section{padding:80px 0}
 /* --- 1. RESET DAN DASAR --- */
 body {
     background-color: #f8f9fa;
