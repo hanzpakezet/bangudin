@@ -50,3 +50,25 @@ footer a{text-decoration:none}
 @media (max-width: 991.98px){
   .hero{padding-bottom:2rem}
 }
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.gallery-item {
+    width: 100%;
+    border-radius: 6px;
+    transition: transform .3s ease, opacity .3s ease;
+}
+
+.gallery-item:hover {
+    transform: scale(1.05);
+    opacity: .85;
+}
+
+.pagination button.active {
+    background: #007bff;
+    color: white;
+}
