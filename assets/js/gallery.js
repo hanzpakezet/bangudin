@@ -36,107 +36,77 @@ const galleryImages = [
 ];
 
 
-(function(){
- 
+(function () {
+
   const perPage = 8;
   let currentPage = 1;
 
-  // elements
-  const grid = document.getElementById("gallery-grid");
-  const paginationEl = document.getElementById("pagination");
-  const sectionEl = document.getElementById("gallery");
+  const grid = document.getElementById("certiGalleryGrid");
+  const pagination = document.getElementById("certiPagination");
+  const gallerySection = document.getElementById("certiGallery");
 
-  if (!grid || !paginationEl) {
-    console.error("Gallery: element gallery-grid or pagination not found.");
+  if (!grid || !pagination) {
+    console.error("Gallery grid/pagination not found!");
     return;
   }
 
-  // set mobile class for 2-col if small screen
-  function applyMobile2Col() {
-    if (window.innerWidth <= 600) {
-      grid.classList.add("gallery-mobile-2col");
-    } else {
-      grid.classList.remove("gallery-mobile-2col");
-    }
-  }
-
-  // render one page
   function renderPage() {
     const start = (currentPage - 1) * perPage;
     const end = start + perPage;
-    const pageImgs = images.slice(start, end);
+    const imgs = galleryImages.slice(start, end);
 
-    // clear
     grid.innerHTML = "";
-
-    // create nodes
-    pageImgs.forEach(src => {
-      const col = document.createElement("div");
-      col.className = "cert-col";
-      col.innerHTML = `
-        <div class="card border-0 h-100">
-          <img loading="lazy" src="${src}" alt="Sertifikat" class="cert-img">
-        </div>
+    imgs.forEach(src => {
+      const item = document.createElement("div");
+      item.className = "certi-item";
+      item.innerHTML = `
+        <img src="${src}" loading="lazy" alt="Sertifikat">
       `;
-      grid.appendChild(col);
+      grid.appendChild(item);
     });
 
-    // update pagination
     renderPagination();
   }
 
-  // render pagination buttons
   function renderPagination() {
-    const total = Math.ceil(images.length / perPage);
-    paginationEl.innerHTML = "";
+    const total = Math.ceil(galleryImages.length / perPage);
+    pagination.innerHTML = "";
 
     // Prev
     const prev = document.createElement("button");
-    prev.className = "page-btn";
     prev.textContent = "Prev";
-    prev.onclick = function() { gotoPage(currentPage - 1); };
-    paginationEl.appendChild(prev);
+    prev.className = "certi-page-btn";
+    prev.onclick = () => gotoPage(currentPage - 1);
+    pagination.appendChild(prev);
 
-    // pages (1..total)
+    // Pages
     for (let i = 1; i <= total; i++) {
       const btn = document.createElement("button");
-      btn.className = "page-btn" + (i === currentPage ? " active" : "");
       btn.textContent = i;
-      btn.onclick = (function(p){ return function(){ gotoPage(p); }; })(i);
-      paginationEl.appendChild(btn);
+      btn.className = "certi-page-btn" + (i === currentPage ? " active" : "");
+      btn.onclick = () => gotoPage(i);
+      pagination.appendChild(btn);
     }
 
     // Next
     const next = document.createElement("button");
-    next.className = "page-btn";
     next.textContent = "Next";
-    next.onclick = function() { gotoPage(currentPage + 1); };
-    paginationEl.appendChild(next);
+    next.className = "certi-page-btn";
+    next.onclick = () => gotoPage(currentPage + 1);
+    pagination.appendChild(next);
   }
 
-  // navigate
   function gotoPage(p) {
-    const max = Math.ceil(images.length / perPage);
+    const max = Math.ceil(galleryImages.length / perPage);
     if (p < 1) p = 1;
     if (p > max) p = max;
-    if (p === currentPage) return;
     currentPage = p;
+
     renderPage();
 
-    // smooth scroll to top of gallery section
-    if (sectionEl) sectionEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    gallerySection.scrollIntoView({ behavior: "smooth" });
   }
 
-  // initial
-  applyMobile2Col();
   renderPage();
-
-  // update on resize
-  window.addEventListener("resize", function(){
-    applyMobile2Col();
-  });
-
-  // expose for debugging (optional)
-  window._myGallery = { images, renderPage, gotoPage };
 
 })();
