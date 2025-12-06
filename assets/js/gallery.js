@@ -1,42 +1,43 @@
-(function(){
-  // DIRECT LINKS (imgbb correct domain 'i.ibb.co')
-  const images = [
-    "https://i.ibb.co/fzcQRmJS/SERTI-FARCHANUDIN-KOMPRES-Page1.png",
-    "https://i.ibb.co/HLSm43rJ/SERTI-FARCHANUDIN-KOMPRES-Page2.png",
-    "https://i.ibb.co/hR8JLXcj/SERTI-FARCHANUDIN-KOMPRES-Page3.png",
-    "https://i.ibb.co/qF3yZvbn/SERTI-FARCHANUDIN-KOMPRES-Page4.png",
-    "https://i.ibb.co/DfDYxq2M/SERTI-FARCHANUDIN-KOMPRES-Page5.png",
-    "https://i.ibb.co/9mfvDtX7/SERTI-FARCHANUDIN-KOMPRES-Page6.png",
-    "https://i.ibb.co/Ng9n9jjc/SERTI-FARCHANUDIN-KOMPRES-Page7.png",
-    "https://i.ibb.co/Gv6RV1P9/SERTI-FARCHANUDIN-KOMPRES-Page8.png",
-    "https://i.ibb.co/ZzCzFW5m/SERTI-FARCHANUDIN-KOMPRES-Page9.png",
-    "https://i.ibb.co/604ygPPB/SERTI-FARCHANUDIN-KOMPRES-Page10.png",
-    "https://i.ibb.co/XxxVp9wh/SERTI-FARCHANUDIN-KOMPRES-Page11.png",
-    "https://i.ibb.co/zWp0cvxJ/SERTI-FARCHANUDIN-KOMPRES-Page12.png",
-    "https://i.ibb.co/35sgBd8V/SERTI-FARCHANUDIN-KOMPRES-Page13.png",
-    "https://i.ibb.co/6JRFnL4B/SERTI-FARCHANUDIN-KOMPRES-Page14.png",
-    "https://i.ibb.co/tTz7ZKNt/SERTI-FARCHANUDIN-KOMPRES-Page15.png",
-    "https://i.ibb.co/271QnkSN/SERTI-FARCHANUDIN-KOMPRES-Page16.png",
-    "https://i.ibb.co/6RZ8YkF8/SERTI-FARCHANUDIN-KOMPRES-Page17.png",
-    "https://i.ibb.co/n8PtFNg6/SERTI-FARCHANUDIN-KOMPRES-Page18.png",
-    "https://i.ibb.co/svwjs1MW/SERTI-FARCHANUDIN-KOMPRES-Page19.png",
-    "https://i.ibb.co/rRbtZTpv/SERTI-FARCHANUDIN-KOMPRES-Page20.png",
-    "https://i.ibb.co/Lh8TN8Dy/SERTI-FARCHANUDIN-KOMPRES-Page21.png",
-    "https://i.ibb.co/ZRJywrf1/SERTI-FARCHANUDIN-KOMPRES-Page22.png",
-    "https://i.ibb.co/jv8fLP6x/SERTI-FARCHANUDIN-KOMPRES-Page23.png",
-    "https://i.ibb.co/0pxtVwzX/SERTI-FARCHANUDIN-KOMPRES-Page24.png",
-    "https://i.ibb.co/C5gKccDG/SERTI-FARCHANUDIN-KOMPRES-Page25.png",
-    "https://i.ibb.co/5gcQQQxC/SERTI-FARCHANUDIN-KOMPRES-Page26.png",
-    "https://i.ibb.co/1fgcVJnx/SERTI-FARCHANUDIN-KOMPRES-Page27.png",
-    "https://i.ibb.co/BVPc74QW/SERTI-FARCHANUDIN-KOMPRES-Page28.png",
-    "https://i.ibb.co/fV0S3Dj9/SERTI-FARCHANUDIN-KOMPRES-Page29.png",
-    "https://i.ibb.co/pBmM2XTS/SERTI-FARCHANUDIN-KOMPRES-Page30.png",
-    "https://i.ibb.co/G35wVnT1/SERTI-FARCHANUDIN-KOMPRES-Page31.png",
-    "https://i.ibb.co/QjpcCnh4/SERTI-FARCHANUDIN-KOMPRES-Page32.png",
-    "https://i.ibb.co/21gq5PVh/SERTI-FARCHANUDIN-KOMPRES-Page33.png",
-    "https://i.ibb.co/Q35wWfsX/SERTI-FARCHANUDIN-KOMPRES-Page34.png"
-  ];
+const galleryImages = [
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page1.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page2.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page3.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page4.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page5.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page6.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page7.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page8.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page9.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page10.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page11.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page12.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page13.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page14.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page15.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page16.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page17.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page18.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page19.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page20.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page21.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page22.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page23.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page24.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page25.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page26.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page27.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page28.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page29.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page30.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page31.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page32.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page33.jpg",
+  "https://raw.githubusercontent.com/hanzpakezet/bangudin/main/assets/img/SERTI%202/SERTI%20FARCHANUDIN%20KOMPRES_Page34.jpg"
+];
 
+
+(function(){
+ 
   const perPage = 8;
   let currentPage = 1;
 
