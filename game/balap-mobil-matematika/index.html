@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="id" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Balap Matematika</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Baloo+2:wght@500;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+  html, body { height: 100%; margin: 0; overflow-x: hidden; }
+  body {
+    font-family: 'Fredoka', sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: #fff;
+  }
+  .app-wrapper {
+    width: 100%; min-height: 100%; overflow: auto;
+    background: repeating-linear-gradient(90deg, transparent, transparent 48px, rgba(255,255,255,0.02) 48px, rgba(255,255,255,0.02) 50px);
+  }
+  .game-title {
+    font-family: 'Baloo 2', cursive;
+    font-weight: 800;
+    font-size: 2.2rem;
+    text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+    letter-spacing: 1px;
+  }
+  .team-card {
+    border-radius: 20px;
+    border: 3px solid;
+    position: relative;
+    overflow: hidden;
+  }
+  .team-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  }
+  .team-blue { border-color: #4fc3f7; background: linear-gradient(180deg, rgba(13,71,161,0.7) 0%, rgba(21,101,192,0.5) 100%); }
+  .team-red { border-color: #ef5350; background: linear-gradient(180deg, rgba(183,28,28,0.7) 0%, rgba(198,40,40,0.5) 100%); }
+
+  /* Race Track */
+  .race-track {
+    background: #2d2d2d;
+    border-radius: 12px;
+    height: 70px;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid #444;
+    margin: 8px 0;
+  }
+  .track-lines {
+    position: absolute; top: 50%; left: 0; right: 0; height: 2px;
+    background: repeating-linear-gradient(90deg, #666, #666 20px, transparent 20px, transparent 40px);
+    transform: translateY(-50%);
+  }
+  .finish-line {
+    position: absolute; right: 8px; top: 4px; bottom: 4px; width: 16px;
+    border-radius: 4px;
+    background: repeating-conic-gradient(#fff 0% 25%, #111 0% 50%) 0 0 / 8px 8px;
+    z-index: 2;
+  }
+  .car-container {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    left: 8px; z-index: 3;
+    transition: left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Question */
+  .question-display {
+    font-family: 'Baloo 2', cursive;
+    font-size: 2.5rem;
+    font-weight: 800;
+    min-height: 60px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.3);
+    border-radius: 14px;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+  }
+  .answer-screen {
+    background: #111;
+    border-radius: 10px;
+    min-height: 48px;
+    font-family: 'Baloo 2', cursive;
+    font-size: 2rem;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #333;
+    color: #0f0;
+    letter-spacing: 3px;
+    min-width: 80px;
+  }
+  .feedback-msg {
+    min-height: 32px;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+    transition: all 0.3s;
+  }
+  .feedback-correct { background: rgba(76,175,80,0.3); color: #69f0ae; }
+  .feedback-wrong { background: rgba(244,67,54,0.3); color: #ff8a80; }
+
+  /* Keypad */
+  .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-width: 240px; margin: 0 auto; }
+  .key-btn {
+    border: none; border-radius: 12px; padding: 10px 0;
+    font-family: 'Fredoka', sans-serif; font-size: 1.3rem; font-weight: 600;
+    cursor: pointer; transition: all 0.15s;
+    color: #fff;
+  }
+  .key-btn:active { transform: scale(0.92); }
+  .key-num { background: rgba(255,255,255,0.15); }
+  .key-num:hover { background: rgba(255,255,255,0.25); }
+  .key-del { background: #ff7043; }
+  .key-del:hover { background: #ff5722; }
+  .key-ok-blue { background: #29b6f6; }
+  .key-ok-blue:hover { background: #03a9f4; }
+  .key-ok-red { background: #ef5350; }
+  .key-ok-red:hover { background: #e53935; }
+
+  .score-badge {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 4px 16px;
+    border-radius: 20px;
+  }
+  .score-blue { background: rgba(41,182,246,0.3); color: #81d4fa; }
+  .score-red { background: rgba(239,83,80,0.3); color: #ef9a9a; }
+
+  /* Win overlay */
+  .win-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 100;
+    justify-content: center; align-items: center;
+    flex-direction: column;
+  }
+  .win-overlay.active { display: flex; }
+  .win-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 3rem; font-weight: 800;
+    text-shadow: 3px 3px 0 rgba(0,0,0,0.5);
+    animation: winBounce 0.6s ease;
+  }
+  @keyframes winBounce {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .win-emoji { font-size: 4rem; animation: winBounce 0.6s ease 0.2s both; }
+  .restart-btn {
+    margin-top: 20px; padding: 12px 40px;
+    font-family: 'Fredoka', sans-serif; font-size: 1.2rem; font-weight: 600;
+    border: none; border-radius: 50px; cursor: pointer;
+    background: linear-gradient(135deg, #ffd54f, #ffb300);
+    color: #333; animation: winBounce 0.6s ease 0.4s both;
+    transition: transform 0.15s;
+  }
+  .restart-btn:hover { transform: scale(1.05); }
+
+  /* Car SVG */
+  .car-svg { width: 54px; height: 30px; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.5)); }
+
+  .shake { animation: shake 0.4s ease; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0) translateY(-50%); }
+    25% { transform: translateX(-6px) translateY(-50%); }
+    75% { transform: translateX(6px) translateY(-50%); }
+  }
+
+  /* Hide content until game starts */
+  .content-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Ready Dialog */
+  .ready-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 101;
+    justify-content: center; align-items: center;
+  }
+  .ready-overlay.active { display: flex; }
+  .ready-box {
+    background: #fff;
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    max-width: 400px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    animation: readyPop 0.5s ease;
+  }
+  @keyframes readyPop {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .ready-text {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 30px;
+  }
+  .ready-btn {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 50px;
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.5rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.15s;
+    box-shadow: 0 4px 15px rgba(255,107,107,0.3);
+  }
+  .ready-btn:hover { transform: scale(1.08); }
+  .ready-btn:active { transform: scale(0.95); }
+
+  @media (max-width: 768px) {
+    .game-title { font-size: 1.5rem; }
+    .question-display { font-size: 1.8rem; }
+    .answer-screen { font-size: 1.5rem; min-height: 40px; }
+    .key-btn { font-size: 1.1rem; padding: 8px 0; }
+    .race-track { height: 56px; }
+    .car-svg { width: 40px; height: 22px; }
+  }
+</style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js" type="text/javascript"></script>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="app-wrapper p-2 p-md-3">
+   <!-- Title -->
+   <header class="text-center mb-2 mb-md-3">
+    <h1 id="gameTitle" class="game-title mb-0">🏁 Game Balap Matematika 🏁</h1>
+    <p class="mb-0 opacity-75" style="font-size:0.9rem">Jawab soal matematika untuk maju!</p>
+   </header>
+   <main class="container-fluid px-1">
+    <div class="row g-2 g-md-3">
+     <!-- TIM BIRU -->
+     <div class="col-12 col-md-6">
+      <div class="team-card team-blue p-2 p-md-3">
+       <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 id="blueTeamLabel" class="mb-0" style="font-size:1.3rem;font-weight:700">🔵 Tim Biru</h2><span id="blueScore" class="score-badge score-blue">Skor: 0</span>
+       </div><!-- Track -->
+       <div class="race-track" id="blueTrack">
+        <div class="track-lines"></div>
+        <div class="finish-line"></div>
+        <div class="car-container" id="blueCar" style="left:8px">
+         <svg class="car-svg" viewbox="0 0 54 30">
+          <rect x="2" y="12" width="50" height="14" rx="5" fill="#1565C0" /> <rect x="10" y="6" width="26" height="12" rx="4" fill="#1E88E5" /> <rect x="14" y="8" width="8" height="7" rx="2" fill="#90CAF9" opacity="0.7" /> <rect x="24" y="8" width="8" height="7" rx="2" fill="#90CAF9" opacity="0.7" /> <circle cx="14" cy="27" r="5" fill="#333" /><circle cx="14" cy="27" r="2.5" fill="#888" /> <circle cx="40" cy="27" r="5" fill="#333" /><circle cx="40" cy="27" r="2.5" fill="#888" />
+         </svg>
+        </div>
+       </div><!-- Question -->
+       <div class="question-display mb-2" id="blueQuestion">
+        7 + 5 = ?
+       </div><!-- Answer + Feedback -->
+       <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+        <div class="answer-screen px-3" id="blueAnswer">
+         &nbsp;
+        </div>
+       </div>
+       <div class="feedback-msg mb-2" id="blueFeedback"></div><!-- Keypad -->
+       <div class="keypad" id="blueKeypad">
+        <button class="key-btn key-num" onclick="pressKey('blue','1')">1</button> <button class="key-btn key-num" onclick="pressKey('blue','2')">2</button> <button class="key-btn key-num" onclick="pressKey('blue','3')">3</button> <button class="key-btn key-num" onclick="pressKey('blue','4')">4</button> <button class="key-btn key-num" onclick="pressKey('blue','5')">5</button> <button class="key-btn key-num" onclick="pressKey('blue','6')">6</button> <button class="key-btn key-num" onclick="pressKey('blue','7')">7</button> <button class="key-btn key-num" onclick="pressKey('blue','8')">8</button> <button class="key-btn key-num" onclick="pressKey('blue','9')">9</button> <button class="key-btn key-del" onclick="pressKey('blue','del')">⌫</button> <button class="key-btn key-num" onclick="pressKey('blue','0')">0</button> <button class="key-btn key-ok-blue" onclick="pressKey('blue','ok')">OK</button>
+       </div>
+      </div>
+     </div><!-- TIM MERAH -->
+     <div class="col-12 col-md-6">
+      <div class="team-card team-red p-2 p-md-3">
+       <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 id="redTeamLabel" class="mb-0" style="font-size:1.3rem;font-weight:700">🔴 Tim Merah</h2><span id="redScore" class="score-badge score-red">Skor: 0</span>
+       </div><!-- Track -->
+       <div class="race-track" id="redTrack">
+        <div class="track-lines"></div>
+        <div class="finish-line"></div>
+        <div class="car-container" id="redCar" style="left:8px">
+         <svg class="car-svg" viewbox="0 0 54 30">
+          <rect x="2" y="12" width="50" height="14" rx="5" fill="#c62828" /> <rect x="10" y="6" width="26" height="12" rx="4" fill="#e53935" /> <rect x="14" y="8" width="8" height="7" rx="2" fill="#ef9a9a" opacity="0.7" /> <rect x="24" y="8" width="8" height="7" rx="2" fill="#ef9a9a" opacity="0.7" /> <circle cx="14" cy="27" r="5" fill="#333" /><circle cx="14" cy="27" r="2.5" fill="#888" /> <circle cx="40" cy="27" r="5" fill="#333" /><circle cx="40" cy="27" r="2.5" fill="#888" />
+         </svg>
+        </div>
+       </div><!-- Question -->
+       <div class="question-display mb-2" id="redQuestion">
+        15 - 8 = ?
+       </div><!-- Answer + Feedback -->
+       <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+        <div class="answer-screen px-3" id="redAnswer">
+         &nbsp;
+        </div>
+       </div>
+       <div class="feedback-msg mb-2" id="redFeedback"></div><!-- Keypad -->
+       <div class="keypad" id="redKeypad">
+        <button class="key-btn key-num" onclick="pressKey('red','1')">1</button> <button class="key-btn key-num" onclick="pressKey('red','2')">2</button> <button class="key-btn key-num" onclick="pressKey('red','3')">3</button> <button class="key-btn key-num" onclick="pressKey('red','4')">4</button> <button class="key-btn key-num" onclick="pressKey('red','5')">5</button> <button class="key-btn key-num" onclick="pressKey('red','6')">6</button> <button class="key-btn key-num" onclick="pressKey('red','7')">7</button> <button class="key-btn key-num" onclick="pressKey('red','8')">8</button> <button class="key-btn key-num" onclick="pressKey('red','9')">9</button> <button class="key-btn key-del" onclick="pressKey('red','del')">⌫</button> <button class="key-btn key-num" onclick="pressKey('red','0')">0</button> <button class="key-btn key-ok-red" onclick="pressKey('red','ok')">OK</button>
+       </div>
+      </div>
+     </div>
+    </div>
+   </main>
+   <footer class="text-center mt-3 pb-2" style="font-size: 0.75rem; opacity: 0.6;">
+    <p class="mb-0">Copyright © 2026 bangudin.my.id</p>
+   </footer>
+  </div><!-- Ready Dialog -->
+  <div class="ready-overlay active" id="readyOverlay">
+   <div class="ready-box">
+    <div class="ready-text">
+     Sudah siap untuk bermain?
+    </div><button class="ready-btn" onclick="startGame()">GASSS!!!</button>
+   </div>
+  </div><!-- Win Overlay -->
+  <div class="win-overlay" id="winOverlay">
+   <div class="win-emoji" id="winEmoji">
+    🏆
+   </div>
+   <div class="win-title" id="winTitle">
+    Tim Biru Menang!
+   </div><button class="restart-btn" onclick="restartGame()">🔄 Main Lagi!</button>
+  </div>
+  <script>
+// ==================== GAME STATE ====================
+const STEPS_TO_WIN = 8;
+const state = {
+  blue: { score: 0, answer: '', question: null },
+  red: { score: 0, answer: '', question: null },
+  gameOver: false
+};
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(freq, duration, type='square') {
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.value = 0.08;
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + duration);
+  } catch(e) {}
+}
+
+function playCorrectSound() { playSound(523, 0.1); setTimeout(() => playSound(659, 0.1), 100); setTimeout(() => playSound(784, 0.15), 200); }
+function playWrongSound() { playSound(200, 0.2, 'sawtooth'); }
+function playWinSound() { [523,659,784,1047].forEach((f,i) => setTimeout(() => playSound(f, 0.2, 'square'), i*150)); }
+
+// ==================== QUESTION GENERATOR ====================
+function generateQuestion() {
+  const isAdd = Math.random() > 0.4;
+  let a, b, op, answer;
+  if (isAdd) {
+    a = Math.floor(Math.random() * 15) + 1;
+    b = Math.floor(Math.random() * (20 - a)) + 1;
+    op = '+'; answer = a + b;
+  } else {
+    a = Math.floor(Math.random() * 16) + 5;
+    b = Math.floor(Math.random() * a) + 1;
+    op = '−'; answer = a - b;
+  }
+  return { text: `${a} ${op} ${b} = ?`, answer };
+}
+
+function newQuestion(team) {
+  const q = generateQuestion();
+  state[team].question = q;
+  state[team].answer = '';
+  document.getElementById(team + 'Question').textContent = q.text;
+  document.getElementById(team + 'Answer').innerHTML = '&nbsp;';
+  document.getElementById(team + 'Feedback').textContent = '';
+  document.getElementById(team + 'Feedback').className = 'feedback-msg mb-2';
+}
+
+// ==================== KEYPAD ====================
+function pressKey(team, key) {
+  if (state.gameOver) return;
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+
+  const s = state[team];
+  const ansEl = document.getElementById(team + 'Answer');
+
+  if (key === 'del') {
+    s.answer = s.answer.slice(0, -1);
+    ansEl.textContent = s.answer || '\u00A0';
+    return;
+  }
+
+  if (key === 'ok') {
+    checkAnswer(team);
+    return;
+  }
+
+  // Max 2 digits
+  if (s.answer.length >= 2) return;
+  s.answer += key;
+  ansEl.textContent = s.answer;
+}
+
+function checkAnswer(team) {
+  const s = state[team];
+  if (!s.answer) return;
+
+  const fb = document.getElementById(team + 'Feedback');
+  const carEl = document.getElementById(team + 'Car');
+
+  if (parseInt(s.answer) === s.question.answer) {
+    // Correct!
+    s.score++;
+    playCorrectSound();
+    fb.textContent = '✅ Benar! Hebat!';
+    fb.className = 'feedback-msg mb-2 feedback-correct';
+    document.getElementById(team + 'Score').textContent = 'Skor: ' + s.score;
+
+    // Move car
+    const track = document.getElementById(team + 'Track');
+    const maxLeft = track.offsetWidth - 78;
+    const step = maxLeft / STEPS_TO_WIN;
+    const newLeft = Math.min(8 + s.score * step, maxLeft);
+    carEl.style.left = newLeft + 'px';
+
+    // Check win
+    if (s.score >= STEPS_TO_WIN) {
+      state.gameOver = true;
+      setTimeout(() => showWin(team), 400);
+      return;
+    }
+
+    setTimeout(() => newQuestion(team), 600);
+  } else {
+    // Wrong
+    playWrongSound();
+    fb.textContent = '❌ Coba lagi!';
+    fb.className = 'feedback-msg mb-2 feedback-wrong';
+    carEl.classList.add('shake');
+    setTimeout(() => carEl.classList.remove('shake'), 400);
+    s.answer = '';
+    document.getElementById(team + 'Answer').innerHTML = '&nbsp;';
+  }
+}
+
+// ==================== WIN ====================
+function showWin(team) {
+  playWinSound();
+  const overlay = document.getElementById('winOverlay');
+  const title = document.getElementById('winTitle');
+  const emoji = document.getElementById('winEmoji');
+
+  const name = team === 'blue'
+    ? (document.getElementById('blueTeamLabel').textContent)
+    : (document.getElementById('redTeamLabel').textContent);
+
+  title.textContent = name + ' Menang!';
+  title.style.color = team === 'blue' ? '#64b5f6' : '#ef9a9a';
+  emoji.textContent = '🏆🎉🏆';
+  overlay.classList.add('active');
+}
+
+function restartGame() {
+  state.blue.score = 0; state.red.score = 0;
+  state.gameOver = false;
+  document.getElementById('blueCar').style.left = '8px';
+  document.getElementById('redCar').style.left = '8px';
+  document.getElementById('blueScore').textContent = 'Skor: 0';
+  document.getElementById('redScore').textContent = 'Skor: 0';
+  document.getElementById('winOverlay').classList.remove('active');
+  newQuestion('blue');
+  newQuestion('red');
+}
+
+// ==================== ELEMENT SDK ====================
+const defaultConfig = {
+  game_title: '🏁 Game Balap Matematika 🏁',
+  blue_team_name: '🔵 Tim Biru',
+  red_team_name: '🔴 Tim Merah',
+  background_color: '#1a1a2e',
+  surface_color: '#0d47a1',
+  text_color: '#ffffff',
+  primary_action_color: '#29b6f6',
+  secondary_action_color: '#ef5350',
+  font_family: 'Fredoka',
+  font_size: 16
+};
+
+function applyConfig(config) {
+  const c = { ...defaultConfig, ...config };
+  document.getElementById('gameTitle').textContent = c.game_title;
+  document.getElementById('blueTeamLabel').textContent = c.blue_team_name;
+  document.getElementById('redTeamLabel').textContent = c.red_team_name;
+
+  document.body.style.fontFamily = `${c.font_family}, Fredoka, sans-serif`;
+  document.body.style.color = c.text_color;
+
+  const wrapper = document.querySelector('.app-wrapper');
+  wrapper.style.background = `linear-gradient(135deg, ${c.background_color} 0%, ${c.surface_color} 100%)`;
+
+  document.querySelectorAll('.key-ok-blue').forEach(b => b.style.background = c.primary_action_color);
+  document.querySelectorAll('.key-ok-red').forEach(b => b.style.background = c.secondary_action_color);
+
+  const base = c.font_size || 16;
+  document.querySelectorAll('.game-title').forEach(el => el.style.fontSize = `${base * 2.2 / 16}rem`);
+  document.querySelectorAll('.question-display').forEach(el => el.style.fontSize = `${base * 2.5 / 16}rem`);
+  document.querySelectorAll('.key-btn').forEach(el => el.style.fontSize = `${base * 1.3 / 16}rem`);
+}
+
+window.elementSdk.init({
+  defaultConfig,
+  onConfigChange: async (config) => applyConfig(config),
+  mapToCapabilities: (config) => ({
+    recolorables: [
+      { get: () => config.background_color || defaultConfig.background_color, set: (v) => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); } },
+      { get: () => config.surface_color || defaultConfig.surface_color, set: (v) => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); } },
+      { get: () => config.text_color || defaultConfig.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+      { get: () => config.primary_action_color || defaultConfig.primary_action_color, set: (v) => { config.primary_action_color = v; window.elementSdk.setConfig({ primary_action_color: v }); } },
+      { get: () => config.secondary_action_color || defaultConfig.secondary_action_color, set: (v) => { config.secondary_action_color = v; window.elementSdk.setConfig({ secondary_action_color: v }); } }
+    ],
+    borderables: [],
+    fontEditable: {
+      get: () => config.font_family || defaultConfig.font_family,
+      set: (v) => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); }
+    },
+    fontSizeable: {
+      get: () => config.font_size || defaultConfig.font_size,
+      set: (v) => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); }
+    }
+  }),
+  mapToEditPanelValues: (config) => new Map([
+    ['game_title', config.game_title || defaultConfig.game_title],
+    ['blue_team_name', config.blue_team_name || defaultConfig.blue_team_name],
+    ['red_team_name', config.red_team_name || defaultConfig.red_team_name]
+  ])
+});
+
+// ==================== INIT ====================
+function startGame() {
+  document.getElementById('readyOverlay').classList.remove('active');
+  newQuestion('blue');
+  newQuestion('red');
+}
+
+newQuestion('blue');
+newQuestion('red');
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ead93fe5100f92c',t:'MTc3NTk0ODExOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
