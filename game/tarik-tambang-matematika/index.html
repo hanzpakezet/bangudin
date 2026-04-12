@@ -55,7 +55,8 @@ h1{
   display:flex;
   align-items:center;
   gap: 0;
-  transition:0.4s ease;
+  transition:0.15s linear;
+  will-change: transform;
 }
 
 /* PLAYER */
@@ -96,6 +97,11 @@ h1{
   background:gold;
   border-radius:50%;
   transform:translateX(-50%);
+}
+
+.player, #rope, #marker{
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 /* CENTER LINE */
@@ -627,7 +633,7 @@ function startCountdown(){
   let el = document.getElementById("countdown");
 
   el.style.display = "flex";
-  el.innerText = sequence[index];
+  el.textContent = sequence[index];
   el.style.animation = "zoomPop 0.4s";
 
   let interval = setInterval(()=>{
@@ -635,7 +641,7 @@ function startCountdown(){
 
     if(index < sequence.length){
 
-      el.innerText = sequence[index];
+      el.textContent = sequence[index];
       el.classList.remove("go");
       el.style.animation = "zoomPop 0.4s";
 
@@ -650,7 +656,9 @@ function startCountdown(){
         // karakter "siap narik"
         let players = document.querySelectorAll(".player");
         players.forEach(p=>{
-          p.style.transform += " scale(1.1)";
+          p.style.transform = p.classList.contains("right-player")
+            ? "scaleX(-1) scale(1.1)"
+            : "scale(1.1)";
           setTimeout(()=>p.style.transform = p.classList.contains("right-player")
             ? "scaleX(-1)"
             : "",200);
@@ -789,44 +797,69 @@ function initGame(){
   bQ = gen();
   rQ = gen();
 
-  qB.innerText = bQ.q;
-  qR.innerText = rQ.q;
+  qB.textContent = bQ.q;
+  qR.textContent = rQ.q;
 }
 
 let step = 0;        // posisi sekarang
 const maxStep = 5;   // batas menang
 
+let pending = false;
+
 function move(team){
-  if(team==="blue") step--;
-  else step++;
+  if(pending) return;
+  pending = true;
 
-  // batas
-  if(step < -maxStep) step = -maxStep;
-  if(step > maxStep) step = maxStep;
+  requestAnimationFrame(()=>{
 
-  // geser seluruh game-area
-  let shift = step * 30; // jarak per langkah (atur sendiri)
-  document.getElementById("game-area").style.transform =
-    `translate(calc(-50% + ${shift}px), -50%)`;
+    if(team==="blue") step--;
+    else step++;
 
-  // cek menang
-  if(step === -maxStep) win("Biru");
-  if(step === maxStep) win("Merah");
+    if(step < -maxStep) step = -maxStep;
+    if(step > maxStep) step = maxStep;
+
+    let shift = step * 30;
+    document.getElementById("game-area").style.transform =
+      `translate(calc(-50% + ${shift}px), -50%)`;
+
+    if(step === -maxStep) win("Biru");
+    if(step === maxStep) win("Merah");
+
+    pending = false;
+  });
 }
 
+// function move(team){
+//   if(team==="blue") step--;
+//   else step++;
+
+//   // batas
+//   if(step < -maxStep) step = -maxStep;
+//   if(step > maxStep) step = maxStep;
+
+//   // geser seluruh game-area
+//   let shift = step * 30; // jarak per langkah (atur sendiri)
+//   document.getElementById("game-area").style.transform =
+//     `translate(calc(-50% + ${shift}px), -50%)`;
+
+//   // cek menang
+//   if(step === -maxStep) win("Biru");
+//   if(step === maxStep) win("Merah");
+// }
+
 function add(id,n){
-  let el=id==="kB"?aB:aR;
-  el.innerText+=n;
+  let el = id==="kB"?aB:aR;
+  el.textContent = el.textContent + n; // 🔥 tanpa delay
 }
 
 function del(id){
   let el=id==="kB"?aB:aR;
-  el.innerText=el.innerText.slice(0,-1);
+  el.textContent=el.textContent.slice(0,-1);
 }
 
 function check(id,team){
   let el=id==="kB"?aB:aR;
-  let val=parseInt(el.innerText);
+  let val=parseInt(el.textContent);
 
   let correctAnswer = team==="blue" ? bQ.a : rQ.a;
 
@@ -841,10 +874,10 @@ function check(id,team){
 
     if(team==="blue"){
       bQ = newQ;
-      qB.innerText = bQ.q;
+      qB.textContent = bQ.q;
     } else {
       rQ = newQ;
-      qR.innerText = rQ.q;
+      qR.textContent = rQ.q;
     }
 
   } else {
@@ -853,9 +886,9 @@ function check(id,team){
 
   setTimeout(()=>{
     el.style.border="2px solid transparent";
-  },500);
+  },200);
 
-  el.innerText="";
+  el.textContent="";
 }
 
 function keypad(id,obj,team){
@@ -863,39 +896,39 @@ function keypad(id,obj,team){
 
   for(let i=1;i<=9;i++){
     let b=document.createElement("button");
-    b.innerText=i;
+    b.textContent=i;
     b.onclick=()=>add(id,i);
     el.appendChild(b);
   }
 
   let delBtn=document.createElement("button");
-  delBtn.innerText="⌫";
+  delBtn.textContent="⌫";
   delBtn.className="del";
   delBtn.onclick=()=>del(id);
   el.appendChild(delBtn);
 
   let zero=document.createElement("button");
-  zero.innerText="0";
+  zero.textContent="0";
   zero.onclick=()=>add(id,0);
   el.appendChild(zero);
 
   let ok=document.createElement("button");
-  ok.innerText="OK";
+  ok.textContent="OK";
   ok.className="ok";
   ok.onclick=()=>check(id,team);
   el.appendChild(ok);
 }
 
 function win(name){
-  document.getElementById("winText").innerText =
+  document.getElementById("winText").textContent =
     "TIM " + name.toUpperCase() + " MENANG !!!!";
 
   document.getElementById("win").classList.add("show");
 
   // 🎉 CONFETTI
   confetti({
-    particleCount: 150,
-    spread: 70,
+    particleCount: 60,
+    spread: 60,
     origin: { y: 0.6 }
   });
 }
