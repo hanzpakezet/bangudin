@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Tarik Tambang Matematika</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+body{
+  font-family:'Fredoka',sans-serif;
+  background:linear-gradient(135deg,#f8f9fa,#dee2e6);
+  margin:0;
+
+  height:100vh;          /* kunci utama */
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;       /* hilangkan scroll */
+}
+
+.main{
+  flex:1;                 /* isi ruang */
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+/* TITLE */
+h1{
+  margin:15px 0 5px;
+  text-align: center;
+  background:linear-gradient(to right,#3a86ff,#ff006e);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+/* AREA */
+.tug{
+  position:relative;
+  height:140px;
+  width:100%;
+  overflow:hidden;
+}
+
+/* GROUP YANG GERAK */
+#game-area{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  display:flex;
+  align-items:center;
+  gap: 0;
+  transition:0.4s ease;
+}
+
+/* PLAYER */
+.player{
+  width:70px;
+  position: relative;
+  z-index: 2;
+}
+
+/* biru masuk ke rope */
+.left-player{
+  margin-right:-10px;
+}
+
+/* merah masuk ke rope */
+.right-player{
+  margin-left:-10px;
+  transform:scaleX(-1);
+}
+
+/* ROPE */
+#rope{
+  width:300px; /* 🔥 panjang rope */
+  height:10px;
+  background:#c19a6b;
+  position:relative;
+  border-radius:5px;
+  top: 15px;
+}
+
+/* MARKER */
+#marker{
+  position:absolute;
+  left:50%;
+  top:-6px;
+  width:18px;
+  height:18px;
+  background:gold;
+  border-radius:50%;
+  transform:translateX(-50%);
+}
+
+/* CENTER LINE */
+#center-line{
+  position:absolute;
+  left:50%;
+  top: 25%;
+  height:60%;
+  width:2px;
+  background:black;
+  transform:translateX(-50%);
+  opacity:0.3;
+}
+
+/* CARD */
+.card{
+  background:white;
+  border-radius:20px;
+  margin:10px;
+  display:inline-block;
+  overflow:hidden;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+  width:100%;
+  max-width:320px;
+  text-align: center;
+}
+
+/* HEADER */
+.header{
+  color:white;
+  font-size:30px;
+  font-weight:bold;
+  padding:20px;
+  text-align: center;
+}
+
+.blue{ background:#3b82f6; }
+.red{ background:#ff006e; }
+
+/* BODY */
+.body{
+  padding:15px;
+}
+
+.answer{
+  background:#eee;
+  padding:20px;
+  border-radius:12px;
+  margin:15px 0;
+  border:2px solid transparent;
+  transition:0.3s;
+
+  font-size:28px;       /* biar gede */
+  height:20px;      /* ini kunci: tinggi */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow: hidden;
+}
+
+/* KEYPAD */
+.keypad{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:5px;
+}
+
+.keypad button{
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  font-size:18px;
+  cursor:pointer;
+}
+
+.ok{background:#00ff88;}
+.del{background:#ff4d4d;color:white;}
+
+.win{
+  position:fixed;
+  inset:0;
+  background:white;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+}
+
+.wrapper{
+  display:flex;
+  justify-content:space-between; /* ini kunci */
+  align-items:flex-start;
+  padding:0 10px; /* jarak dari tepi layar */
+  margin:20px auto;
+  flex-wrap:wrap;
+  width: 100%;
+  max-width: 1200px;
+  gap: 40px; /* jarak antar card */
+}
+
+@media (max-width: 768px){
+  .wrapper{
+    flex-direction:column;
+    align-items:center;
+    gap:20px;
+  }
+}
+
+.subtitle{
+  font-family:'Open Sans', sans-serif;
+  color:#000;
+  margin: 0 0 10px;
+  font-size:16px;
+  opacity: 0.7;
+  text-align: center;
+}
+
+@media (max-height: 700px){
+  .tug{
+    height:110px;
+  }
+
+  .char{
+    font-size:35px;
+  }
+}
+
+.footer{
+  padding:5px 0;          /* kecilin tinggi */
+  font-size:14px;         /* tetap */
+  color:#666;
+  text-align:center;
+}
+
+/* POPUP OVERLAY */
+.start-popup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+
+/* BOX */
+.popup-box{
+  background:white;
+  padding:30px 40px;
+  border-radius:20px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* TEXT */
+.popup-box h2{
+  margin-bottom:20px;
+  font-family:'Open Sans', sans-serif;
+}
+
+/* BUTTON */
+.popup-box button{
+  padding:12px 25px;
+  font-size:18px;
+  border:none;
+  border-radius:10px;
+  background:#3a86ff;
+  color:white;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.popup-box button:hover{
+  transform:scale(1.05);
+}
+
+/* WIN SCREEN */
+.win{
+  position:fixed;
+  inset:0;
+  background:rgba(0, 0, 0, 0.9); /* 🔥 hitam transparan */
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:999;
+}
+
+.win.show{
+  display:flex;
+}
+
+/* TEXT */
+#winText{
+  color:white;
+  font-size:40px;
+  margin-bottom:20px;
+  text-align:center;
+  animation:pop 0.4s ease;
+}
+
+/* BUTTON */
+.win button{
+  padding:12px 25px;
+  font-size:18px;
+  border:none;
+  border-radius:10px;
+  background:#ffcc00;
+  cursor:pointer;
+}
+
+@keyframes pop{
+  from{transform:scale(0.7); opacity:0;}
+  to{transform:scale(1); opacity:1;}
+}
+
+/* animasi dasar */
+.countdown{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.9);
+  color:white;
+  font-size:80px;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+  font-family:'Fredoka', sans-serif;
+  transition:0.2s;
+}
+
+/* zoom masuk */
+@keyframes zoomPop{
+  0%{ transform:scale(0.5); opacity:0; }
+  50%{ transform:scale(1.2); }
+  100%{ transform:scale(1); opacity:1; }
+}
+
+/* GO efek besar */
+.go{
+  color:#00ff88 !important;
+  animation:goBoom 0.5s ease;
+}
+
+@keyframes goBoom{
+  0%{ transform:scale(0.5); }
+  50%{ transform:scale(1.5); }
+  100%{ transform:scale(1); }
+}
+
+/* screen shake */
+@keyframes shake{
+  0%{ transform:translate(0,0); }
+  25%{ transform:translate(5px,-5px); }
+  50%{ transform:translate(-5px,5px); }
+  75%{ transform:translate(5px,5px); }
+  100%{ transform:translate(0,0); }
+}
+
+.mode-title{
+  margin-bottom:10px;
+  font-size:22px;
+  background:linear-gradient(to right,#3a86ff,#ff006e);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.mode-list{
+  display:grid;
+  grid-template-columns:repeat(5,1fr); /* 🔥 5 kolom */
+  gap:12px;
+  margin-top:20px;
+}
+
+.mode-list button{
+  background:#f1f1f1;
+  border:none;
+  border-radius:12px;
+  padding:12px;
+  cursor:pointer;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  font-family:'Open Sans', sans-serif;
+  font-size:13px;
+  transition:0.2s;
+  color: #222;
+}
+
+.mode-list button:hover{
+  background:#3a86ff;
+  color:white;
+  transform:scale(1.05);
+}
+
+.mode-list .icon{
+  font-size:22px;
+  margin-bottom:5px;
+}
+
+.mode-popup{
+  background:white !important;
+}
+
+.mode-popup .popup-box{
+  color:#222; /* 🔥 teks jadi hitam */
+}
+
+.mode-popup,
+.mode-popup *{
+  color:#222 !important;
+}
+
+@media (max-width: 768px){
+  .mode-list{
+    grid-template-columns:repeat(3,1fr);
+  }
+}
+
+@media (max-width: 480px){
+  .mode-list{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+.credit{
+  margin-top:20px;
+  font-size:13px;
+  color:#555;
+  font-family:'Open Sans', sans-serif;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="main">
+
+  <h1>TARIK TAMBANG MATEMATIKA</h1>
+
+  <p class="subtitle">
+    Jawab pertanyaan dengan benar untuk menarik tambang
+  </p>
+
+  <div class="tug">
+
+    <!-- GARIS TENGAH (tetap) -->
+    <div id="center-line"></div>
+
+    <!-- SEMUA DIGABUNG DI SINI -->
+    <div id="game-area">
+
+      <img src="https://drive.google.com/thumbnail?id=1outADLE7ZDBjR-1qk8kH98N4NU7kdGeH"
+          class="player left-player">
+
+      <div id="rope">
+        <div id="marker"></div>
+      </div>
+
+      <img src="https://drive.google.com/thumbnail?id=1X2oMf-WCWbVRheZeLM2mx44gWWWgHJQ8"
+          class="player right-player">
+
+    </div>
+
+  </div>
+
+  <!-- TIM BIRU -->
+  <div class="wrapper">
+  <div class="card">
+    <div id="qB" class="header blue"></div>
+    <div class="body">
+      <div id="aB" class="answer"></div>
+      <div id="kB" class="keypad"></div>
+    </div>
+  </div>
+
+  <!-- TIM MERAH -->
+  <div class="card">
+    <div id="qR" class="header red"></div>
+    <div class="body">
+      <div id="aR" class="answer"></div>
+      <div id="kR" class="keypad"></div>
+    </div>
+  </div>
+
+  </div>
+
+  <div id="win" class="win">
+    <h1 id="winText"></h1>
+    <button onclick="location.reload()">Main Lagi</button>
+  </div>
+
+</div>
+
+<footer class="footer">
+  © 2026 bangudin.my.id All right reserved
+</footer>
+
+<div id="mode-popup" class="start-popup mode-popup" style="display: flex;">
+  <div class="popup-box">
+    <h1 class="mode-title">TARIK TAMBANG MATEMATIKA</h1>
+    <h2>Pilih Mode Permainan</h2>
+
+    <div class="mode-list">
+
+      <button onclick="selectMode('tambah')">
+        <div class="icon">➕</div>
+        <div>Tambah</div>
+      </button>
+
+      <button onclick="selectMode('kurang')">
+        <div class="icon">➖</div>
+        <div>Kurang</div>
+      </button>
+
+      <button onclick="selectMode('kali')">
+        <div class="icon">✖️</div>
+        <div>Kali</div>
+      </button>
+
+      <button onclick="selectMode('bagi')">
+        <div class="icon">➗</div>
+        <div>Bagi</div>
+      </button>
+
+      <button onclick="selectMode('campur1')">
+        <div class="icon">±</div>
+        <div>Tambah Kurang</div>
+      </button>
+
+      <button onclick="selectMode('campur2')">
+        <div class="icon">×÷</div>
+        <div>Kali Bagi</div>
+      </button>
+
+      <button onclick="selectMode('pangkat2')">
+        <div class="icon">²</div>
+        <div>Pangkat 2</div>
+      </button>
+
+      <button onclick="selectMode('akar2')">
+        <div class="icon">√</div>
+        <div>Akar 2</div>
+      </button>
+
+      <button onclick="selectMode('pangkat3')">
+        <div class="icon">³</div>
+        <div>Pangkat 3</div>
+      </button>
+
+      <button onclick="selectMode('akar3')">
+        <div class="icon">∛</div>
+        <div>Akar 3</div>
+      </button>
+
+      <button onclick="selectMode('kpk')">
+        <div class="icon">KPK</div>
+        <div>KPK</div>
+      </button>
+
+      <button onclick="selectMode('fpb')">
+        <div class="icon">FPB</div>
+        <div>FPB</div>
+      </button>
+
+      <button onclick="selectMode('persen')">
+        <div class="icon">%</div>
+        <div>Pecahan → %</div>
+      </button>
+
+      <button onclick="selectMode('waktu')">
+        <div class="icon">⏰</div>
+        <div>Satuan Waktu</div>
+      </button>
+
+      <button onclick="selectMode('panjang')">
+        <div class="icon">📏</div>
+        <div>Panjang</div>
+      </button>
+
+      <button onclick="selectMode('luas')">
+        <div class="icon">⬛</div>
+        <div>Luas</div>
+      </button>
+
+      <button onclick="selectMode('kubik')">
+        <div class="icon">🧊</div>
+        <div>Kubik</div>
+      </button>
+
+    </div>
+
+    <div class="credit">
+      <div>credit : bangudin.my.id                                  📷 @hnnnzzzz_</div>
+    </div>
+  </div>
+</div>
+
+<div id="start-popup" class="start-popup" style="display:none;">
+  <div class="popup-box">
+    <h2>Sudah siap memulai ?</h2>
+    <button onclick="startGame()">GASSS!!!</button>
+  </div>
+</div>
+
+<div id="countdown" class="countdown">3</div>
+
+<script>
+
+let gameMode = "tambah";
+
+function selectMode(mode){
+  gameMode = mode;
+
+  // tutup mode popup
+  document.getElementById("mode-popup").style.display = "none";
+
+  // tampilkan popup GAS
+  document.getElementById("start-popup").style.display = "flex";
+}
+
+function startCountdown(){
+  let sequence = ["3", "2", "1", "GO...!!!"];
+  let index = 0;
+  let el = document.getElementById("countdown");
+
+  el.style.display = "flex";
+  el.innerText = sequence[index];
+  el.style.animation = "zoomPop 0.4s";
+
+  let interval = setInterval(()=>{
+    index++;
+
+    if(index < sequence.length){
+
+      el.innerText = sequence[index];
+      el.classList.remove("go");
+      el.style.animation = "zoomPop 0.4s";
+
+      // 🔥 khusus GO
+      if(sequence[index] === "GO...!!!"){
+        el.classList.add("go");
+
+        // screen shake
+        document.body.style.animation = "shake 0.3s";
+        setTimeout(()=>document.body.style.animation="",300);
+
+        // karakter "siap narik"
+        let players = document.querySelectorAll(".player");
+        players.forEach(p=>{
+          p.style.transform += " scale(1.1)";
+          setTimeout(()=>p.style.transform = p.classList.contains("right-player")
+            ? "scaleX(-1)"
+            : "",200);
+        });
+      }
+
+    } else {
+      clearInterval(interval);
+      el.style.display = "none";
+      initGame();
+    }
+
+  }, 1000);
+}
+
+function startGame(){
+  document.getElementById("start-popup").style.display = "none";
+  startCountdown();
+}
+
+let pos=50;
+
+function gcd(a,b){
+  while(b!==0){
+    let t=b;
+    b=a%b;
+    a=t;
+  }
+  return a;
+}
+
+function lcm(a,b){
+  return (a*b)/gcd(a,b);
+}
+
+function gen(){
+  let a = Math.floor(Math.random()*10)+1;
+  let b = Math.floor(Math.random()*10)+1;
+
+  switch(gameMode){
+
+    case "tambah":
+      return {q:`${a} + ${b} = ?`, a:a+b};
+
+    case "kurang":
+      if(a < b){ [a,b] = [b,a]; }
+      return {q:`${a} - ${b} = ?`, a:a-b};
+
+    case "kali":
+      return {q:`${a} × ${b} = ?`, a:a*b};
+
+    case "bagi":
+      let hasil = Math.floor(Math.random()*10)+1;
+      let pembagi = Math.floor(Math.random()*10)+1;
+      return {q:`${hasil*pembagi} ÷ ${pembagi} = ?`, a:hasil};
+
+    case "campur1":
+      if(Math.random() > 0.5){
+        return {q:`${a} + ${b} = ?`, a:a+b};
+      } else {
+        if(a < b){ [a,b] = [b,a]; }
+        return {q:`${a} - ${b} = ?`, a:a-b};
+      }
+
+    case "campur2":
+      if(Math.random() > 0.5){
+        return {q:`${a} × ${b} = ?`, a:a*b};
+      } else {
+        let h = Math.floor(Math.random()*10)+1;
+        let p = Math.floor(Math.random()*10)+1;
+        return {q:`${h*p} ÷ ${p} = ?`, a:h};
+      }
+
+    case "pangkat2":
+      let x = Math.floor(Math.random()*10)+1;
+      return {q:`${x}² = ?`, a:x*x};
+
+    case "akar2":
+      let n = Math.floor(Math.random()*10)+1;
+      return {q:`√${n*n} = ?`, a:n};
+
+    case "pangkat3":
+      let p3 = Math.floor(Math.random()*5)+1;
+      return {q:`${p3}³ = ?`, a:p3*p3*p3};
+
+    case "akar3":
+      let c = Math.floor(Math.random()*5)+1;
+      return {q:`∛${c*c*c} = ?`, a:c};
+
+    case "kpk":
+      let a1 = Math.floor(Math.random()*10)+1;
+      let b1 = Math.floor(Math.random()*10)+1;
+      return {q:`KPK dari ${a1} dan ${b1} = ?`, a:lcm(a1,b1)};
+
+    case "fpb":
+      let a2 = Math.floor(Math.random()*20)+1;
+      let b2 = Math.floor(Math.random()*20)+1;
+      return {q:`FPB dari ${a2} dan ${b2} = ?`, a:gcd(a2,b2)};
+
+    case "persen":
+      let pembilang = Math.floor(Math.random()*10)+1;
+      let penyebut = pembilang * (Math.floor(Math.random()*5)+1);
+      return {
+        q:`${pembilang}/${penyebut} = ? %`,
+        a:(pembilang/penyebut)*100
+      };
+
+    case "waktu":
+      let menit = Math.floor(Math.random()*60)+1;
+      return {q:`${menit} menit = ? detik`, a:menit*60};
+
+    case "panjang":
+      let meter = Math.floor(Math.random()*10)+1;
+      return {q:`${meter} m = ? cm`, a:meter*100};
+
+    case "luas":
+      let sisi = Math.floor(Math.random()*10)+1;
+      return {q:`Luas persegi sisi ${sisi} = ?`, a:sisi*sisi};
+
+    case "kubik":
+      let s = Math.floor(Math.random()*5)+1;
+      return {q:`Volume kubus sisi ${s} = ?`, a:s*s*s};
+
+    default:
+      return {q:`${a} + ${b} = ?`, a:a+b};
+  }
+}
+
+let bQ=gen();
+let rQ=gen();
+
+// qB.innerText=bQ.q;
+// qR.innerText=rQ.q;
+
+function initGame(){
+  bQ = gen();
+  rQ = gen();
+
+  qB.innerText = bQ.q;
+  qR.innerText = rQ.q;
+}
+
+let step = 0;        // posisi sekarang
+const maxStep = 5;   // batas menang
+
+function move(team){
+  if(team==="blue") step--;
+  else step++;
+
+  // batas
+  if(step < -maxStep) step = -maxStep;
+  if(step > maxStep) step = maxStep;
+
+  // geser seluruh game-area
+  let shift = step * 30; // jarak per langkah (atur sendiri)
+  document.getElementById("game-area").style.transform =
+    `translate(calc(-50% + ${shift}px), -50%)`;
+
+  // cek menang
+  if(step === -maxStep) win("Biru");
+  if(step === maxStep) win("Merah");
+}
+
+function add(id,n){
+  let el=id==="kB"?aB:aR;
+  el.innerText+=n;
+}
+
+function del(id){
+  let el=id==="kB"?aB:aR;
+  el.innerText=el.innerText.slice(0,-1);
+}
+
+function check(id,team){
+  let el=id==="kB"?aB:aR;
+  let val=parseInt(el.innerText);
+
+  let correctAnswer = team==="blue" ? bQ.a : rQ.a;
+
+  el.style.border="2px solid transparent";
+
+  if(val===correctAnswer){
+    el.style.border="2px solid limegreen";
+
+    move(team);
+
+    let newQ = gen();
+
+    if(team==="blue"){
+      bQ = newQ;
+      qB.innerText = bQ.q;
+    } else {
+      rQ = newQ;
+      qR.innerText = rQ.q;
+    }
+
+  } else {
+    el.style.border="2px solid red";
+  }
+
+  setTimeout(()=>{
+    el.style.border="2px solid transparent";
+  },500);
+
+  el.innerText="";
+}
+
+function keypad(id,obj,team){
+  let el=document.getElementById(id);
+
+  for(let i=1;i<=9;i++){
+    let b=document.createElement("button");
+    b.innerText=i;
+    b.onclick=()=>add(id,i);
+    el.appendChild(b);
+  }
+
+  let delBtn=document.createElement("button");
+  delBtn.innerText="⌫";
+  delBtn.className="del";
+  delBtn.onclick=()=>del(id);
+  el.appendChild(delBtn);
+
+  let zero=document.createElement("button");
+  zero.innerText="0";
+  zero.onclick=()=>add(id,0);
+  el.appendChild(zero);
+
+  let ok=document.createElement("button");
+  ok.innerText="OK";
+  ok.className="ok";
+  ok.onclick=()=>check(id,team);
+  el.appendChild(ok);
+}
+
+function win(name){
+  document.getElementById("winText").innerText =
+    "TIM " + name.toUpperCase() + " MENANG !!!!";
+
+  document.getElementById("win").classList.add("show");
+
+  // 🎉 CONFETTI
+  confetti({
+    particleCount: 150,
+    spread: 70,
+    origin: { y: 0.6 }
+  });
+}
+
+keypad("kB",bQ,"blue");
+keypad("kR",rQ,"red");
+</script>
+
+</body>
+</html>
