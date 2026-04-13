@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Tarik Tambang Matematika</title>
+<title>Tarik Tambang PAI</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
@@ -16,17 +16,16 @@ body{
   background:linear-gradient(135deg,#f8f9fa,#dee2e6);
   margin:0;
 
-  height:100vh;          /* kunci utama */
+  min-height:100vh;          /* kunci utama */
   display:flex;
   flex-direction:column;
-  overflow:hidden;       /* hilangkan scroll */
 }
 
 .main{
-  flex:1;                 /* isi ruang */
+  flex:1;
   display:flex;
   flex-direction:column;
-  justify-content:center;
+  justify-content:flex-start; /* ini kunci */
 }
 
 /* TITLE */
@@ -41,7 +40,7 @@ h1{
 /* AREA */
 .tug{
   position:relative;
-  height:140px;
+  height:90px;
   width:100%;
   overflow:hidden;
 }
@@ -90,12 +89,12 @@ h1{
 /* MARKER */
 #marker{
   position:absolute;
-  left:46%;
+  left:47%;
   top:-6px;
   width:18px;
   height:18px;
   background:gold;
-  border-radius:20%;
+  border-radius:50%;
   transform:translateX(-50%);
 }
 
@@ -127,6 +126,9 @@ h1{
   width:100%;
   max-width:320px;
   text-align: center;
+  overflow:visible; /* 🔥 biar header nyatu */   
+  transition: 0.2s;
+  position: relative;
 }
 
 /* HEADER */
@@ -154,27 +156,47 @@ h1{
   border:2px solid transparent;
   transition:0.3s;
 
-  font-size:28px;       /* biar gede */
+  font-size:32px;       /* biar gede */
+  font-weight: bold;
   height:20px;      /* ini kunci: tinggi */
   display:flex;
   align-items:center;
   justify-content:center;
   overflow: hidden;
+  max-width: 520px; /* sesuaikan dengan jawaban terbesar */
+  gap: 12px; /* jarak antara jawaban dan tombol */
 }
 
 /* KEYPAD */
 .keypad{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:5px;
+  grid-template-columns:repeat(2,1fr); /* 🔥 jadi 2 kolom */
+  gap:10px;
 }
 
 .keypad button{
-  padding:10px;
+  font-size:24px;
+  font-weight:bold;
   border:none;
-  border-radius:10px;
-  font-size:18px;
+  border-radius:16px;
+  padding:20px;
   cursor:pointer;
+  min-height: 70px; /* kunci utama: tinggi tombol */
+  min-width: 70px;
+  touch-action:manipulation;
+  transition: 0.1s;
+}
+
+/* efek tekan */
+.keypad button:active{
+  transform:scale(0.95);
+}
+
+.keypad.locked button{
+  background:#ccc !important;
+  color:#666;
+  cursor:not-allowed;
+  transform:none;
 }
 
 .ok{background:#00ff88;}
@@ -196,6 +218,8 @@ h1{
   align-items:flex-start;
   padding:0 10px; /* jarak dari tepi layar */
   margin:20px auto;
+  margin-top: -10px;
+  margin-bottom: 10px;
   flex-wrap:wrap;
   width: 100%;
   max-width: 1200px;
@@ -234,6 +258,8 @@ h1{
   font-size:14px;         /* tetap */
   color:#666;
   text-align:center;
+  flex-shrink:0;
+  margin-top: auto;
 }
 
 /* POPUP OVERLAY */
@@ -371,7 +397,7 @@ h1{
 
 .mode-list{
   display:grid;
-  grid-template-columns:repeat(5,1fr); /* 🔥 5 kolom */
+  grid-template-columns:repeat(3,1fr); /* 🔥 5 kolom */
   gap:12px;
   margin-top:20px;
 }
@@ -437,6 +463,68 @@ h1{
   font-family:'Open Sans', sans-serif;
 }
 
+.quiz-center{
+  text-align:center;
+  margin-top:10px;
+  min-height: 140px; /* kunci: tinggi minimum untuk mencegah lompat */
+}
+
+#question{
+  min-height:50px; /* 🔥 biar tidak dorong layout */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.answers{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  max-width:400px;
+  margin:10px auto;
+  min-height:80px; /* 🔥 penting */
+}
+
+.opt{
+  background:white;
+  padding:14px 12px;
+  border-radius:12px;
+  font-size: 18px;
+}
+
+/* WARNA OPSI */
+.optA{background:#3b82f6;color:white;} /* biru */
+.optB{background:#22c55e;color:white;} /* hijau */
+.optC{background:#f59e0b;color:white;} /* kuning */
+.optD{background:#ef4444;color:white;} /* merah */
+
+.team-header{
+  padding:12px;
+  font-weight:bold;
+  color:white;
+  border-top-left-radius:20px;
+  border-top-right-radius:20px;
+  font-size:18px;
+}
+
+/* warna tim */
+.blue{background:#3b82f6;}
+.red{background:#ef4444;}
+
+.lock-text{
+  position:absolute;        /* 🔥 tidak dorong layout */
+  top:-30px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:20px;
+  font-weight:bold;
+  color:#ef4444;
+  pointer-events:none;
+  white-space: nowrap;
+  text-shadow:0 2px 5px rgba(0,0,0,0.3);
+  z-index: 10;
+}
+
 </style>
 </head>
 
@@ -444,53 +532,54 @@ h1{
 
 <div class="main">
 
-  <h1>TARIK TAMBANG MATEMATIKA</h1>
+  <h1>TARIK TAMBANG PAI</h1>
 
   <p class="subtitle">
     Jawab pertanyaan dengan benar untuk menarik tambang
   </p>
 
   <div class="tug">
-
     <!-- GARIS TENGAH (tetap) -->
     <div id="center-line"></div>
-
     <!-- SEMUA DIGABUNG DI SINI -->
     <div id="game-area">
-
       <img src="https://drive.google.com/thumbnail?id=1outADLE7ZDBjR-1qk8kH98N4NU7kdGeH"
           class="player left-player">
-
       <div id="rope">
         <div id="marker"></div>
       </div>
-
       <img src="https://drive.google.com/thumbnail?id=1X2oMf-WCWbVRheZeLM2mx44gWWWgHJQ8"
           class="player right-player">
-
     </div>
-
   </div>
 
-  <!-- TIM BIRU -->
+  <div class="quiz-center">
+    <h2 id="question"></h2>
+    <div class="answers">
+        <div id="optA" class="opt optA"></div>
+        <div id="optB" class="opt optB"></div>
+        <div id="optC" class="opt optC"></div>
+        <div id="optD" class="opt optD"></div>
+    </div>
+  </div>
+
   <div class="wrapper">
-  <div class="card">
-    <div id="qB" class="header blue"></div>
-    <div class="body">
-      <div id="aB" class="answer"></div>
-      <div id="kB" class="keypad"></div>
+    <!-- TIM BIRU -->
+    <div class="card">
+        <div class="team-header blue">TIM BIRU</div>
+        <div class="lock-text" id="lockB"></div> <!-- 🔥 ini baru -->
+        <div class="body">
+            <div id="kB" class="keypad"></div>
+        </div>
     </div>
-  </div>
-
-  <!-- TIM MERAH -->
-  <div class="card">
-    <div id="qR" class="header red"></div>
-    <div class="body">
-      <div id="aR" class="answer"></div>
-      <div id="kR" class="keypad"></div>
+    <!-- TIM MERAH -->
+    <div class="card">
+        <div class="team-header red">TIM MERAH</div>
+        <div class="lock-text" id="lockR"></div> <!-- 🔥 ini baru -->
+        <div class="body">
+            <div id="kR" class="keypad"></div>
+        </div>
     </div>
-  </div>
-
   </div>
 
   <div id="win" class="win">
@@ -506,97 +595,57 @@ h1{
 
 <div id="mode-popup" class="start-popup mode-popup" style="display: flex;">
   <div class="popup-box">
-    <h1 class="mode-title">TARIK TAMBANG MATEMATIKA</h1>
-    <h2>Pilih Mode Permainan</h2>
+    <h1 class="mode-title">TARIK TAMBANG PAI</h1>
+    <h2>Pilih Materi Permainan</h2>
 
     <div class="mode-list">
 
-      <button onclick="selectMode('tambah')">
-        <div class="icon">➕</div>
-        <div>Tambah</div>
-      </button>
+        <button onclick="selectMode('aqidah')">
+            <div class="icon">🕌</div>
+            <div>Aqidah</div>
+        </button>
 
-      <button onclick="selectMode('kurang')">
-        <div class="icon">➖</div>
-        <div>Kurang</div>
-      </button>
+        <button onclick="selectMode('akhlaq')">
+            <div class="icon">😊</div>
+            <div>Akhlak</div>
+        </button>
 
-      <button onclick="selectMode('kali')">
-        <div class="icon">✖️</div>
-        <div>Kali</div>
-      </button>
+        <button onclick="selectMode('fiqih')">
+            <div class="icon">🧎</div>
+            <div>Fiqih</div>
+        </button>
 
-      <button onclick="selectMode('bagi')">
-        <div class="icon">➗</div>
-        <div>Bagi</div>
-      </button>
+        <button onclick="selectMode('arab')">
+            <div class="icon">📖</div>
+            <div>Bahasa Arab</div>
+        </button>
 
-      <button onclick="selectMode('campur1')">
-        <div class="icon">±</div>
-        <div>Tambah Kurang</div>
-      </button>
+        <button onclick="selectMode('tarikh')">
+            <div class="icon">📜</div>
+            <div>Tarikh</div>
+        </button>
 
-      <button onclick="selectMode('campur2')">
-        <div class="icon">×÷</div>
-        <div>Kali Bagi</div>
-      </button>
+        <button onclick="selectMode('quran')">
+            <div class="icon">📖</div>
+            <div>Al Qur'an</div>
+        </button>
 
-      <button onclick="selectMode('pangkat2')">
-        <div class="icon">²</div>
-        <div>Pangkat 2</div>
-      </button>
+        <button onclick="selectMode('hadits')">
+            <div class="icon">🗣️</div>
+            <div>Hadits</div>
+        </button>
 
-      <button onclick="selectMode('akar2')">
-        <div class="icon">√</div>
-        <div>Akar 2</div>
-      </button>
+        <button onclick="selectMode('kemuh')">
+             <div class="icon">🧠</div>
+            <div>Kemuhammadiyahan</div>
+        </button>
 
-      <button onclick="selectMode('pangkat3')">
-        <div class="icon">³</div>
-        <div>Pangkat 3</div>
-      </button>
+        <button onclick="selectMode('campur')">
+            <div class="icon">🎯</div>
+            <div>Campuran</div>
+        </button>
 
-      <button onclick="selectMode('akar3')">
-        <div class="icon">∛</div>
-        <div>Akar 3</div>
-      </button>
-
-      <button onclick="selectMode('kpk')">
-        <div class="icon">KPK</div>
-        <div>KPK</div>
-      </button>
-
-      <button onclick="selectMode('fpb')">
-        <div class="icon">FPB</div>
-        <div>FPB</div>
-      </button>
-
-      <button onclick="selectMode('persen')">
-        <div class="icon">%</div>
-        <div>Pecahan → %</div>
-      </button>
-
-      <button onclick="selectMode('waktu')">
-        <div class="icon">⏰</div>
-        <div>Satuan Waktu</div>
-      </button>
-
-      <button onclick="selectMode('panjang')">
-        <div class="icon">📏</div>
-        <div>Panjang</div>
-      </button>
-
-      <button onclick="selectMode('luas')">
-        <div class="icon">⬛</div>
-        <div>Luas</div>
-      </button>
-
-      <button onclick="selectMode('kubik')">
-        <div class="icon">🧊</div>
-        <div>Kubik</div>
-      </button>
-
-    </div>
+        </div>
 
     <div class="credit">
       <div>credit : bangudin.my.id                                  📷 @hnnnzzzz_</div>
@@ -613,17 +662,24 @@ h1{
 
 <div id="countdown" class="countdown">3</div>
 
+<script src="bank-soal-pai/aqidah.js"></script>
+<script src="bank-soal-pai/akhlak.js"></script>
+<script src="bank-soal-pai/fiqih.js"></script>
+<script src="bank-soal-pai/arab.js"></script>
+<script src="bank-soal-pai/tarikh.js"></script>
+<script src="bank-soal-pai/quran.js"></script>
+<script src="bank-soal-pai/hadits.js"></script>
+<script src="bank-soal-pai/kemuh.js"></script>
+<script src="bank-soal-pai/index.js"></script>
+
 <script>
 
-let gameMode = "tambah";
+let gameMode = "aqidah";
 
 function selectMode(mode){
   gameMode = mode;
-
-  // tutup mode popup
+  console.log("Mode dipilih:", mode); // debug
   document.getElementById("mode-popup").style.display = "none";
-
-  // tampilkan popup GAS
   document.getElementById("start-popup").style.display = "flex";
 }
 
@@ -679,6 +735,96 @@ function startGame(){
   startCountdown();
 }
 
+let current;
+let answered=false;
+let lockBlue = false;
+let lockRed = false;
+let lockTimerBlue = null;
+let lockTimerRed = null;
+
+function newQuestion(){
+  answered = false;
+
+  let mapSoal = {
+    aqidah,
+    akhlaq,
+    fiqih,
+    arab,
+    tarikh,
+    quran,
+    hadits
+  };
+
+  let pool;
+
+  if(gameMode === "campur"){
+    pool = semuaSoal;
+  } else {
+    pool = mapSoal[gameMode];
+  }
+
+  if(!pool){
+    console.warn("Mode tidak valid:", gameMode);
+    pool = aqidah; // fallback biar tetap jalan
+  }
+
+  current = pool[Math.floor(Math.random()*pool.length)];
+
+  document.getElementById("question").textContent = current.q;
+  document.getElementById("optA").textContent = "A. " + current.A;
+  document.getElementById("optB").textContent = "B. " + current.B;
+  document.getElementById("optC").textContent = "C. " + current.C;
+  document.getElementById("optD").textContent = "D. " + current.D;
+}
+
+function answer(choice,team){
+  if(answered) return;
+
+  // 🔒 cek lock
+  if(team==="blue" && lockBlue) return;
+  if(team==="red" && lockRed) return;
+
+  let isCorrect = choice === current.correct;
+
+  // ambil card tim
+  let card = team==="blue"
+    ? document.querySelector("#kB").closest(".card")
+    : document.querySelector("#kR").closest(".card");
+
+    if(isCorrect){
+        answered = true;
+
+        resetLock(); // 🔥 tambahin ini
+
+        card.style.border = "2px solid limegreen";
+
+        move(team);
+
+        setTimeout(()=>{
+            card.style.border = "none";
+            newQuestion();
+        }, 500);
+    } else {
+
+    // ❌ SALAH → merah
+    card.style.border = "2px solid red";
+
+    // 🔒 lock 4 detik
+    if(team==="blue") lockBlue = true;
+    else lockRed = true;
+
+    startLockCountdown(team);
+
+    setTimeout(()=>{
+      card.style.border = "none";
+
+      if(team==="blue") lockBlue = false;
+      else lockRed = false;
+
+    }, 4000);
+  }
+}
+
 let pos=50;
 
 function gcd(a,b){
@@ -694,111 +840,9 @@ function lcm(a,b){
   return (a*b)/gcd(a,b);
 }
 
-function gen(){
-  let a = Math.floor(Math.random()*10)+1;
-  let b = Math.floor(Math.random()*10)+1;
-
-  switch(gameMode){
-
-    case "tambah":
-      return {q:`${a} + ${b} = ?`, a:a+b};
-
-    case "kurang":
-      if(a < b){ [a,b] = [b,a]; }
-      return {q:`${a} - ${b} = ?`, a:a-b};
-
-    case "kali":
-      return {q:`${a} × ${b} = ?`, a:a*b};
-
-    case "bagi":
-      let hasil = Math.floor(Math.random()*10)+1;
-      let pembagi = Math.floor(Math.random()*10)+1;
-      return {q:`${hasil*pembagi} ÷ ${pembagi} = ?`, a:hasil};
-
-    case "campur1":
-      if(Math.random() > 0.5){
-        return {q:`${a} + ${b} = ?`, a:a+b};
-      } else {
-        if(a < b){ [a,b] = [b,a]; }
-        return {q:`${a} - ${b} = ?`, a:a-b};
-      }
-
-    case "campur2":
-      if(Math.random() > 0.5){
-        return {q:`${a} × ${b} = ?`, a:a*b};
-      } else {
-        let h = Math.floor(Math.random()*10)+1;
-        let p = Math.floor(Math.random()*10)+1;
-        return {q:`${h*p} ÷ ${p} = ?`, a:h};
-      }
-
-    case "pangkat2":
-      let x = Math.floor(Math.random()*10)+1;
-      return {q:`${x}² = ?`, a:x*x};
-
-    case "akar2":
-      let n = Math.floor(Math.random()*10)+1;
-      return {q:`√${n*n} = ?`, a:n};
-
-    case "pangkat3":
-      let p3 = Math.floor(Math.random()*5)+1;
-      return {q:`${p3}³ = ?`, a:p3*p3*p3};
-
-    case "akar3":
-      let c = Math.floor(Math.random()*5)+1;
-      return {q:`∛${c*c*c} = ?`, a:c};
-
-    case "kpk":
-      let a1 = Math.floor(Math.random()*10)+1;
-      let b1 = Math.floor(Math.random()*10)+1;
-      return {q:`KPK dari ${a1} dan ${b1} = ?`, a:lcm(a1,b1)};
-
-    case "fpb":
-      let a2 = Math.floor(Math.random()*20)+1;
-      let b2 = Math.floor(Math.random()*20)+1;
-      return {q:`FPB dari ${a2} dan ${b2} = ?`, a:gcd(a2,b2)};
-
-    case "persen":
-      let pembilang = Math.floor(Math.random()*10)+1;
-      let penyebut = pembilang * (Math.floor(Math.random()*5)+1);
-      return {
-        q:`${pembilang}/${penyebut} = ? %`,
-        a:(pembilang/penyebut)*100
-      };
-
-    case "waktu":
-      let menit = Math.floor(Math.random()*60)+1;
-      return {q:`${menit} menit = ? detik`, a:menit*60};
-
-    case "panjang":
-      let meter = Math.floor(Math.random()*10)+1;
-      return {q:`${meter} m = ? cm`, a:meter*100};
-
-    case "luas":
-      let sisi = Math.floor(Math.random()*10)+1;
-      return {q:`Luas persegi sisi ${sisi} = ?`, a:sisi*sisi};
-
-    case "kubik":
-      let s = Math.floor(Math.random()*5)+1;
-      return {q:`Volume kubus sisi ${s} = ?`, a:s*s*s};
-
-    default:
-      return {q:`${a} + ${b} = ?`, a:a+b};
-  }
-}
-
-let bQ=gen();
-let rQ=gen();
-
-// qB.innerText=bQ.q;
-// qR.innerText=rQ.q;
 
 function initGame(){
-  bQ = gen();
-  rQ = gen();
-
-  qB.textContent = bQ.q;
-  qR.textContent = rQ.q;
+  newQuestion();
 }
 
 let step = 0;        // posisi sekarang
@@ -812,15 +856,16 @@ function move(team){
 
   requestAnimationFrame(()=>{
 
-    if(team==="blue") step--;
-    else step++;
+    if(team==="blue") step--;   // ⬅️ kiri
+    else step++;                // ➡️ kanan
 
     if(step < -maxStep) step = -maxStep;
     if(step > maxStep) step = maxStep;
 
     let shift = step * 30;
+
     document.getElementById("game-area").style.transform =
-      `translate(calc(-50% + ${shift}px), -50%)`;
+      `translate(-50%, -50%) translateX(${shift}px)`;
 
     if(step === -maxStep) win("Biru");
     if(step === maxStep) win("Merah");
@@ -829,94 +874,23 @@ function move(team){
   });
 }
 
-// function move(team){
-//   if(team==="blue") step--;
-//   else step++;
-
-//   // batas
-//   if(step < -maxStep) step = -maxStep;
-//   if(step > maxStep) step = maxStep;
-
-//   // geser seluruh game-area
-//   let shift = step * 30; // jarak per langkah (atur sendiri)
-//   document.getElementById("game-area").style.transform =
-//     `translate(calc(-50% + ${shift}px), -50%)`;
-
-//   // cek menang
-//   if(step === -maxStep) win("Biru");
-//   if(step === maxStep) win("Merah");
-// }
-
-function add(id,n){
-  let el = id==="kB"?aB:aR;
-  el.textContent = el.textContent + n; // 🔥 tanpa delay
-}
-
-function del(id){
-  let el=id==="kB"?aB:aR;
-  el.textContent=el.textContent.slice(0,-1);
-}
-
-function check(id,team){
-  let el=id==="kB"?aB:aR;
-  let val=parseInt(el.textContent);
-
-  let correctAnswer = team==="blue" ? bQ.a : rQ.a;
-
-  el.style.border="2px solid transparent";
-
-  if(val===correctAnswer){
-    el.style.border="2px solid limegreen";
-
-    move(team);
-
-    let newQ = gen();
-
-    if(team==="blue"){
-      bQ = newQ;
-      qB.textContent = bQ.q;
-    } else {
-      rQ = newQ;
-      qR.textContent = rQ.q;
-    }
-
-  } else {
-    el.style.border="2px solid red";
-  }
-
-  setTimeout(()=>{
-    el.style.border="2px solid transparent";
-  },200);
-
-  el.textContent="";
-}
-
-function keypad(id,obj,team){
+function keypad(id,team){
   let el=document.getElementById(id);
 
-  for(let i=1;i<=9;i++){
+  const map = [
+    {k:"A", cls:"optA"},
+    {k:"B", cls:"optB"},
+    {k:"C", cls:"optC"},
+    {k:"D", cls:"optD"}
+  ];
+
+  map.forEach(x=>{
     let b=document.createElement("button");
-    b.textContent=i;
-    b.onclick=()=>add(id,i);
+    b.textContent=x.k;        // 🔥 hanya huruf
+    b.className=x.cls;        // 🔥 warna sama
+    b.onclick=()=>answer(x.k,team);
     el.appendChild(b);
-  }
-
-  let delBtn=document.createElement("button");
-  delBtn.textContent="⌫";
-  delBtn.className="del";
-  delBtn.onclick=()=>del(id);
-  el.appendChild(delBtn);
-
-  let zero=document.createElement("button");
-  zero.textContent="0";
-  zero.onclick=()=>add(id,0);
-  el.appendChild(zero);
-
-  let ok=document.createElement("button");
-  ok.textContent="OK";
-  ok.className="ok";
-  ok.onclick=()=>check(id,team);
-  el.appendChild(ok);
+  });
 }
 
 function win(name){
@@ -933,8 +907,64 @@ function win(name){
   });
 }
 
-keypad("kB",bQ,"blue");
-keypad("kR",rQ,"red");
+keypad("kB","blue");
+keypad("kR","red");
+
+function startLockCountdown(team){
+
+  let el = team==="blue"
+    ? document.getElementById("lockB")
+    : document.getElementById("lockR");
+
+  let keypad = team==="blue"
+    ? document.getElementById("kB")
+    : document.getElementById("kR");
+
+  let time = 4;
+
+  el.textContent = "Tunggu " + time;
+
+  // 🔥 disable tombol
+  keypad.classList.add("locked");
+
+  let interval = setInterval(()=>{
+    time--;
+
+    if(time > 0){
+      el.textContent = "Tunggu " + time;
+    } else {
+      el.textContent = "";
+      keypad.classList.remove("locked");
+      clearInterval(interval);
+    }
+  },1000);
+
+  // 🔥 simpan interval
+  if(team==="blue") lockTimerBlue = interval;
+  else lockTimerRed = interval;
+}
+
+function resetLock(){
+
+  // 🔵 BLUE
+  if(lockTimerBlue){
+    clearInterval(lockTimerBlue);
+    lockTimerBlue = null;
+    document.getElementById("lockB").textContent = "";
+    document.getElementById("kB").classList.remove("locked");
+    lockBlue = false;
+  }
+
+  // 🔴 RED
+  if(lockTimerRed){
+    clearInterval(lockTimerRed);
+    lockTimerRed = null;
+    document.getElementById("lockR").textContent = "";
+    document.getElementById("kR").classList.remove("locked");
+    lockRed = false;
+  }
+}
+
 </script>
 
 </body>
