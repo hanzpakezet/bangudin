@@ -1,4 +1,4 @@
-window.kemuhammadiyahan = [
+window.kemuh = [
 
 { q:"Pendiri Muhammadiyah adalah?", A:"KH Hasyim Asy'ari", B:"KH Ahmad Dahlan", C:"KH Wahid Hasyim", D:"KH Zainal Mustafa", correct:"B" },
 { q:"Muhammadiyah didirikan pada tahun?", A:"1908", B:"1912", C:"1926", D:"1945", correct:"B" },
