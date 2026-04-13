@@ -6,5 +6,5 @@ const semuaSoal = [
   ...tarikh,
   ...quran,
   ...hadits,
-  ...kemuh,
+  ...kemuhammadiyahan
 ];
