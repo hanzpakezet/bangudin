@@ -444,45 +444,50 @@ h1{
 .track{
   position:absolute;
   width:90%;
-  height:100px;
-
-  /* warna hijau tua */
+  height:120px;
   background:#2e7d32;
-
   border-radius:20px;
   left:50%;
   transform:translateX(-50%);
   bottom:20px;
-
-  /* garis tengah */
   overflow:hidden;
 }
 
-/* garis lintasan */
+/* garis tengah (pisah jalur) */
 .track::before{
   content:"";
   position:absolute;
   top:50%;
   width:100%;
   height:4px;
-
-  background: repeating-linear-gradient(
-    to right,
-    white 0px,
-    white 20px,
-    transparent 20px,
-    transparent 40px
-  );
-
+  background:white;
   transform:translateY(-50%);
 }
 
+/* garis lane atas */
+.track::after{
+  content:"";
+  position:absolute;
+  top:25%;
+  width:100%;
+  height:2px;
+  background:rgba(255,255,255,0.5);
+}
+
+/* garis finish kotak-kotak */
 .finish{
   position:absolute;
   right:5%;
-  width:10px;
-  height:100px;
-  background:red;
+  width:20px;
+  height:120px;
+
+  background: repeating-linear-gradient(
+    0deg,
+    white 0px,
+    white 10px,
+    black 10px,
+    black 20px
+  );
 }
 
 .runner{
@@ -492,15 +497,16 @@ h1{
   transition:0.2s;
 }
 
-/* posisi beda jalur */
+/* jalur atas = biru */
 .blue-runner{
-  bottom:70px;
+  bottom:90px;
 }
 
+/* jalur bawah = merah */
 .red-runner{
-  bottom:10px;
+  bottom:20px;
 }
-
+  
 /* efek lompat */
 @keyframes jumpAnim{
   0%{ transform:translateY(0); }
@@ -529,15 +535,14 @@ h1{
 
   <!-- pelari biru -->
   <img 
-    id="blueRunner"
-    src="https://drive.google.com/thumbnail?id=1outADLE7ZDBjR-1qk8kH98N4NU7kdGeH"
-    class="runner blue-runner">
+  id="blueRunner"
+  src="https://game.afifedu.com/balap_karung/blue_stand.png"
+  class="runner blue-runner">
 
-  <!-- pelari merah -->
-  <img 
-    id="redRunner"
-    src="https://drive.google.com/thumbnail?id=1X2oMf-WCWbVRheZeLM2mx44gWWWgHJQ8"
-    class="runner red-runner">
+<img 
+  id="redRunner"
+  src="https://game.afifedu.com/balap_karung/red_stand.png"
+  class="runner red-runner">
 
 </div>
 
@@ -874,6 +879,12 @@ redPos = 0;
 
 document.getElementById("blueRunner").style.left = "5%";
 document.getElementById("redRunner").style.left = "5%";
+
+  document.getElementById("blueRunner").src =
+"https://game.afifedu.com/balap_karung/blue_stand.png";
+
+document.getElementById("redRunner").src =
+"https://game.afifedu.com/balap_karung/red_stand.png";
 }
 
 let step = 0;        // posisi sekarang
@@ -896,8 +907,16 @@ function move(team){
       let percent = (bluePos / maxStep) * 80;
       let el = document.getElementById("blueRunner");
 
+      // 🔥 ganti ke mode lompat
+      el.src = "https://game.afifedu.com/balap_karung/blue_hop.png";
+
       el.style.left = percent + "%";
       el.style.animation = "jumpAnim 0.25s";
+
+      // balik ke idle
+      setTimeout(()=>{
+        el.src = "https://game.afifedu.com/balap_karung/blue_stand.png";
+      },200);
 
       if(bluePos >= maxStep) win("Biru");
 
@@ -908,8 +927,16 @@ function move(team){
       let percent = (redPos / maxStep) * 80;
       let el = document.getElementById("redRunner");
 
+      // 🔥 lompat
+      el.src = "https://game.afifedu.com/balap_karung/red_hop.png";
+
       el.style.left = percent + "%";
       el.style.animation = "jumpAnim 0.25s";
+
+      // balik idle
+      setTimeout(()=>{
+        el.src = "https://game.afifedu.com/balap_karung/red_stand.png";
+      },200);
 
       if(redPos >= maxStep) win("Merah");
     }
