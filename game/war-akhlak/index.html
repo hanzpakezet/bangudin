@@ -89,7 +89,9 @@ html, body {
   z-index: -1;
 }
 
-video {
+/* VIDEO DEFAULT DESKTOP */
+#video1,
+#video2 {
   position: fixed;
   top: 0;
   left: 0;
@@ -242,86 +244,112 @@ animation: blink 0.5s infinite;
   padding: 10px 20px;
 }
 
-
 /* =========================
-   MOBILE FIX FINAL
+   MOBILE LAYOUT FIX
 ========================= */
 @media screen and (max-width: 768px) {
-  /* BODY */
-  html, body {
-    margin: 0;
-    padding: 0;
+
+  html,
+  body {
     overflow-y: auto;
+    overflow-x: hidden;
     height: auto;
     background: black;
   }
 
   body {
-    display: block;
-  }
-
-  /* VIDEO */
-  #video1,
-  #video2 {
-    position: relative !important;
-    top: unset !important;
-    left: unset !important;
-    width: 100% !important;
-    height: 40vh !important;
-    object-fit: contain !important;
-    z-index: 1 !important;
-    background: black;
-  }
-
-  /* GAME UI */
-  #gameUI {
-    position: relative !important;
     display: flex;
     flex-direction: column;
-    width: 100%;
+  }
+
+  /* VIDEO AREA */
+  #video1,
+  #video2 {
+
+    position: relative !important;
+
+    width: 100% !important;
+
+    height: 250px !important;
+
+    object-fit: contain !important;
+
+    background: black;
+
+    top: unset !important;
+    left: unset !important;
+  }
+
+  /* UI */
+  #gameUI {
+
+    position: relative !important;
+
+    display: flex;
+    flex-direction: column;
+
     height: auto !important;
   }
 
   /* HP */
-  .hp-wrapper {
+  .wrapper {
+
     position: absolute;
-    top: 5px;
-    left: 0;
+
+    top: 0;
+
     width: 100%;
+
     z-index: 5;
   }
 
   /* QUIZ */
   #quizBox {
+
     position: relative !important;
+
     width: 100%;
+
     background: rgba(0,0,0,0.95);
-    margin: 0;
-    padding: 20px;
+
     box-sizing: border-box;
-    border-top: 2px solid white;
-    z-index: 2;
+
+    padding: 20px;
+
+    margin-top: 0;
   }
 
   /* QUESTION */
   #question {
-    text-align: center;
+
     font-size: 16px;
+
     line-height: 1.5;
+
+    text-align: center;
   }
 
   /* ANSWERS */
   #answers {
+
     display: flex;
+
     flex-direction: column;
+
     gap: 10px;
+
     margin-top: 20px;
   }
 
   /* BUTTON */
   #answers button {
+
     width: 100%;
+
+    margin: 0;
+
     padding: 14px;
+
     font-size: 16px;
   }
 
