@@ -242,53 +242,82 @@ animation: blink 0.5s infinite;
   padding: 10px 20px;
 }
 
-/* MODE HP */
+
+/* =========================
+   MODE HP
+========================= */
 @media (max-width: 768px) {
 
-  /* video hanya di atas */
-  #video1, #video2 {
-    position: relative;
-    width: 100%;
-    height: 50vh; /* setengah layar */
-    object-fit: cover;
+  html, body {
+    overflow-y: auto;
+    height: auto;
   }
 
-  /* game UI jadi vertikal */
-  #gameUI {
-    height: 100vh;
+  body {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    background: black;
   }
 
-  /* HP bar tetap di atas */
-  .hp-container {
-    width: 90%;
-    margin: 5px auto;
+  /* VIDEO AREA */
+  #video1,
+  #video2 {
+    position: relative !important;
+    width: 100%;
+    height: auto;
+    max-height: 45vh;
+    object-fit: contain;
+    background: black;
   }
 
-  /* quiz di bawah */
+  /* GAME UI */
+  #gameUI {
+    position: relative;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HP AREA */
+  .hp-wrapper {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 100%;
+    z-index: 5;
+  }
+
+  /* QUIZ AREA */
   #quizBox {
     position: relative;
     width: 100%;
-    background: rgba(0,0,0,0.9);
-    padding: 15px;
-    text-align: center;
+    background: rgba(0,0,0,0.95);
+    padding: 20px 15px;
+    box-sizing: border-box;
+    margin-top: 0;
+    border-top: 2px solid white;
   }
 
-  /* tombol biar enak di HP */
+  /* QUESTION */
+  #question {
+    text-align: center;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+
+  /* ANSWERS */
+  #answers {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* BUTTON */
   #answers button {
     width: 100%;
-    margin: 5px 0;
-  }
-
-  #question {
+    padding: 14px;
     font-size: 16px;
-  }
-
-  button {
-    font-size: 16px;
-    padding: 12px;
   }
 
 }
@@ -319,24 +348,24 @@ animation: blink 0.5s infinite;
 <div id="gameUI">
 
   <!-- HP -->
-  <div style="display:flex; justify-content:space-between; padding:10px;">
+  <div class="wrapper">
+    <div style="display:flex; justify-content:space-between; padding:10px;">
+      <!-- PLAYER -->
+      <div style="width:40%; text-align:left;">
+        <div>Kamu: <span id="hpPlayerText">100</span></div>
+        <div class="hp-box">
+          <div id="hpPlayer" class="hp-fill player"></div>
+        </div>
+      </div>
 
-    <!-- PLAYER -->
-    <div style="width:40%; text-align:left;">
-      <div>Kamu: <span id="hpPlayerText">100</span></div>
-      <div class="hp-box">
-        <div id="hpPlayer" class="hp-fill player"></div>
+      <!-- MONSTER -->
+      <div style="width:40%; text-align:right;">
+        <div>Monster: <span id="hpMonsterText">100</span></div>
+        <div class="hp-box">
+          <div id="hpMonster" class="hp-fill monster"></div>
+        </div>
       </div>
     </div>
-
-    <!-- MONSTER -->
-    <div style="width:40%; text-align:right;">
-      <div>Monster: <span id="hpMonsterText">100</span></div>
-      <div class="hp-box">
-        <div id="hpMonster" class="hp-fill monster"></div>
-      </div>
-    </div>
-
   </div>
 
   <!-- QUIZ -->
