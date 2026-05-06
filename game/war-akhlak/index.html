@@ -244,58 +244,63 @@ animation: blink 0.5s infinite;
 
 
 /* =========================
-   MODE HP
+   MOBILE FIX FINAL
 ========================= */
-@media (max-width: 768px) {
-
+@media screen and (max-width: 768px) {
+  /* BODY */
   html, body {
+    margin: 0;
+    padding: 0;
     overflow-y: auto;
     height: auto;
-  }
-
-  body {
-    display: flex;
-    flex-direction: column;
     background: black;
   }
 
-  /* VIDEO AREA */
+  body {
+    display: block;
+  }
+
+  /* VIDEO */
   #video1,
   #video2 {
     position: relative !important;
-    width: 100%;
-    height: auto;
-    max-height: 45vh;
-    object-fit: contain;
+    top: unset !important;
+    left: unset !important;
+    width: 100% !important;
+    height: 40vh !important;
+    object-fit: contain !important;
+    z-index: 1 !important;
     background: black;
   }
 
   /* GAME UI */
   #gameUI {
-    position: relative;
-    height: auto;
+    position: relative !important;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    height: auto !important;
   }
 
-  /* HP AREA */
+  /* HP */
   .hp-wrapper {
     position: absolute;
-    top: 10px;
+    top: 5px;
     left: 0;
     width: 100%;
     z-index: 5;
   }
 
-  /* QUIZ AREA */
+  /* QUIZ */
   #quizBox {
-    position: relative;
+    position: relative !important;
     width: 100%;
     background: rgba(0,0,0,0.95);
-    padding: 20px 15px;
+    margin: 0;
+    padding: 20px;
     box-sizing: border-box;
-    margin-top: 0;
     border-top: 2px solid white;
+    z-index: 2;
   }
 
   /* QUESTION */
@@ -303,7 +308,6 @@ animation: blink 0.5s infinite;
     text-align: center;
     font-size: 16px;
     line-height: 1.5;
-    margin-bottom: 20px;
   }
 
   /* ANSWERS */
@@ -311,6 +315,7 @@ animation: blink 0.5s infinite;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    margin-top: 20px;
   }
 
   /* BUTTON */
