@@ -242,6 +242,57 @@ animation: blink 0.5s infinite;
   padding: 10px 20px;
 }
 
+/* MODE HP */
+@media (max-width: 768px) {
+
+  /* video hanya di atas */
+  #video1, #video2 {
+    position: relative;
+    width: 100%;
+    height: 50vh; /* setengah layar */
+    object-fit: cover;
+  }
+
+  /* game UI jadi vertikal */
+  #gameUI {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  /* HP bar tetap di atas */
+  .hp-container {
+    width: 90%;
+    margin: 5px auto;
+  }
+
+  /* quiz di bawah */
+  #quizBox {
+    position: relative;
+    width: 100%;
+    background: rgba(0,0,0,0.9);
+    padding: 15px;
+    text-align: center;
+  }
+
+  /* tombol biar enak di HP */
+  #answers button {
+    width: 100%;
+    margin: 5px 0;
+  }
+
+  #question {
+    font-size: 16px;
+  }
+
+  button {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+}
+
 </style>
 </head>
 
