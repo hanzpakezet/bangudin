@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Game Edukasi Battle</title>
+
+<style>
+
+/* overlay awal */
+#startScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  z-index: 10;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* container box */
+#boxContainer {
+  display: grid;
+  grid-template-columns: repeat(5, 90px);
+  gap: 25px; /* ini yang bikin jarak jauh */
+  margin-top: 30px;
+}
+
+/* box */
+.box {
+  width: 90px;
+  height: 90px;
+  background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+  border: 2px solid rgba(255,255,255,0.4);
+  border-radius: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: bold;
+  font-size: 18px;
+  color: white;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* hover effect */
+.box:hover {
+  transform: scale(1.08);
+  border-color: white;
+  background: linear-gradient(145deg, #3a3a3a, #222);
+}
+
+/* klik effect */
+.box:active {
+  transform: scale(0.95);
+}
+
+/* story */
+#storyBox {
+  margin-top: 20px;
+  max-width: 500px;
+  text-align: center;
+}
+
+/* RESET */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  color: white;
+}
+
+/* VIDEO BACKGROUND */
+#bgVideo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* UI LAYER */
+#gameUI {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* HP */
+.hp-container {
+  width: 80%;
+  margin: 10px auto;
+}
+
+.hp-bar {
+  height: 20px;
+  background: limegreen;
+  border-radius: 5px;
+  transition: width 0.5s;
+}
+
+/* QUIZ PANEL */
+#quizBox {
+  width: 100%;
+  background: rgba(0,0,0,0.7);
+  padding: 20px 0;
+  border-top: 2px solid white;
+
+  text-align: center; /* ini kuncinya */
+}
+
+#question {
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+/* BUTTON */
+button {
+  padding: 10px 15px;
+  margin: 5px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+#answers {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+#answers button {
+  width: 200px;
+  min-width: 120px;
+}
+
+/* FEEDBACK */
+#feedback {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+/* BOX (wadah HP) */
+.hp-box {
+  width: 100%;
+  height: 28px; /* lebih tebal */
+  border: 2px solid white;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.1);
+}
+
+/* FILL (isi HP) */
+.hp-fill {
+  height: 100%;
+  transition: width 0.4s;
+}
+
+/* PLAYER (kiri) */
+.hp-fill.player {
+  background: limegreen;
+  width: 100%;
+}
+
+/* MONSTER (kanan) */
+.hp-fill.monster {
+  background: limegreen;
+  width: 100%;
+  margin-left: auto; /* ini bikin dia nempel kanan */
+}
+
+.hp-fill.low {
+  background: orange;
+}
+
+.hp-fill.critical {
+  background: red;
+animation: blink 0.5s infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0.5; }
+}
+
+/* overlay gelap */
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  z-index: 5;
+}
+
+/* popup box */
+#popupBox {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  background: #111;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+
+  z-index: 6;
+}
+
+#popupBox button {
+  margin-top: 15px;
+  padding: 10px 20px;
+}
+
+</style>
+</head>
+
+<body>
+
+  <div id="startScreen">
+
+    <h2>Pilih satu box</h2>
+
+    <div id="boxContainer"></div>
+
+    <div id="storyBox" style="display:none;">
+      <p id="storyText"></p>
+      <button onclick="startGame()">Mulai Game</button>
+    </div>
+
+  </div>
+
+<!-- VIDEO BACKGROUND -->
+<video id="video1" autoplay muted loop></video>
+<video id="video2" autoplay muted loop style="display:none;"></video>
+
+<!-- UI -->
+<div id="gameUI">
+
+  <!-- HP -->
+  <div style="display:flex; justify-content:space-between; padding:10px;">
+
+    <!-- PLAYER -->
+    <div style="width:40%; text-align:left;">
+      <div>Kamu: <span id="hpPlayerText">100</span></div>
+      <div class="hp-box">
+        <div id="hpPlayer" class="hp-fill player"></div>
+      </div>
+    </div>
+
+    <!-- MONSTER -->
+    <div style="width:40%; text-align:right;">
+      <div>Monster: <span id="hpMonsterText">100</span></div>
+      <div class="hp-box">
+        <div id="hpMonster" class="hp-fill monster"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quizBox">
+    <p id="question">Loading...</p>
+    <div id="answers"></div>
+  </div>
+
+</div>
+
+<script>
+
+// ================= DATA =================
+let hpPlayer = 100;
+let hpMonster = 100;
+let currentQuestion = 0;
+let questions = [];
+let isAnswering = false;
+
+const stories = [
+
+/* ===================== CERITA 1 ===================== */
+{
+text: "Di sebuah fakultas hukum, seorang mahasiswi bernama Alya mulai merasa tidak nyaman dengan salah satu seniornya. Senior tersebut sering memberikan komentar tentang penampilan Alya, mulai dari cara berpakaian hingga bentuk tubuhnya. Awalnya Alya mencoba menganggapnya sebagai candaan biasa, namun lama-kelamaan komentar tersebut menjadi semakin personal dan membuatnya merasa tertekan. Bahkan, ketika Alya mencoba menghindar, senior tersebut justru semakin sering mencari perhatian dengan cara yang tidak pantas. Beberapa teman Alya menyadari hal ini, namun hanya sedikit yang berani menegur. Dalam situasi ini, terlihat bahwa kurangnya kesadaran terhadap batasan interaksi dapat mengarah pada pelecehan verbal bahkan seksual secara tidak langsung.",
+
+questions: [
+{q:"Berdasarkan cerita tersebut, bagaimana seharusnya kita mengkategorikan perilaku senior yang terus memberikan komentar personal terhadap tubuh dan penampilan Alya?",a:["Candaan biasa dalam pergaulan kampus","Bentuk perhatian yang wajar dari senior","Pelecehan verbal yang berpotensi berkembang menjadi pelecehan seksual","Cara membangun hubungan sosial"],correct:2},
+{q:"Mengapa tindakan yang awalnya dianggap candaan dapat berubah menjadi bentuk kekerasan verbal?",a:["Karena korban terlalu sensitif","Karena candaan yang berulang dapat melukai psikologis seseorang","Karena tidak ada aturan kampus","Karena semua orang melakukannya"],correct:1},
+{q:"Apa dampak utama yang dirasakan Alya akibat perlakuan tersebut?",a:["Meningkatnya rasa percaya diri","Rasa tidak nyaman dan tekanan mental","Motivasi untuk berubah","Kedekatan dengan senior"],correct:1},
+{q:"Dalam perspektif akhlak Islam, bagaimana seharusnya seseorang menjaga interaksi dengan lawan jenis?",a:["Bebas selama tidak ketahuan","Menjaga batasan dan kehormatan","Mengikuti lingkungan","Tidak perlu diatur"],correct:1},
+{q:"Apa peran teman-teman Alya dalam situasi ini?",a:["Ikut diam karena bukan urusan mereka","Menertawakan agar suasana cair","Berani menegur dan mendukung korban","Menghindari konflik"],correct:2},
+{q:"Mengapa penting untuk memahami batasan dalam bercanda?",a:["Agar terlihat lucu","Agar tidak melanggar norma dan menyakiti orang lain","Agar disukai semua orang","Agar bebas berekspresi"],correct:1},
+{q:"Apa bentuk pencegahan yang bisa dilakukan di lingkungan kampus?",a:["Membiarkan semua perilaku","Meningkatkan kesadaran dan edukasi tentang pelecehan","Menghindari semua interaksi","Menutup diri"],correct:1},
+{q:"Mengapa korban sering sulit melawan?",a:["Karena tidak peduli","Karena tekanan sosial dan rasa takut","Karena tidak tahu","Karena malas"],correct:1},
+{q:"Apa nilai akhlak utama yang dilanggar dalam cerita tersebut?",a:["Kejujuran","Menjaga kehormatan","Kedisiplinan","Kesabaran"],correct:1},
+{q:"Bagaimana seharusnya seorang senior bersikap kepada junior?",a:["Bebas berperilaku","Memberi contoh yang baik dan menghormati","Menguji mental dengan tekanan","Mengabaikan"],correct:1},
+{q:"Apa dampak jangka panjang dari pelecehan verbal?",a:["Tidak ada dampak","Trauma dan gangguan kepercayaan diri","Hiburan","Motivasi"],correct:1},
+{q:"Mengapa edukasi tentang pelecehan penting?",a:["Agar viral","Agar semua orang paham batasan","Agar terlihat pintar","Agar bebas"],correct:1},
+{q:"Apa sikap Islami dalam menjaga lisan?",a:["Berkata bebas","Berkata baik atau diam","Mengikuti tren","Bercanda tanpa batas"],correct:1},
+{q:"Bagaimana sikap terbaik Alya?",a:["Diam terus","Melaporkan atau mencari dukungan","Membalas","Menghindar selamanya"],correct:1},
+{q:"Kesimpulan utama dari cerita ini adalah?",a:["Candaan tidak masalah","Penting menjaga batasan dan menghormati orang lain","Semua bebas","Tidak penting"],correct:1}
+]
+},
+
+/* ===================== CERITA 2 ===================== */
+{
+text: "Di sebuah kampus, seorang mahasiswi bernama Nadia sedang mengambil mata kuliah yang diajar oleh seorang dosen yang cukup berpengaruh. Awalnya interaksi berjalan normal, hingga suatu saat dosen tersebut mulai memberikan perhatian khusus kepada Nadia, seperti memuji secara berlebihan, sering mengirim pesan di luar konteks akademik, dan mengajak bertemu secara pribadi tanpa alasan yang jelas. Nadia merasa tidak nyaman, namun ia juga takut jika menolak atau bersikap tegas akan memengaruhi nilai akademiknya. Beberapa temannya menyarankan untuk 'ikut saja agar aman', sementara yang lain merasa itu tidak wajar. Situasi ini menunjukkan bagaimana relasi kuasa dapat membuat seseorang berada dalam posisi rentan terhadap pelecehan yang terselubung, serta bagaimana tekanan akademik dapat mempersulit korban untuk mengambil sikap.",
+questions: [
+{q:"Dalam cerita tersebut, bagaimana seharusnya kita memahami perilaku dosen yang memberikan perhatian berlebihan di luar konteks akademik?",a:["Sebagai bentuk kepedulian biasa terhadap mahasiswa","Sebagai metode pendekatan untuk membantu akademik","Sebagai potensi penyalahgunaan relasi kuasa yang dapat mengarah pada pelecehan","Sebagai komunikasi yang wajar dalam dunia kampus"],correct:2},
+{q:"Mengapa Nadia merasa takut untuk menolak ajakan dosen tersebut?",a:["Karena tidak peduli dengan situasi","Karena adanya kekhawatiran terhadap dampak nilai akademik","Karena ingin mendapatkan keuntungan","Karena semua mahasiswa mengalaminya"],correct:1},
+{q:"Apa yang dimaksud dengan relasi kuasa dalam konteks cerita ini?",a:["Hubungan pertemanan biasa","Hubungan di mana satu pihak memiliki kekuasaan lebih besar terhadap pihak lain","Hubungan kerja sama setara","Hubungan sosial umum"],correct:1},
+{q:"Mengapa relasi kuasa dapat menjadi berbahaya jika disalahgunakan?",a:["Karena membuat hubungan lebih dekat","Karena dapat menekan pihak yang lebih lemah untuk menerima perlakuan tidak pantas","Karena semua orang setuju","Karena tidak berdampak"],correct:1},
+{q:"Apa tanda awal dari perilaku yang tidak sehat dalam interaksi tersebut?",a:["Diskusi akademik di kelas","Komunikasi formal terkait tugas","Pesan pribadi yang tidak relevan dengan akademik","Penjelasan materi"],correct:2},
+{q:"Bagaimana seharusnya seorang dosen bersikap terhadap mahasiswa?",a:["Bebas selama tidak ketahuan","Menjaga profesionalitas dan batasan","Mengikuti keinginan pribadi","Tidak perlu aturan"],correct:1},
+{q:"Apa dampak psikologis yang mungkin dialami Nadia?",a:["Rasa nyaman","Tekanan dan kebingungan","Motivasi tinggi","Kebahagiaan"],correct:1},
+{q:"Mengapa saran 'ikut saja agar aman' bukan solusi yang tepat?",a:["Karena memperkuat perilaku yang salah","Karena membuat cepat selesai","Karena semua orang melakukannya","Karena mudah"],correct:0},
+{q:"Apa langkah yang seharusnya dilakukan Nadia dalam situasi tersebut?",a:["Diam dan mengikuti semua permintaan","Mencari dukungan dan melaporkan kepada pihak berwenang","Membalas secara emosional","Menghindari semua kegiatan akademik"],correct:1},
+{q:"Mengapa penting adanya sistem pelaporan di kampus?",a:["Agar terlihat resmi","Untuk melindungi korban dan mencegah penyalahgunaan kekuasaan","Untuk formalitas","Agar semua sama"],correct:1},
+{q:"Dalam perspektif akhlak Islam, bagaimana seharusnya seseorang menjaga interaksi dengan lawan jenis dalam posisi tidak setara?",a:["Bebas selama tidak diketahui","Menjaga batasan, kehormatan, dan niat","Mengikuti kebiasaan lingkungan","Tidak perlu diatur"],correct:1},
+{q:"Apa nilai akhlak utama yang dilanggar dalam cerita tersebut?",a:["Kedisiplinan","Kejujuran","Menjaga amanah dan kehormatan","Kesabaran"],correct:2},
+{q:"Mengapa korban sering merasa ragu untuk melapor?",a:["Karena tidak peduli","Karena takut konsekuensi dan tidak dipercaya","Karena tidak ada masalah","Karena ingin diam"],correct:1},
+{q:"Apa peran teman dalam situasi seperti ini?",a:["Menyarankan untuk diam","Mendukung dan membantu mencari solusi","Menertawakan","Menghindari"],correct:1},
+{q:"Kesimpulan utama dari cerita tersebut adalah?",a:["Semua interaksi bebas","Penting menjaga profesionalitas dan tidak menyalahgunakan kekuasaan","Tidak perlu aturan","Hal tersebut wajar"],correct:1}
+]
+},
+
+/* ===================== CERITA 3 ===================== */
+
+{
+text: "Di sebuah organisasi kampus, seorang mahasiswa bernama Rafi mulai merasa tidak nyaman berada di lingkungannya sendiri. Awalnya semua terlihat normal, hingga beberapa anggota mulai memberikan julukan-julukan yang merendahkan dirinya. Mereka sering menertawakan cara bicara, penampilan, bahkan latar belakang Rafi di depan orang lain. Hal tersebut dianggap sebagai candaan dan 'bumbu keakraban', namun dilakukan secara berulang. Seiring waktu, Rafi menjadi semakin pendiam, menghindari pertemuan, dan kehilangan rasa percaya diri. Yang lebih mengkhawatirkan, anggota lain yang melihat kejadian tersebut justru ikut tertawa atau memilih diam karena takut dikucilkan. Fenomena ini menunjukkan bagaimana kekerasan verbal bisa dinormalisasi dalam kelompok, dan bagaimana tekanan sosial membuat orang enggan untuk bertindak benar.",
+questions: [
+{q:"Dalam konteks cerita tersebut, bagaimana seharusnya kita mengklasifikasikan perilaku pemberian julukan yang merendahkan kepada Rafi?",a:["Sebagai bentuk keakraban dalam organisasi","Sebagai candaan yang wajar dalam pergaulan","Sebagai kekerasan verbal yang dapat merusak kondisi mental","Sebagai cara membangun hubungan sosial"],correct:2},
+{q:"Mengapa tindakan yang dianggap candaan dapat berubah menjadi sesuatu yang berbahaya bagi korban?",a:["Karena korban terlalu sensitif terhadap lingkungan","Karena candaan yang terus diulang dapat melukai harga diri dan mental seseorang","Karena tidak ada aturan tertulis yang melarangnya","Karena semua orang pernah mengalaminya"],correct:1},
+{q:"Apa dampak psikologis yang paling terlihat pada Rafi akibat perlakuan tersebut?",a:["Menjadi lebih percaya diri","Merasa terhibur","Menarik diri dan kehilangan kepercayaan diri","Menjadi lebih aktif"],correct:2},
+{q:"Mengapa anggota lain memilih diam atau ikut tertawa dalam situasi tersebut?",a:["Karena mereka setuju sepenuhnya","Karena ingin menjaga posisi sosial dan takut dikucilkan","Karena tidak memahami situasi","Karena tidak peduli"],correct:1},
+{q:"Fenomena ikut-ikutan dalam kelompok tanpa berpikir kritis disebut sebagai apa?",a:["Empati sosial","Tekanan kelompok (peer pressure)","Kepedulian","Solidaritas positif"],correct:1},
+{q:"Dalam perspektif akhlak Islam, bagaimana seharusnya seseorang memperlakukan orang lain dalam pergaulan?",a:["Bebas selama tidak ada yang protes","Mengikuti kebiasaan lingkungan","Menjaga lisan dan menghormati orang lain","Mengutamakan hiburan"],correct:2},
+{q:"Apa peran penting seorang individu ketika melihat tindakan yang salah dalam kelompok?",a:["Diam agar tidak terlibat","Ikut serta agar diterima","Berani menegur atau menghentikan dengan cara yang baik","Menghindar sepenuhnya"],correct:2},
+{q:"Mengapa kekerasan verbal sering sulit dikenali dibanding kekerasan fisik?",a:["Karena tidak terlihat secara langsung namun berdampak pada mental","Karena tidak pernah terjadi","Karena selalu dianggap lucu","Karena mudah diabaikan"],correct:0},
+{q:"Apa dampak jangka panjang jika perilaku seperti ini terus dibiarkan dalam suatu lingkungan?",a:["Lingkungan menjadi lebih kuat","Lingkungan menjadi tidak sehat dan penuh tekanan","Lingkungan menjadi lebih bebas","Tidak ada dampak berarti"],correct:1},
+{q:"Bagaimana cara menciptakan lingkungan organisasi yang sehat dan aman?",a:["Membiarkan semua perilaku selama tidak ada konflik besar","Menjaga sikap, ucapan, dan saling menghargai satu sama lain","Menghindari semua interaksi","Membatasi komunikasi"],correct:1},
+{q:"Apa nilai akhlak utama yang dilanggar dalam cerita tersebut?",a:["Kejujuran","Menjaga kehormatan dan lisan","Kedisiplinan","Kesabaran"],correct:1},
+{q:"Mengapa menghargai perbedaan sangat penting dalam lingkungan sosial?",a:["Agar terlihat baik","Agar semua orang merasa aman dan dihargai","Agar tidak ada konflik sama sekali","Agar bebas berpendapat"],correct:1},
+{q:"Apa yang seharusnya dilakukan oleh Rafi untuk mengatasi situasi tersebut?",a:["Terus diam dan menahan diri","Mencari dukungan dan berbicara kepada pihak yang dipercaya","Membalas dengan cara yang sama","Menghindari semua orang selamanya"],correct:1},
+{q:"Bagaimana Islam memandang tindakan menghina atau merendahkan orang lain?",a:["Diperbolehkan jika bercanda","Dilarang karena menyakiti hati dan merusak hubungan","Netral tergantung situasi","Diperbolehkan dalam kelompok"],correct:1},
+{q:"Kesimpulan utama yang dapat diambil dari cerita tersebut adalah?",a:["Candaan selalu tidak berbahaya","Penting untuk menjaga ucapan dan berani melawan perilaku yang salah","Semua orang bebas berperilaku","Tidak perlu terlalu serius dalam pergaulan"],correct:1}
+]
+},
+
+/* ===================== CERITA 4 ===================== */
+
+{
+text: "Dalam sebuah kegiatan malam keakraban di kampus, seorang mahasiswa baru bernama Fikri mengalami perlakuan yang tidak pantas dari beberapa senior. Dengan alasan 'melatih mental', Fikri dipaksa melakukan aktivitas fisik yang melelahkan secara berlebihan, seperti push-up tanpa batas dan berdiri berjam-jam tanpa istirahat. Tidak hanya itu, ia juga dipermalukan di depan peserta lain dengan teriakan dan kata-kata kasar. Beberapa mahasiswa lain merasa bahwa hal tersebut sudah berlebihan, namun tidak ada yang berani menghentikan karena takut terhadap senioritas. Fikri sendiri merasa tertekan, takut, dan tidak berdaya. Situasi ini menunjukkan bagaimana budaya senioritas yang salah dapat berubah menjadi bentuk kekerasan fisik dan mental yang merusak, meskipun dibungkus dengan alasan pembinaan.",
+questions: [
+{q:"Dalam cerita tersebut, bagaimana seharusnya kita menilai tindakan senior yang memaksa Fikri melakukan aktivitas fisik berlebihan?",a:["Sebagai metode pelatihan mental yang wajar","Sebagai bentuk kedisiplinan yang diperlukan","Sebagai kekerasan fisik dan mental yang tidak dapat dibenarkan","Sebagai tradisi kampus yang harus dijaga"],correct:2},
+{q:"Mengapa alasan 'melatih mental' tidak dapat digunakan untuk membenarkan tindakan tersebut?",a:["Karena semua orang tidak setuju","Karena melibatkan tindakan yang menyakiti dan melanggar batas kemanusiaan","Karena tidak ada aturan tertulis","Karena hanya sebagian orang yang mengalami"],correct:1},
+{q:"Apa dampak psikologis yang mungkin dialami oleh Fikri akibat perlakuan tersebut?",a:["Meningkatnya rasa percaya diri","Perasaan takut, tertekan, dan tidak aman","Semangat belajar yang meningkat","Kebahagiaan dalam beradaptasi"],correct:1},
+{q:"Mengapa mahasiswa lain memilih untuk diam meskipun merasa tidak nyaman?",a:["Karena mereka setuju dengan tindakan tersebut","Karena takut terhadap senior dan tekanan sosial","Karena tidak peduli dengan situasi","Karena ingin ikut terlibat"],correct:1},
+{q:"Fenomena di mana seseorang tidak berani bertindak karena tekanan dari kelompok disebut sebagai apa?",a:["Empati sosial","Tekanan kelompok (peer pressure)","Kepedulian","Kebebasan individu"],correct:1},
+{q:"Dalam perspektif akhlak Islam, bagaimana seharusnya seseorang memperlakukan orang lain dalam situasi seperti ini?",a:["Boleh keras selama untuk tujuan baik","Harus menjaga keselamatan dan martabat orang lain","Mengikuti kebiasaan lingkungan","Bebas bertindak"],correct:1},
+{q:"Apa peran penting seorang mahasiswa ketika melihat tindakan kekerasan di lingkungan kampus?",a:["Diam agar aman","Ikut serta agar diterima","Berani menolak dan mencari bantuan atau melaporkan","Menghindari sepenuhnya"],correct:2},
+{q:"Mengapa kekerasan fisik sering dibungkus dengan istilah 'tradisi' atau 'pembinaan'?",a:["Agar terlihat benar dan dapat diterima","Karena memang benar","Karena tidak ada dampak","Karena semua orang setuju"],correct:0},
+{q:"Apa dampak jangka panjang jika budaya seperti ini terus dipertahankan?",a:["Lingkungan menjadi kuat","Lingkungan menjadi penuh kekerasan dan ketakutan","Lingkungan menjadi bebas","Tidak ada perubahan"],correct:1},
+{q:"Bagaimana cara menciptakan budaya kampus yang sehat?",a:["Membiarkan tradisi lama berjalan","Menegakkan aturan dan menghormati sesama","Menghindari semua kegiatan","Membatasi interaksi"],correct:1},
+{q:"Apa nilai akhlak utama yang dilanggar dalam cerita tersebut?",a:["Kejujuran","Kemanusiaan dan kasih sayang","Kedisiplinan","Kesabaran"],correct:1},
+{q:"Mengapa senior seharusnya menjadi teladan bagi junior?",a:["Agar ditakuti","Agar dihormati melalui sikap baik","Agar berkuasa","Agar bebas"],correct:1},
+{q:"Apa yang seharusnya dilakukan oleh Fikri dalam menghadapi situasi tersebut?",a:["Terus mengikuti tanpa berpikir","Mencari bantuan atau melaporkan kepada pihak berwenang","Membalas dengan kekerasan","Menghindari semua orang selamanya"],correct:1},
+{q:"Bagaimana Islam memandang tindakan menyakiti orang lain secara fisik maupun mental?",a:["Diperbolehkan jika ada tujuan","Dilarang karena merusak dan melanggar nilai kemanusiaan","Netral tergantung situasi","Diperbolehkan dalam kelompok"],correct:1},
+{q:"Kesimpulan utama dari cerita tersebut adalah?",a:["Tradisi harus dijaga apa pun bentuknya","Kekerasan tidak dapat dibenarkan meskipun dibungkus alasan baik","Semua bebas bertindak","Tidak perlu terlalu serius"],correct:1}
+]
+},
+
+
+/* ===================== CERITA 5 ===================== */
+
+{
+text: "Di lingkungan kampus, seorang mahasiswi bernama Sinta menjalin hubungan dengan seorang mahasiswa bernama Arga. Awalnya hubungan mereka terlihat biasa, bahkan Arga dikenal perhatian dan protektif. Namun seiring waktu, sikap Arga berubah menjadi semakin mengontrol. Ia mulai melarang Sinta berteman dengan orang lain, memeriksa ponselnya tanpa izin, dan mudah marah ketika Sinta tidak menuruti keinginannya. Pada suatu titik, pertengkaran mereka berubah menjadi tindakan fisik seperti menarik tangan dengan kasar dan mendorong. Setelah itu, Arga selalu meminta maaf dan berjanji tidak akan mengulanginya, namun kejadian serupa terus berulang. Sinta merasa bingung, takut, dan sulit keluar dari hubungan tersebut karena masih berharap Arga akan berubah. Situasi ini menunjukkan bagaimana kekerasan dalam hubungan dapat terjadi secara bertahap dan sering disertai manipulasi emosional.",
+questions: [
+{q:"Bagaimana kita mengidentifikasi perubahan sikap Arga dari perhatian menjadi perilaku yang tidak sehat dalam hubungan tersebut?",a:["Sebagai bentuk cinta yang tulus","Sebagai perhatian yang berlebihan namun wajar","Sebagai kontrol berlebihan yang mengarah pada hubungan tidak sehat","Sebagai bentuk perlindungan biasa"],correct:2},
+{q:"Mengapa tindakan seperti memeriksa ponsel tanpa izin dan melarang berteman termasuk perilaku yang bermasalah?",a:["Karena itu menunjukkan kepedulian","Karena melanggar privasi dan kebebasan individu","Karena semua pasangan melakukannya","Karena itu hal biasa"],correct:1},
+{q:"Apa yang menunjukkan bahwa hubungan tersebut sudah masuk ke dalam kategori kekerasan?",a:["Adanya perhatian lebih","Adanya pertengkaran biasa","Adanya tindakan fisik seperti mendorong dan menarik dengan kasar","Adanya komunikasi intens"],correct:2},
+{q:"Mengapa Sinta merasa sulit keluar dari hubungan tersebut?",a:["Karena tidak ada pilihan lain","Karena manipulasi emosional dan harapan perubahan dari pasangan","Karena tidak sadar","Karena ingin bertahan"],correct:1},
+{q:"Apa yang dimaksud dengan manipulasi emosional dalam konteks cerita ini?",a:["Memberi hadiah","Membuat korban merasa bersalah agar tetap bertahan","Memberi perhatian","Bersikap baik"],correct:1},
+{q:"Mengapa permintaan maaf dari pelaku tidak selalu berarti perubahan nyata?",a:["Karena maaf tidak penting","Karena sering digunakan untuk mengulang siklus kekerasan","Karena semua orang berubah","Karena tidak berpengaruh"],correct:1},
+{q:"Apa dampak psikologis yang dialami korban dalam hubungan seperti ini?",a:["Rasa aman","Rasa takut, bingung, dan ketergantungan","Semangat tinggi","Kebahagiaan"],correct:1},
+{q:"Bagaimana seharusnya seseorang menyikapi hubungan yang sudah mengandung kekerasan?",a:["Tetap bertahan","Mencari bantuan dan keluar dari hubungan tersebut","Diam saja","Mengabaikan"],correct:1},
+{q:"Mengapa penting mengenali tanda-tanda awal hubungan tidak sehat?",a:["Agar bisa melanjutkan","Agar bisa mencegah kekerasan lebih lanjut","Agar terlihat pintar","Agar bebas"],correct:1},
+{q:"Dalam perspektif akhlak Islam, bagaimana seharusnya hubungan antar manusia dijalankan?",a:["Dengan kontrol dan tekanan","Dengan kasih sayang, penghormatan, dan tanggung jawab","Dengan kebebasan mutlak","Dengan dominasi"],correct:1},
+{q:"Apa nilai akhlak utama yang dilanggar dalam cerita tersebut?",a:["Kejujuran","Kasih sayang dan penghormatan terhadap sesama","Kedisiplinan","Kesabaran"],correct:1},
+{q:"Mengapa kekerasan dalam hubungan sering tidak disadari sejak awal?",a:["Karena terjadi secara tiba-tiba","Karena muncul secara bertahap dan terselubung","Karena tidak terlihat","Karena tidak penting"],correct:1},
+{q:"Apa peran teman atau lingkungan dalam membantu korban?",a:["Menyuruh bertahan","Memberikan dukungan dan solusi","Mengabaikan","Menilai"],correct:1},
+{q:"Apa langkah konkret yang bisa dilakukan korban untuk keluar dari situasi tersebut?",a:["Diam saja","Mencari bantuan dari pihak terpercaya atau lembaga terkait","Membalas kekerasan","Menghindar tanpa solusi"],correct:1},
+{q:"Kesimpulan utama dari cerita tersebut adalah?",a:["Semua hubungan harus dipertahankan","Kekerasan dalam hubungan tidak boleh ditoleransi dan harus dihentikan","Hubungan bebas tanpa batas","Tidak perlu dipikirkan"],correct:1}
+]
+},
+
+/* ===================== CERITA 6 ===================== */
+{
+text: "Seorang anak sering membantah dan berbicara kasar kepada orang tuanya ketika dinasihati. Ia merasa lebih tahu dan tidak mau mendengarkan. Padahal dalam Islam, berbakti kepada orang tua adalah salah satu perintah utama yang harus dijaga sepanjang hidup.",
+
+questions: [
+{q:"Perilaku membantah orang tua menunjukkan sikap apa?",a:["Hormat","Durhaka","Peduli","Netral"],correct:1},
+{q:"Mengapa berbicara kasar kepada orang tua tidak dibenarkan?",a:["Karena biasa","Karena melanggar akhlak","Karena lucu","Karena bebas"],correct:1},
+{q:"Apa yang diajarkan Islam tentang orang tua?",a:["Bebas","Harus dihormati","Diabaikan","Dilawan"],correct:1},
+{q:"Apa akibat durhaka kepada orang tua?",a:["Bahagia","Dosa","Lucu","Biasa"],correct:1},
+{q:"Sikap yang benar adalah?",a:["Membantah","Mendengarkan","Menghina","Menghindar"],correct:1},
+{q:"Menghormati orang tua termasuk?",a:["Opsional","Akhlak terpuji","Netral","Tidak penting"],correct:1},
+{q:"Apa yang harus dilakukan saat dinasihati?",a:["Marah","Mendengarkan","Menghindar","Membalas"],correct:1},
+{q:"Ucapan sopan menunjukkan?",a:["Kelemahan","Akhlak baik","Kebiasaan","Netral"],correct:1},
+{q:"Perilaku buruk harus?",a:["Dilanjutkan","Dihentikan","Didiamkan","Ditiru"],correct:1},
+{q:"Mengapa orang tua penting?",a:["Karena biasa","Karena berjasa","Karena lucu","Karena netral"],correct:1},
+{q:"Akhlak baik mencerminkan?",a:["Harta","Iman","Status","Gaya"],correct:1},
+{q:"Sikap kasar berdampak?",a:["Baik","Buruk","Lucu","Netral"],correct:1},
+{q:"Apa yang harus dihindari?",a:["Sopan","Kasar","Baik","Netral"],correct:1},
+{q:"Tujuan akhlak?",a:["Menghina","Perbaikan diri","Lucu","Netral"],correct:1},
+{q:"Kesimpulan cerita?",a:["Wajar","Harus hormat","Lucu","Netral"],correct:1}
+]
+},
+
+/* ===================== CERITA 7 ===================== */
+{
+text: "Seorang siswa dengan tulus membantu temannya yang kesulitan memahami pelajaran tanpa mengharapkan imbalan apapun. Ia merasa bahwa membantu orang lain adalah bagian dari kebaikan yang harus dilakukan.",
+
+questions: [
+{q:"Perilaku membantu tanpa imbalan menunjukkan sikap apa?",a:["Riya","Ikhlas","Pamer","Biasa"],correct:1},
+{q:"Mengapa membantu teman itu penting?",a:["Agar terkenal","Agar saling menolong","Agar lucu","Agar santai"],correct:1},
+{q:"Apa nilai utama dalam cerita?",a:["Kesombongan","Keikhlasan","Kebencian","Netral"],correct:1},
+{q:"Sikap ikhlas berarti?",a:["Mengharap balasan","Tanpa pamrih","Pamer","Diam"],correct:1},
+{q:"Islam mengajarkan?",a:["Egois","Tolong-menolong","Diam","Netral"],correct:1},
+{q:"Apa dampak kebaikan?",a:["Konflik","Kebahagiaan","Lucu","Netral"],correct:1},
+{q:"Lingkungan baik?",a:["Egois","Saling bantu","Bebas","Netral"],correct:1},
+{q:"Menolong orang lain termasuk?",a:["Buruk","Baik","Netral","Lucu"],correct:1},
+{q:"Apa yang harus dihindari?",a:["Ikhlas","Riya","Baik","Netral"],correct:1},
+{q:"Akhlak terpuji?",a:["Egois","Peduli","Marah","Cuek"],correct:1},
+{q:"Sikap peduli berarti?",a:["Cuek","Perhatian","Marah","Benci"],correct:1},
+{q:"Perilaku baik membawa?",a:["Masalah","Kebaikan","Lucu","Netral"],correct:1},
+{q:"Tujuan membantu?",a:["Pamer","Menolong","Menghina","Netral"],correct:1},
+{q:"Mengapa harus ikhlas?",a:["Agar dipuji","Agar bernilai","Agar bebas","Agar lucu"],correct:1},
+{q:"Kesimpulan?",a:["Tidak penting","Ikhlas itu penting","Lucu","Netral"],correct:1}
+]
+},
+
+/* ===================== CERITA 8 ===================== */
+{
+text: "Seorang siswa mengalami perundungan fisik di sekolah oleh teman-temannya. Ia merasa takut dan tidak nyaman untuk datang ke sekolah. Hal ini menunjukkan pentingnya menciptakan lingkungan yang aman.",
+
+questions: [
+{q:"Perundungan fisik termasuk?",a:["Baik","Kekerasan","Lucu","Netral"],correct:1},
+{q:"Dampak bagi korban?",a:["Bahagia","Takut","Lucu","Netral"],correct:1},
+{q:"Apa yang harus dilakukan?",a:["Ikut","Melaporkan","Diam","Menertawakan"],correct:1},
+{q:"Lingkungan aman berarti?",a:["Keras","Nyaman","Lucu","Netral"],correct:1},
+{q:"Islam melarang?",a:["Baik","Kekerasan","Lucu","Netral"],correct:1},
+{q:"Sikap teman?",a:["Ikut","Menolong","Diam","Menertawakan"],correct:1},
+{q:"Akibat jangka panjang?",a:["Baik","Trauma","Lucu","Netral"],correct:1},
+{q:"Perilaku baik?",a:["Menyakiti","Melindungi","Menghina","Netral"],correct:1},
+{q:"Menghormati orang lain?",a:["Buruk","Wajib","Lucu","Netral"],correct:1},
+{q:"Kekerasan berdampak?",a:["Positif","Negatif","Lucu","Netral"],correct:1},
+{q:"Apa solusi terbaik?",a:["Diam","Hentikan","Ikut","Netral"],correct:1},
+{q:"Akhlak baik?",a:["Kasar","Lembut","Lucu","Netral"],correct:1},
+{q:"Sikap peduli?",a:["Cuek","Menolong","Marah","Netral"],correct:1},
+{q:"Lingkungan sehat?",a:["Keras","Damai","Lucu","Netral"],correct:1},
+{q:"Kesimpulan?",a:["Wajar","Harus dihentikan","Lucu","Netral"],correct:1}
+]
+},
+
+/* ===================== CERITA 9 ===================== */
+{
+text: "Seorang siswa dikenal rajin beribadah dan selalu menjaga sikapnya terhadap orang lain. Ia menjadi contoh bagi teman-temannya.",
+
+questions: [
+{q:"Perilaku tersebut mencerminkan?",a:["Akhlak baik","Buruk","Lucu","Netral"],correct:0},
+{q:"Mengapa ibadah penting?",a:["Biasa","Mendekatkan diri","Lucu","Netral"],correct:1},
+{q:"Sikap baik terhadap orang lain?",a:["Menghina","Menghargai","Cuek","Netral"],correct:1},
+{q:"Contoh baik disebut?",a:["Buruk","Teladan","Lucu","Netral"],correct:1},
+{q:"Akhlak mencerminkan?",a:["Harta","Iman","Status","Netral"],correct:1},
+{q:"Lingkungan baik?",a:["Buruk","Positif","Lucu","Netral"],correct:1},
+{q:"Ibadah membawa?",a:["Masalah","Kebaikan","Lucu","Netral"],correct:1},
+{q:"Sikap sopan?",a:["Baik","Buruk","Lucu","Netral"],correct:0},
+{q:"Perilaku baik harus?",a:["Ditinggalkan","Dipertahankan","Lucu","Netral"],correct:1},
+{q:"Menjadi teladan berarti?",a:["Buruk","Dicontoh","Lucu","Netral"],correct:1},
+{q:"Apa yang harus dijaga?",a:["Akhlak","Ego","Lucu","Netral"],correct:0},
+{q:"Sikap baik berdampak?",a:["Negatif","Positif","Lucu","Netral"],correct:1},
+{q:"Menghormati orang lain?",a:["Buruk","Baik","Lucu","Netral"],correct:1},
+{q:"Akhlak baik penting?",a:["Tidak","Ya","Lucu","Netral"],correct:1},
+{q:"Kesimpulan?",a:["Tidak penting","Harus dijaga","Lucu","Netral"],correct:1}
+]
+},
+
+/* ===================== CERITA 10 ===================== */
+{
+text: "Seorang siswa sering bercanda dengan kata-kata kasar tanpa sadar bahwa hal tersebut menyakiti hati temannya.",
+
+questions: [
+{q:"Bercanda kasar termasuk?",a:["Baik","Buruk","Lucu","Netral"],correct:1},
+{q:"Mengapa bisa menyakiti?",a:["Lucu","Melukai hati","Netral","Biasa"],correct:1},
+{q:"Sikap terbaik?",a:["Teruskan","Perbaiki","Diam","Netral"],correct:1},
+{q:"Menjaga lisan berarti?",a:["Bebas","Baik","Lucu","Netral"],correct:1},
+{q:"Ucapan buruk?",a:["Baik","Dosa","Lucu","Netral"],correct:1},
+{q:"Apa dampaknya?",a:["Bahagia","Sedih","Lucu","Netral"],correct:1},
+{q:"Sikap Islami?",a:["Kasar","Santun","Lucu","Netral"],correct:1},
+{q:"Lingkungan baik?",a:["Kasar","Sopan","Lucu","Netral"],correct:1},
+{q:"Empati berarti?",a:["Cuek","Peduli","Marah","Netral"],correct:1},
+{q:"Akhlak baik?",a:["Buruk","Baik","Lucu","Netral"],correct:1},
+{q:"Perilaku harus?",a:["Dilanjutkan","Diperbaiki","Lucu","Netral"],correct:1},
+{q:"Menghina orang?",a:["Baik","Dosa","Lucu","Netral"],correct:1},
+{q:"Ucapan sopan?",a:["Buruk","Baik","Lucu","Netral"],correct:1},
+{q:"Tujuan akhlak?",a:["Menghina","Perbaikan","Lucu","Netral"],correct:1},
+{q:"Kesimpulan?",a:["Wajar","Harus dijaga","Lucu","Netral"],correct:1}
+]
+}
+
+];
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+let selectedStory = null;
+
+let shuffledStories = [];
+
+function createBoxes() {
+  const container = document.getElementById("boxContainer");
+  container.innerHTML = "";
+
+  // shuffle cerita
+  shuffledStories = [...stories];
+  shuffleArray(shuffledStories);
+
+  for (let i = 0; i < 10; i++) {
+    let div = document.createElement("div");
+    div.className = "box";
+    div.innerText = i + 1;
+
+    div.onclick = () => {
+
+      // ambil random langsung
+      let randomIndex = Math.floor(Math.random() * shuffledStories.length);
+      selectedStory = shuffledStories[randomIndex];
+
+      container.style.display = "none";
+
+      document.querySelector("#startScreen h2").innerText = "Baca petunjuk berikut";
+
+      document.getElementById("storyText").innerText = selectedStory.text;
+      document.getElementById("storyBox").style.display = "block";
+    };
+
+    container.appendChild(div);
+  }
+}
+
+// ================= VIDEO =================
+let activeVideo = document.getElementById("video1");
+let nextVideo = document.getElementById("video2");
+
+function switchVideo(src, loop=false, speed=1, callback=null) {
+
+  // siapkan video berikutnya
+  nextVideo.src = src;
+  nextVideo.loop = loop;
+
+  nextVideo.onloadeddata = () => {
+    nextVideo.playbackRate = speed;
+    nextVideo.play();
+
+    // tampilkan video baru
+    nextVideo.style.display = "block";
+    activeVideo.style.display = "none";
+
+    // swap
+    let temp = activeVideo;
+    activeVideo = nextVideo;
+    nextVideo = temp;
+
+    if (callback) {
+      activeVideo.onended = () => {
+        activeVideo.onended = null;
+        callback();
+      };
+    }
+  };
+}
+
+// ================= HP =================
+function updateHP() {
+
+  let playerBar = document.getElementById("hpPlayer");
+  let monsterBar = document.getElementById("hpMonster");
+
+  // reset class dulu (biar nggak numpuk)
+  playerBar.classList.remove("low", "critical");
+  monsterBar.classList.remove("low", "critical");
+
+  // update width
+  playerBar.style.width = hpPlayer + "%";
+  monsterBar.style.width = hpMonster + "%";
+
+  // update text
+  document.getElementById("hpPlayerText").innerText = hpPlayer;
+  document.getElementById("hpMonsterText").innerText = hpMonster;
+
+  // PLAYER warna
+  if (hpPlayer < 50) playerBar.classList.add("low");
+  if (hpPlayer < 20) playerBar.classList.add("critical");
+
+  // MONSTER warna
+  if (hpMonster < 50) monsterBar.classList.add("low");
+  if (hpMonster < 20) monsterBar.classList.add("critical");
+}
+
+// ================= LOAD =================
+function loadQuestion() {
+  if (currentQuestion >= questions.length) return;
+
+  let q = questions[currentQuestion];
+  document.getElementById("question").innerText = q.q;
+
+  let html = "";
+  q.a.forEach((ans, i) => {
+    html += `<button onclick="answer(${i})">${ans}</button>`;
+  });
+
+  document.getElementById("answers").innerHTML = html;
+  document.querySelectorAll("#answers button").forEach(btn => {
+    btn.disabled = false;
+  });
+}
+
+// ================= ANSWER =================
+function answer(index) {
+  // kalau sedang proses, blok
+  if (isAnswering) return;
+  isAnswering = true;
+  document.querySelectorAll("#answers button").forEach(btn => {
+    btn.disabled = true;
+  });
+  let q = questions[currentQuestion];
+  if (index === q.correct) {
+    if (hpMonster <= 20) {
+      hpMonster = 0;
+      updateHP();
+
+      switchVideo("monster_mati.mp4", false, 1.2, () => {
+        showGameOver("Kamu Menang!");
+      });
+
+      return;
+    }
+
+    hpMonster -= 20;
+    updateHP();
+
+    switchVideo("tentara_serang.mp4", false, 2.5, () => {
+      isAnswering = false; // buka lagi
+      cekGame();
+    });
+
+  } else {
+
+    if (hpPlayer <= 20) {
+      hpPlayer = 0;
+      updateHP();
+
+      switchVideo("tentara_mati.mp4", false, 1.2, () => {
+        showGameOver("Kamu Kalah!");
+      });
+
+      return;
+    }
+
+    hpPlayer -= 20;
+    updateHP();
+
+    switchVideo("monster_serang.mp4", false, 2.5, () => {
+      isAnswering = false; // buka lagi
+      cekGame();
+    });
+  }
+}
+
+// ================= CHECK =================
+function cekGame() {
+
+  if (hpMonster <= 0) {
+    switchVideo("monster_mati.mp4", false, 1.2);
+    showGameOver("Kamu Menang!");
+    return;
+  }
+
+  if (hpPlayer <= 0) {
+    switchVideo("tentara_mati.mp4");
+    showGameOver("Kamu Kalah!");
+    return;
+  }
+
+  currentQuestion++;
+  loadQuestion();
+
+  switchVideo("efek_diam.mp4", true, 1);
+}
+
+function showGameOver(text) {
+  document.getElementById("resultText").innerText = text;
+  document.getElementById("gameOver").style.display = "block";
+}
+
+function restartGame() {
+  hpPlayer = 100;
+  hpMonster = 100;
+  currentQuestion = 0;
+
+  questions.sort(() => Math.random() - 0.5);
+
+  document.getElementById("gameOver").style.display = "none";
+  document.getElementById("boxContainer").style.display = "grid";
+  document.getElementById("storyBox").style.display = "none";
+  document.querySelector("#startScreen h2").innerText = "Pilih satu box";
+
+  createBoxes();
+  document.getElementById("startScreen").style.display = "flex";
+
+  updateHP();
+  loadQuestion();
+  switchVideo("efek_diam.mp4", true, 1);
+}
+
+// ================= START =================
+switchVideo("efek_diam.mp4", true, 1);
+updateHP();
+loadQuestion();
+
+function startGame() {
+  document.getElementById("startScreen").style.display = "none";
+
+  // pakai soal dari cerita
+  questions.length = 0;
+  selectedStory.questions.forEach(q => questions.push(q));
+
+  // shuffle soal
+  questions.sort(() => Math.random() - 0.5);
+
+  currentQuestion = 0;
+
+  loadQuestion();
+}
+
+createBoxes();
+
+</script>
+
+<div id="gameOver" style="display:none;">
+  <div id="overlay"></div>
+
+  <div id="popupBox">
+    <h2 id="resultText">Kamu Menang!</h2>
+    <button onclick="restartGame()">Main Lagi</button>
+  </div>
+</div>
+
+</body>
+</html>
