@@ -78,7 +78,7 @@
 #storyText {
   font-size: 24px;
   line-height: 1.6;
-  text-align: justify;
+  text-align: center;
   width: 100%;
   margin: 0 auto;
   word-break: break-word;
@@ -189,18 +189,26 @@ button:hover {
 
 #answers {
   display: flex;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px auto 0 auto;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 10px;
 }
 
 #answers button {
-  width: 200px;
-  min-width: 120px;
+  min-width: 260px;
+  max-width: 500px;
+  width: 100%;
+  padding: 14px 20px;
   font-size: 18px;
-  padding: 14px;
+  line-height: 1.4;
+  border-radius: 12px;
+  white-space: normal;
+  word-break: break-word;
 }
-
 /* FEEDBACK */
 #feedback {
   margin-top: 10px;
