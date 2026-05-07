@@ -248,19 +248,34 @@ animation: blink 0.5s infinite;
 }
 
 #timer {
-  font-size: 42px;
+  font-size: 46px;
   font-weight: bold;
-  color: #ff2b2b;
+  color: white;
   text-shadow:
-    0 0 5px #ff0000,
-    0 0 10px #ff0000,
-    0 0 20px #ff0000,
-    2px 2px 0 #000;
+    0 0 5px red,
+    0 0 10px red,
+    0 0 20px red,
+    3px 3px 0 black;
   font-family: 'Creepster', cursive;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
   min-width: 80px;
   text-align: center;
   z-index: 20;
+}
+
+.hp-name {
+  font-family: 'Creepster', cursive;
+  font-size: 26px;
+  color: white;
+  text-shadow:
+    0 0 5px black,
+    2px 2px 0 black;
+  margin-bottom: 6px;
+  letter-spacing: 2px;
+}
+
+.lowhp {
+  color: red !important;
 }
 
 /* =========================
@@ -406,7 +421,9 @@ animation: blink 0.5s infinite;
     <div style="display:flex; justify-content:space-between; padding:10px;">
       <!-- PLAYER -->
       <div style="width:40%; text-align:left;">
-        <div>Kamu: <span id="hpPlayerText">100</span></div>
+        <div class="hp-name">
+          Kamu : <span id="hpPlayerText">100</span>
+        </div>
         <div class="hp-box">
           <div id="hpPlayer" class="hp-fill player"></div>
         </div>
@@ -416,7 +433,9 @@ animation: blink 0.5s infinite;
 
       <!-- MONSTER -->
       <div style="width:40%; text-align:right;">
-        <div>Monster: <span id="hpMonsterText">100</span></div>
+        <div class="hp-name">
+          Monster : <span id="hpMonsterText">100</span>
+        </div>
         <div class="hp-box">
           <div id="hpMonster" class="hp-fill monster"></div>
         </div>
@@ -693,6 +712,10 @@ function startTimer() {
       
       if (timeLeft <= 5) {
       document.getElementById("timer").style.color = "yellow";
+      }
+
+      if (hpPlayer <= 40) {
+        document.querySelector(".hp-name").classList.add("lowhp");
       }
 
       // cek mati
