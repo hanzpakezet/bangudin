@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Game Edukasi Battle</title>
+<link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
 
 <style>
 
@@ -246,6 +247,22 @@ animation: blink 0.5s infinite;
   padding: 10px 20px;
 }
 
+#timer {
+  font-size: 42px;
+  font-weight: bold;
+  color: #ff2b2b;
+  text-shadow:
+    0 0 5px #ff0000,
+    0 0 10px #ff0000,
+    0 0 20px #ff0000,
+    2px 2px 0 #000;
+  font-family: 'Creepster', cursive;
+  letter-spacing: 2px;
+  min-width: 80px;
+  text-align: center;
+  z-index: 20;
+}
+
 /* =========================
    MOBILE LAYOUT FIX
 ========================= */
@@ -357,6 +374,8 @@ animation: blink 0.5s infinite;
 
 }
 
+
+
 </style>
 </head>
 
@@ -393,6 +412,8 @@ animation: blink 0.5s infinite;
         </div>
       </div>
 
+      <div id="timer">20</div>
+
       <!-- MONSTER -->
       <div style="width:40%; text-align:right;">
         <div>Monster: <span id="hpMonsterText">100</span></div>
@@ -419,6 +440,8 @@ let hpMonster = 100;
 let currentQuestion = 0;
 let questions = [];
 let isAnswering = false;
+let timer;
+let timeLeft = 20;
 
 const stories = [
 
@@ -654,6 +677,44 @@ questions: [
 
 ];
 
+function startTimer() {
+  clearInterval(timer);
+  timeLeft = 20;
+  document.getElementById("timer").innerText = timeLeft;
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timer").innerText = timeLeft;
+    // waktu habis
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      // cegah spam
+      if (isAnswering) return;
+      isAnswering = true;
+      
+      if (timeLeft <= 5) {
+      document.getElementById("timer").style.color = "yellow";
+      }
+
+      // cek mati
+      if (hpPlayer <= 20) {
+        hpPlayer = 0;
+        updateHP();
+        switchVideo("tentara_mati.mp4", false, 1.2, () => {
+          showGameOver("Kamu Kalah!");
+        });
+        return;
+      }
+      // monster serang
+      hpPlayer -= 20;
+      updateHP();
+      switchVideo("monster_serang.mp4", false, 2.5, () => {
+        isAnswering = false;
+        cekGame();
+      });
+    }
+  }, 1000);
+}
+
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
@@ -771,10 +832,12 @@ function loadQuestion() {
   document.querySelectorAll("#answers button").forEach(btn => {
     btn.disabled = false;
   });
+  startTimer();
 }
 
 // ================= ANSWER =================
 function answer(index) {
+  clearInterval(timer);
   // kalau sedang proses, blok
   if (isAnswering) return;
   isAnswering = true;
@@ -852,46 +915,23 @@ function showGameOver(text) {
 }
 
 function restartGame() {
-
-  // reset anti spam click
-  isAnswering = false;
-
+  
+  isAnswering = false; // reset anti spam click
   // reset hp
   hpPlayer = 100;
   hpMonster = 100;
 
-  // reset soal
-  currentQuestion = 0;
-
-  // acak soal lagi
-  questions.sort(() => Math.random() - 0.5);
-
-  // sembunyikan popup game over
-  document.getElementById("gameOver").style.display = "none";
-
-  // tampilkan box lagi
-  document.getElementById("boxContainer").style.display = "grid";
-
-  // sembunyikan cerita
-  document.getElementById("storyBox").style.display = "none";
-
-  // reset judul
-  document.querySelector("#startScreen h2").innerText = "Pilih satu box";
-
-  // acak ulang box
-  createBoxes();
-
-  // tampilkan start screen
-  document.getElementById("startScreen").style.display = "flex";
-
-  // update hp
-  updateHP();
-
-  // load soal lagi
-  loadQuestion();
-
-  // reset video idle
-  switchVideo("efek_diam.mp4", true, 1);
+  currentQuestion = 0; // reset soal
+  questions.sort(() => Math.random() - 0.5); // acak soal lagi
+  document.getElementById("gameOver").style.display = "none";// sembunyikan popup game over
+  document.getElementById("boxContainer").style.display = "grid";// tampilkan box lagi
+  document.getElementById("storyBox").style.display = "none"; // sembunyikan cerita
+  document.querySelector("#startScreen h2").innerText = "Pilih satu box";  // reset judul
+  createBoxes(); // acak ulang box
+  document.getElementById("startScreen").style.display = "flex";  // tampilkan start screen
+  updateHP();// update hp
+  loadQuestion(); // load soal lagi
+  switchVideo("efek_diam.mp4", true, 1); // reset video idle
 }
 
 // ================= START =================
