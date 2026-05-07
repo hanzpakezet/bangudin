@@ -246,61 +246,33 @@ animation: blink 0.5s infinite;
 }
 
 /* =========================
-   MOBILE LAYOUT FIX FINAL
-   KHUSUS HP / iPHONE
+   MOBILE PERFECT FIX
 ========================= */
 @media screen and (max-width: 768px) {
 
-  /* BODY */
   html,
   body {
+
     margin: 0;
     padding: 0;
 
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-
     width: 100%;
-    height: auto !important;
+    height: auto;
+
+    overflow-x: hidden;
+    overflow-y: auto;
 
     background: black;
   }
 
   body {
+
     display: flex;
     flex-direction: column;
   }
 
   /* =========================
-     VIDEO AREA
-  ========================= */
-  #video1,
-  #video2 {
-
-    position: relative !important;
-
-    display: block !important;
-
-    width: 100% !important;
-
-    height: auto !important;
-
-    max-height: 40vh !important;
-
-    object-fit: contain !important;
-
-    background: black;
-
-    top: unset !important;
-    left: unset !important;
-    bottom: unset !important;
-    right: unset !important;
-
-    z-index: 1 !important;
-  }
-
-  /* =========================
-     GAME UI
+     GAME AREA
   ========================= */
   #gameUI {
 
@@ -310,25 +282,45 @@ animation: blink 0.5s infinite;
     flex-direction: column;
 
     width: 100%;
-
     height: auto !important;
-
-    overflow: visible !important;
   }
 
   /* =========================
-     HP BAR AREA
+     VIDEO
+  ========================= */
+  #video1,
+  #video2 {
+
+    position: relative !important;
+
+    display: block;
+
+    width: 100% !important;
+
+    height: auto !important;
+
+    max-height: 35vh !important;
+
+    object-fit: contain !important;
+
+    background: black;
+
+    z-index: 1;
+  }
+
+  /* =========================
+     HP WRAPPER
   ========================= */
   .wrapper {
 
-    position: absolute;
+    position: absolute !important;
 
-    top: 10px;
+    top: 5px;
     left: 0;
 
     width: 100%;
 
-    z-index: 5;
+    z-index: 10;
 
     padding: 0 10px;
 
@@ -342,19 +334,19 @@ animation: blink 0.5s infinite;
 
     position: relative !important;
 
-    width: 100% !important;
+    width: 100%;
 
-    margin-top: 10px;
+    margin: 0 !important;
 
-    padding: 20px;
+    padding: 15px;
 
     box-sizing: border-box;
 
     background: rgba(0,0,0,0.95);
 
-    border-top: 2px solid rgba(255,255,255,0.2);
+    border-top: 1px solid rgba(255,255,255,0.2);
 
-    z-index: 10;
+    z-index: 5;
   }
 
   /* =========================
@@ -364,13 +356,11 @@ animation: blink 0.5s infinite;
 
     font-size: 16px;
 
-    line-height: 1.6;
+    line-height: 1.5;
 
     text-align: center;
 
-    margin-bottom: 20px;
-
-    color: white;
+    margin-bottom: 15px;
   }
 
   /* =========================
@@ -382,9 +372,7 @@ animation: blink 0.5s infinite;
 
     flex-direction: column;
 
-    gap: 12px;
-
-    width: 100%;
+    gap: 10px;
   }
 
   /* =========================
@@ -394,51 +382,11 @@ animation: blink 0.5s infinite;
 
     width: 100%;
 
-    padding: 14px;
+    padding: 12px;
 
-    font-size: 16px;
+    font-size: 15px;
 
     border-radius: 10px;
-
-    border: 1px solid rgba(255,255,255,0.2);
-
-    box-sizing: border-box;
-  }
-
-  /* =========================
-     STORY SCREEN
-  ========================= */
-  #storyBox {
-
-    width: 90%;
-
-    max-height: 70vh;
-
-    overflow-y: auto;
-
-    padding: 20px;
-
-    box-sizing: border-box;
-  }
-
-  /* =========================
-     BOX CONTAINER
-  ========================= */
-  #boxContainer {
-
-    grid-template-columns: repeat(2, 1fr);
-
-    gap: 20px;
-  }
-
-  /* =========================
-     BOX
-  ========================= */
-  .box {
-
-    width: 100%;
-
-    height: 80px;
   }
 
 }
