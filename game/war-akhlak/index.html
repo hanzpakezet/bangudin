@@ -985,6 +985,8 @@ function showGameOver(text) {
 function restartGame() {
   
   isAnswering = false; // reset anti spam click
+  clearInterval(timer);
+  
   // reset hp
   hpPlayer = 100;
   hpMonster = 100;
@@ -998,7 +1000,6 @@ function restartGame() {
   createBoxes(); // acak ulang box
   document.getElementById("startScreen").style.display = "flex";  // tampilkan start screen
   updateHP();// update hp
-  loadQuestion(); // load soal lagi
   switchVideo("efek_diam.mp4", true, 1); // reset video idle
 }
 
