@@ -852,22 +852,45 @@ function showGameOver(text) {
 }
 
 function restartGame() {
+
+  // reset anti spam click
+  isAnswering = false;
+
+  // reset hp
   hpPlayer = 100;
   hpMonster = 100;
+
+  // reset soal
   currentQuestion = 0;
 
+  // acak soal lagi
   questions.sort(() => Math.random() - 0.5);
 
+  // sembunyikan popup game over
   document.getElementById("gameOver").style.display = "none";
+
+  // tampilkan box lagi
   document.getElementById("boxContainer").style.display = "grid";
+
+  // sembunyikan cerita
   document.getElementById("storyBox").style.display = "none";
+
+  // reset judul
   document.querySelector("#startScreen h2").innerText = "Pilih satu box";
 
+  // acak ulang box
   createBoxes();
+
+  // tampilkan start screen
   document.getElementById("startScreen").style.display = "flex";
 
+  // update hp
   updateHP();
+
+  // load soal lagi
   loadQuestion();
+
+  // reset video idle
   switchVideo("efek_diam.mp4", true, 1);
 }
 
@@ -902,6 +925,25 @@ createBoxes();
     <h2 id="resultText">Kamu Menang!</h2>
     <button onclick="restartGame()">Main Lagi</button>
   </div>
+</div>
+
+<!-- PRELOAD VIDEO -->
+<div style="display:none;">
+  <video preload="auto">
+    <source src="efek_diam.mp4" type="video/mp4">
+  </video>
+  <video preload="auto">
+    <source src="tentara_serang.mp4" type="video/mp4">
+  </video>
+  <video preload="auto">
+    <source src="monster_serang.mp4" type="video/mp4">
+  </video>
+  <video preload="auto">
+    <source src="monster_mati.mp4" type="video/mp4">
+  </video>
+  <video preload="auto">
+    <source src="tentara_mati.mp4" type="video/mp4">
+  </video>
 </div>
 
 </body>
