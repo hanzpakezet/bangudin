@@ -70,6 +70,23 @@
   text-align: center;
 }
 
+#storyText {
+  font-size: 22px;
+  line-height: 1.9;
+  color: white;
+  text-align: left;
+  padding: 10px;
+  font-family: Arial, sans-serif;
+}
+
+#startStoryBtn {
+  font-size: 24px;
+  padding: 14px 30px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
 /* RESET */
 html, body {
   margin: 0;
@@ -141,6 +158,8 @@ html, body {
   text-align: center;
   font-size: 18px;
   margin-bottom: 15px;
+  font-size: 24px;
+  line-height: 1.6;
 }
 
 /* BUTTON */
@@ -166,6 +185,8 @@ button:hover {
 #answers button {
   width: 200px;
   min-width: 120px;
+  font-size: 18px;
+  padding: 14px;
 }
 
 /* FEEDBACK */
@@ -397,16 +418,12 @@ animation: blink 0.5s infinite;
 <body>
 
   <div id="startScreen">
-
     <h2>Pilih satu box</h2>
-
     <div id="boxContainer"></div>
-
     <div id="storyBox" style="display:none;">
       <p id="storyText"></p>
-      <button onclick="startGame()">Mulai Game</button>
+      <button id="startStoryBtn" onclick="startGame()">Mulai Game</button>
     </div>
-
   </div>
 
 <!-- VIDEO BACKGROUND -->
