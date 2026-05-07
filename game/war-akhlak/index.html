@@ -89,21 +89,22 @@ html, body {
   z-index: -1;
 }
 
+/* VIDEO DESKTOP */
 #video1,
 #video2 {
-  position: relative !important;
-  display: block;
-  width: 100% !important;
-  height: auto !important;
-  max-height: 40vh !important;
+  position: fixed;
+  top: 0;
+  left: 0;
 
-  object-fit: contain !important;
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  z-index: -1;
 
   background: black;
-
-  margin: 0 auto;
 }
-
 /* UI LAYER */
 #gameUI {
   position: relative;
