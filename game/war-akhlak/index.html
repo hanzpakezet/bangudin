@@ -189,26 +189,29 @@ button:hover {
 
 #answers {
   display: flex;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  width: 100%;
-  max-width: 1200px;
-  margin: 20px auto 0 auto;
   justify-content: center;
-  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 12px;
+  flex-wrap: nowrap;
+  width: 100%;
+  overflow-x: auto;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 #answers button {
-  min-width: 260px;
-  max-width: 500px;
-  width: 100%;
-  padding: 14px 20px;
-  font-size: 18px;
+  flex: 1;
+  min-width: 220px;
+  max-width: 350px;
+  padding: 12px 16px;
+  font-size: 17px;
   line-height: 1.4;
-  border-radius: 12px;
+  border-radius: 10px;
   white-space: normal;
   word-break: break-word;
+  text-align: center;
 }
+
 /* FEEDBACK */
 #feedback {
   margin-top: 10px;
