@@ -1148,20 +1148,27 @@ function isMobileDevice() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
-// TAMPILKAN POPUP
-window.addEventListener("load", () => {
-  if (isMobileDevice()) {
-    document.getElementById("mobileWarning").style.display = "flex";
-  }
-});
+// // TAMPILKAN POPUP
+// window.addEventListener("load", () => {
+//   if (isMobileDevice()) {
+//     document.getElementById("mobileWarning").style.display = "flex";
+//   }
+// });
 
-// TUTUP POPUP
+// // TUTUP POPUP
+// function closeMobileWarning() {
+//   document.getElementById("mobileWarning").style.display = "none";
+// }
+
 function closeMobileWarning() {
   document.getElementById("mobileWarning").style.display = "none";
 }
 
 function openGameIntro() {
+  // tutup popup intro
   document.getElementById("introPopup").style.display = "none";
+  // tampilkan popup warning
+  document.getElementById("mobileWarning").style.display = "flex";
 }
 
 </script>
@@ -1200,12 +1207,15 @@ function openGameIntro() {
     <h2>⚠ Peringatan</h2>
     <p>
       Game ini dapat menyebabkan gangguan pernafasan,
-      Trauma berat, Insomnia, Anxiety, Gangguan Ginjal dan Janin.
-      
-      Hehe, canda...
-
-      Game ini belum disediakan untuk perangkat mobile.
-      silahkan buka website menggunakan laptop atau PC.
+      trauma berat, insomnia, anxiety,
+      gangguan ginjal dan janin.
+      <br><br>
+      Hehe... canda.. Game ini aman😄
+      <br><br>
+      Untuk pengalaman bermain terbaik,
+      disarankan membuka game menggunakan laptop atau PC.
+      <br><br>
+      Perangkat mobile masih dalam tahap pengembangan.
     </p>
     <button class="gameButton" onclick="closeMobileWarning()">
       Lanjutkan
