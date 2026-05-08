@@ -7,6 +7,90 @@
 
 <style>
 
+/* =========================
+   INTRO POPUP
+========================= */
+#introPopup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.92);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999;
+}
+
+#introBox {
+  width: 80%;
+  max-width: 1000px;
+  background: rgba(10,10,10,0.95);
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 40px;
+  color: white;
+  box-sizing: border-box;
+  box-shadow: 0 0 40px rgba(255,0,0,0.2);
+}
+
+#introBox h1 {
+  text-align: center;
+  font-size: 46px;
+  margin-bottom: 25px;
+  font-family: 'Creepster', cursive;
+  color: white;
+  text-shadow:
+    0 0 10px red,
+    0 0 20px red;
+}
+
+.introDesc {
+  font-size: 22px;
+  line-height: 1.8;
+  text-align: justify;
+  margin-bottom: 35px;
+}
+
+#introBox h2 {
+  text-align: center;
+  font-size: 32px;
+  margin-bottom: 25px;
+  font-family: 'Creepster', cursive;
+}
+
+.memberGrid {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  margin-bottom: 40px;
+}
+
+.memberColumn {
+  text-align: left;
+}
+
+.memberColumn p {
+  font-size: 22px;
+  line-height: 1.9;
+  margin: 0;
+}
+
+#openGameBtn {
+  display: block;
+  margin: 0 auto;
+  padding: 16px 50px;
+  font-size: 26px;
+  font-weight: bold;
+  border-radius: 14px;
+  border: 2px solid #ff4444;
+  background: linear-gradient(to bottom, #cc0000, #550000);
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(255,0,0,0.4);
+}
+
 /* overlay awal */
 #startScreen {
   position: fixed;
@@ -1050,6 +1134,10 @@ function closeMobileWarning() {
   document.getElementById("mobileWarning").style.display = "none";
 }
 
+function openGameIntro() {
+  document.getElementById("introPopup").style.display = "none";
+}
+
 </script>
 
 <div id="gameOver" style="display:none;">
@@ -1090,6 +1178,35 @@ function closeMobileWarning() {
     </p>
     <button onclick="closeMobileWarning()">
       Lanjutkan
+    </button>
+  </div>
+</div>
+
+<!-- INTRO POPUP -->
+<div id="introPopup">
+  <div id="introBox">
+    <h1>Adventure Edu Game</h1>
+    <p class="introDesc">
+      AI yang digunakan dalam game ini adalah ChatGPT dan GrokAI.
+      Game ini dibangun dengan coding yang 100% dihasilkan oleh ChatGPT.
+      Efek visual dalam game hanya berupa video yang dihasilkan dengan GrokAI.
+    </p>
+    <h2>Anggota Kelompok</h2>
+    <div class="memberGrid">
+      <div class="memberColumn">
+        <p>1. Siti Fadilah Ramadani</p>
+        <p>2. Lazimatun Ni'mah</p>
+        <p>3. Nailil 'Ulya</p>
+      </div>
+
+      <div class="memberColumn">
+        <p>4. Fajar Sodik Abdurrahman</p>
+        <p>5. Badi Mustofa</p>
+        <p>6. Farchanudin</p>
+      </div>
+    </div>
+    <button id="openGameBtn" onclick="openGameIntro()">
+      Buka Game
     </button>
   </div>
 </div>
