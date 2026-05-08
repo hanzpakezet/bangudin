@@ -91,6 +91,29 @@
   box-shadow: 0 0 20px rgba(255,0,0,0.4);
 }
 
+/* =========================
+   GLOBAL GAME BUTTON
+========================= */
+.gameButton {
+  display: block;
+  margin: 0 auto;
+  padding: 16px 50px;
+  font-size: 26px;
+  font-weight: bold;
+  border-radius: 14px;
+  border: 2px solid #ff4444;
+  background: linear-gradient(to bottom, #cc0000, #550000);
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(255,0,0,0.4);
+  transition: 0.2s;
+}
+
+.gameButton:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(255,0,0,0.6);
+}
+
 /* overlay awal */
 #startScreen {
   position: fixed;
@@ -516,16 +539,19 @@ animation: blink 0.5s infinite;
 }
 
 #mobileWarningBox h2 {
-  font-size: 28px;
-  margin-bottom: 15px;
+  font-size: 42px;
+  margin-bottom: 20px;
   color: #ff4444;
   font-family: 'Creepster', cursive;
+  text-shadow:
+    0 0 10px red,
+    0 0 20px red;
 }
 
 #mobileWarningBox p {
-  font-size: 18px;
-  line-height: 1.7;
-  margin-bottom: 20px;
+  font-size: 24px;
+  line-height: 1.8;
+  margin-bottom: 30px;
 }
 
 #mobileWarningBox button {
@@ -1145,7 +1171,7 @@ function openGameIntro() {
 
   <div id="popupBox">
     <h2 id="resultText">Kamu Menang!</h2>
-    <button onclick="restartGame()">Main Lagi</button>
+    <button class="gameButton" onclick="restartGame()">Main Lagi</button>
   </div>
 </div>
 
@@ -1176,7 +1202,7 @@ function openGameIntro() {
       Untuk pengalaman bermain yang lebih baik,
       silahkan buka website ini menggunakan laptop atau PC.
     </p>
-    <button onclick="closeMobileWarning()">
+    <button class="gameButton" onclick="closeMobileWarning()">
       Lanjutkan
     </button>
   </div>
@@ -1205,7 +1231,7 @@ function openGameIntro() {
         <p>6. Farchanudin</p>
       </div>
     </div>
-    <button id="openGameBtn" onclick="openGameIntro()">
+    <button class="gameButton" id="openGameBtn" onclick="openGameIntro()">
       Buka Game
     </button>
   </div>
