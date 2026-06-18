@@ -62,10 +62,10 @@ button:disabled{
 class="fixed inset-0 bg-slate-100 z-50"
 style="display:flex;">
 
-<div class="w-screen h-screen flex">
+<div class="w-screen h-screen flex flex-col lg:flex-row">
 
     <!-- KIRI -->
-    <div class="w-[70%] relative bg-primary-600 overflow-hidden">
+    <div class="hidden lg:flex lg:w-[70%] relative bg-primary-600 overflow-hidden">
 
         <img
         src="login-banner3.png"
@@ -113,17 +113,13 @@ style="display:flex;">
     </div>
 
     <!-- KANAN -->
-    <div class="w-[30%] bg-white flex items-center justify-center">
-
-        <div class="w-[80%]">
-
+    <div class="w-full lg:w-[30%] bg-white flex items-center justify-center">
+        <div class="w-[85%] sm:w-[80%]">
             <div class="mb-10">
-
                 <img
                 src="logo.png"
                 class="h-56 mb-8"
                 alt="Logo">
-
                 <h2 class="text-4xl font-bold tracking-tight text-slate-900">
                     Selamat Datang
                 </h2>
