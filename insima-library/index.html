@@ -611,7 +611,11 @@ async function renderDashboard(){
   const totalBooks=books.reduce((s,b)=>s+b.stockTotal,0);
   const totalStudents=students.length;
   const borrowed=borrows.filter(b=>b.status!=='Selesai').length;
-  const overdue=borrows.filter(b=>b.status==='Terlambat').length;
+  
+    const overdue = borrows.filter(b =>b.status !== 'Selesai' && Math.max( 0, Math.ceil(
+      (new Date(getToday()) - new Date(b.dueDate)) / 864e5 )) > 0
+    ).length;
+
   // const totalFines=borrows.filter(b=>b.fine>0&&!b.finePaid).reduce((s,b)=>s+b.fine,0);
   const DENDA_PER_HARI = 1000;
 
