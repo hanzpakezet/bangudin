@@ -67,12 +67,10 @@ style="display:flex;">
     <!-- KIRI -->
     <div class="hidden lg:flex lg:w-[70%] relative bg-primary-600 overflow-hidden">
 
-        <!-- banner login -->
         <img
-        src="https://raw.githubusercontent.com/hanzpakezet/bangudin/main/insima-library/login-banner3.png"        
+        src="login-banner3.png"
         alt="Banner"
         class="absolute inset-0 w-full h-full object-cover">
-        <!-- src="https://drive.google.com/file/d/1VdS1iG260qOcNK2El2Ms3t_7YV39Ccor&sz=w2000" -->
 
         <div class="absolute inset-0 bg-black/40"></div>
 
@@ -120,15 +118,10 @@ style="display:flex;">
     <div class="w-full lg:w-[30%] bg-white flex items-center justify-center">
         <div class="w-[85%] sm:w-[80%]">
             <div class="mb-10">
-
-                <!-- logo utama -->
                 <img
-                src="https://raw.githubusercontent.com/hanzpakezet/bangudin/main/insima-library/logo.png"
+                src="logo.png"
                 class="h-56 mb-8"
                 alt="Logo">
-                <!-- 
-                src="https://drive.google.com/file/d/1bdfclJIkhTk1Setx9YV40M9ANvD1--pa"  -->
-
                 <h2 class="text-4xl font-bold tracking-tight text-slate-900">
                     Selamat Datang
                 </h2>
@@ -280,22 +273,13 @@ style="display:flex;">
 
 // ===== DATA =====
 const KEYS={books:'lib_books',students:'lib_students',borrows:'lib_borrows',visitors:'lib_visitors',settings:'lib_settings'};
-
-<!-- ISI DENGAN LINK APLIKASI APPSCRIPT NYA -->
 const API_URL = "https://script.google.com/macros/s/AKfycbxnYydiZNlKpRP1bGlt-FiZk_iDObNS_Pxa9U1lZt-ajK7uuAB3nq75ccOxeIBXzwJ8/exec";
-
-let booksCache = [];
 let studentsCache = [];
-let borrowsCache = [];
-let visitorsCache = [];
-let finesCache = [];
-let settingsCache = null;
-let historyCache = [];
+let booksCache = [];
 
 function load(k){try{return JSON.parse(localStorage.getItem(k))||null}catch{return null}}
 function save(k,d){localStorage.setItem(k,JSON.stringify(d))}
-function getLocalSettings(){return load(KEYS.settings)||{libName:'PERPUSTAKAAN INSIMA',schoolName:'SMA INSIMA',address:'',phone:'',finePerDay:1000,loanDays:7,maxBorrow:3}}
-
+function getSettings(){return load(KEYS.settings)||{libName:'PERPUSTAKAAN INSIMA',schoolName:'SMA INSIMA',address:'',phone:'',finePerDay:1000,loanDays:7,maxBorrow:3}}
 function saveSettings(s){save(KEYS.settings,s)}
 
 function initData(){
@@ -330,15 +314,11 @@ function toggleProfileMenu(){
 }
 
 function logout(){
-    localStorage.removeItem('isLoggedIn');
-    window.location.replace("https://script.google.com/macros/s/AKfycbysOTftBSKarIS0aX3Ljm7BBpNPjqwTHLMryKGMhmH3Wi2838hl2y5CxzikYvotngnb/exec");
+  localStorage.removeItem(
+    'isLoggedIn'
+  );
+  location.reload();
 }
-// function logout(){
-//   localStorage.removeItem(
-//     'isLoggedIn'
-//   );
-//   location.reload();
-// }
 
 document.addEventListener(
 'click',
@@ -362,36 +342,12 @@ function(e){
 
 // ----------------------------------------- JS CRUD ---------------------------------
 
-// async function getBooks() {
-//   const res = await fetch(API_URL + "?sheet=Buku");
-//   const json = await res.json();
-//   const rows = json.data;
-
-//   return rows.slice(1).map(r => ({
-//     id: r[0],
-//     title: r[1],
-//     isbn: r[2],
-//     author: r[3],
-//     publisher: r[4],
-//     year: r[5],
-//     category: r[6],
-//     rack: r[7],
-//     stockTotal: Number(r[8]),
-//     stockAvailable: Number(r[9])
-//   }));
-// }
-
-async function getBooks(forceRefresh = false) {
-
-  if (booksCache.length && !forceRefresh) {
-    return booksCache;
-  }
-
+async function getBooks() {
   const res = await fetch(API_URL + "?sheet=Buku");
   const json = await res.json();
   const rows = json.data;
 
-  booksCache = rows.slice(1).map(r => ({
+  return rows.slice(1).map(r => ({
     id: r[0],
     title: r[1],
     isbn: r[2],
@@ -403,127 +359,46 @@ async function getBooks(forceRefresh = false) {
     stockTotal: Number(r[8]),
     stockAvailable: Number(r[9])
   }));
-
-  return booksCache;
-
 }
 
-async function getSettings(forceRefresh = false) {
-
-  if (settingsCache && !forceRefresh) {
-    return settingsCache;
-  }
-
-  const res = await fetch(API_URL + "?sheet=Pengaturan");
-  const json = await res.json();
-  const rows = json.data;
-
-  const settings = {};
-
-  rows.slice(1).forEach(r => {
-    settings[r[0]] = r[1];
-  });
-
-  settingsCache = {
-    libName: settings.NamaPerpustakaan || "",
-    schoolName: settings.NamaSekolah || "",
-    address: settings.Alamat || "",
-    phone: settings.Telepon || "",
-    finePerDay: Number(settings.DendaPerHari || 1000),
-    loanDays: Number(settings.LamaPinjam || 7),
-    maxBorrow: Number(settings.MaksPinjam || 3)
-  };
-
-  return settingsCache;
-
-}
-
-async function getStudents(forceRefresh = false) {
-
-  if (studentsCache.length && !forceRefresh) {
-    return studentsCache;
-  }
-
+async function getStudents() {
   const res = await fetch(API_URL + "?sheet=Siswa");
   const json = await res.json();
   const rows = json.data;
-
-  studentsCache = rows.slice(1).map(r => ({
+  return rows.slice(1).map(r => ({
     nis: r[0],
     name: r[1],
     class: r[2],
     gender: r[3],
     active: r[4] === 'Aktif'
   }));
-
-  return studentsCache;
-
 }
 
-async function getBorrows(forceRefresh = false) {
-
-  if (!settingsCache) {
-      settingsCache = await getSettings(true);
-  }
-
-  if (borrowsCache.length && !forceRefresh) {
-    return borrowsCache;
-  }
-
+async function getBorrows() {
   const res = await fetch(API_URL + "?sheet=Peminjaman");
   const json = await res.json();
 
-  const today = new Date();
-  today.setHours(0,0,0,0);
-
-  borrowsCache = json.data
+  return json.data
     .slice(1)
-    .filter(r => r[0])
-    .map(r => {
-
-        let status = r[7];
-
-        const due = new Date(r[6]);
-        due.setHours(0,0,0,0);
-
-        const lateDays = Math.max(
-          0,
-          Math.floor((today - due) / 86400000)
-        );
-
-        if(status !== "Selesai" && lateDays > 0){
-            status = "Terlambat";
-        }
-
-        return {
-            transactionId: r[0],
-            bookId: r[1],
-            nis: r[2],
-            studentName: r[3],
-            bookTitle: r[4],
-            borrowDate: r[5],
-            dueDate: r[6],
-            status,
-            lateDays,
-            fine: lateDays * settingsCache.finePerDay
-        };
-
-    });
-
-  return borrowsCache;
-
+    .filter(r => r[0])   // hanya ambil yang punya ID transaksi
+    .map(r => ({
+      transactionId: r[0],
+      bookId: r[1],
+      nis: r[2],
+      studentName: r[3],
+      bookTitle: r[4],
+      borrowDate: r[5],
+      dueDate: r[6],
+      status: r[7]
+    }));
 }
 
-async function getVisitors(forceRefresh = false) {
-
-  if (visitorsCache.length && !forceRefresh) {
-    return visitorsCache;
-  }
-
-  const res = await fetch(API_URL + "?sheet=Pengunjung");
+async function getVisitors() {
+  const res = await fetch(
+    API_URL + "?sheet=Pengunjung"
+  );
   const json = await res.json();
-
-  visitorsCache = json.data
+  return json.data
     .slice(1)
     .filter(r => r[0])
     .map(r => ({
@@ -535,73 +410,9 @@ async function getVisitors(forceRefresh = false) {
       purpose: r[5]
     }));
 
-  return visitorsCache;
-
 }
 
-function getToday() {
-  const now = new Date();
-
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-
-  return `${year}-${month}-${day}`;
-}
-
-async function refreshCache(){
-    booksCache = await getBooks(true);
-    studentsCache = await getStudents(true);
-    borrowsCache = await getBorrows(true);
-    visitorsCache = await getVisitors(true);
-    settingsCache = await getSettings(true);
-    finesCache = await getFines(true);
-    historyCache = await getHistory(true);
-
-    console.log("CACHE");
-    console.log("Books :", booksCache.length);
-    console.log("Students :", studentsCache.length);
-    console.log("Borrows :", borrowsCache.length);
-    console.log("Visitors :", visitorsCache.length);
-}
-
-async function preloadEssentialData(){
-    await getSettings(true);
-    await Promise.all([
-        getBooks(true),
-        getStudents(true),
-        getBorrows(true),
-        getVisitors(true)
-    ]);
-}
-
-// async function refreshCache(){
-//     const [
-//         books,
-//         students,
-//         borrows,
-//         visitors,
-//         settings,
-//         fines,
-//         history
-//     ] = await Promise.all([
-//         getBooks(),
-//         getStudents(),
-//         getBorrows(),
-//         getVisitors(),
-//         getSettings(),
-//         getFines(),
-//         getHistory()
-//     ]);
-
-//     booksCache = books;
-//     studentsCache = students;
-//     borrowsCache = borrows;
-//     visitorsCache = visitors;
-//     settingsCache = settings;
-//     finesCache = fines;
-//     historyCache = history;
-// }
+function getToday(){return new Date().toISOString().split('T')[0]}
 
 // ===== UI UTILS =====
 function toast(msg,type='success'){
@@ -732,32 +543,13 @@ async function renderSidebar(){
 }
 
 let currentPage='dashboard';
-const renderedPages = new Set();
-
-async function navigateTo(page){
-
-  currentPage = page;
-
-  document.querySelectorAll('.page-section')
-    .forEach(p => p.classList.remove('active'));
-
-  document.getElementById('page-'+page)
-    .classList.add('active');
-
-  document.getElementById('page-heading').textContent =
-    menuItems.find(m=>m.id===page)?.label || '';
-
-  document.querySelectorAll('.sidebar-item')
-    .forEach(b =>
-      b.classList.toggle('active', b.dataset.page===page)
-    );
-
-  // Tambahan
-  if(!renderedPages.has(page)){
-      await renderPage(page, false);
-      renderedPages.add(page);
-  }
-  toggleSidebar(true);
+function navigateTo(page){
+  currentPage=page;
+  document.querySelectorAll('.page-section').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('page-heading').textContent=menuItems.find(m=>m.id===page)?.label||'';
+  document.querySelectorAll('.sidebar-item').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+  renderPage(page);toggleSidebar(true);
 }
 
 function toggleSidebar(forceClose){
@@ -766,15 +558,26 @@ function toggleSidebar(forceClose){
   else{sb.classList.toggle('open');ov.classList.toggle('hidden')}
 }
 
-async function renderPage(page, forceLoading = false){
+function showLoader(){
+  const loader =
+    document.getElementById('page-loader');
+  if(loader)
+    loader.style.width = '70%';
+}
 
-  if(renderedPages.has(page) && !forceLoading){
-    return;
-  }
-  if(forceLoading){
-    showLoader();
-  }
+function hideLoader(){
+  const loader =
+    document.getElementById('page-loader');
+  if(!loader) return;
+  loader.style.width = '100%';
+  setTimeout(()=>{
+    loader.style.width = '0%';
+  },300);
+}
 
+async function renderPage(page){
+  showLoader();
+  // showTableLoading(page); // render dengan loading memuat data
   const r={
     dashboard:renderDashboard,
     books:renderBooks,
@@ -787,93 +590,25 @@ async function renderPage(page, forceLoading = false){
     fines:renderFines,
     settings:renderSettings
   };
-
   try{
-
-    if(forceLoading){
-
-      const pageElement = document.getElementById(`page-${page}`);
-
-      pageElement.innerHTML = `
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-10 text-center">
-          <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent mb-4"></div>
-
-          <p class="text-gray-500 dark:text-gray-400 font-medium">
-            Memuat data...
-          </p>
-        </div>
-      `;
-
-    }
-
-    if(r[page]){
+    if(r[page])
       await r[page]();
-      renderedPages.add(page);
-    }
-
   }finally{
-
-    if(forceLoading){
-      hideLoader();
-    }
-
+    hideLoader();
   }
-
 }
-
-// async function renderPage(page){
-//   showLoader();
-//   // showTableLoading(page); // render dengan loading memuat data
-//   const r={
-//     dashboard:renderDashboard,
-//     books:renderBooks,
-//     students:renderStudents,
-//     borrow:renderBorrow,
-//     return:renderReturn,
-//     history:renderHistory,
-//     visitors:renderVisitors,
-//     stats:renderStats,
-//     fines:renderFines,
-//     settings:renderSettings
-//   };
-//   try{
-//     const pageElement = document.getElementById(`page-${page}`);
-
-//     pageElement.innerHTML = `
-//         <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-10 text-center">
-//             <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent mb-4"></div>
-
-//             <p class="text-gray-500 dark:text-gray-400 font-medium">
-//                 Memuat data...
-//             </p>
-//         </div>
-//     `;
-//     if(r[page])
-//       await r[page]();
-//   }finally{
-//     hideLoader();
-//   }
-// }
 
 // ===== DASHBOARD =====
 async function renderDashboard(){
 
-  console.log("Dashboard Render");
-  console.log({
-      books: booksCache.length,
-      students: studentsCache.length,
-      borrows: borrowsCache.length,
-      visitors: visitorsCache.length
-  });
-  
     // baru ke gs ======================================
-  const books = booksCache;
-  const students = studentsCache;
-  const borrows = borrowsCache;
-  const visitors = visitorsCache;
-  const settings = settingsCache || await getSettings(true);
-  const fines = finesCache;
+  const books = await getBooks();
+  const students = await getStudents();
+  const borrows = await getBorrows();
+  const visitors = await getVisitors();
+  const settings = getSettings();
 
+  // kode lama =========================================
   //   const books=getBooks(),students=getStudents(),borrows=getBorrows(),visitors=getVisitors(),settings=getSettings();
   const totalBooks=books.reduce((s,b)=>s+b.stockTotal,0);
   const totalStudents=students.length;
@@ -884,8 +619,9 @@ async function renderDashboard(){
     ).length;
 
   // const totalFines=borrows.filter(b=>b.fine>0&&!b.finePaid).reduce((s,b)=>s+b.fine,0);
-  const DENDA_PER_HARI = Number(settings.finePerDay);
+  const DENDA_PER_HARI = 1000;
 
+  const fines = await getFines();
   const activeLate = borrows.reduce((total,b)=>{
     if(b.status === 'Selesai')
     return total;
@@ -935,11 +671,6 @@ async function renderDashboard(){
   <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Selamat Datang di</p>
   <h2 class="text-xl font-bold text-gray-900 dark:text-white mt-1">${settings.libName}</h2>
   <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Sistem Informasi Perpustakaan Digital</p>
-  <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-    ${settings.schoolName}
-    ${settings.address ? ` • ${settings.address}` : ''}
-    ${settings.phone ? ` • HP. ${settings.phone}` : ''}
-  </div>
   <div class="flex flex-wrap gap-4 mt-4">
     <span class="text-sm text-gray-600 dark:text-gray-300 font-medium"><i data-lucide="book" class="w-4 h-4 inline mr-1 text-primary-600"></i>${totalBooks} Buku</span>
     <span class="text-sm text-gray-600 dark:text-gray-300 font-medium"><i data-lucide="users" class="w-4 h-4 inline mr-1 text-primary-600"></i>${totalStudents} Member</span>
@@ -1028,26 +759,10 @@ ${stats.map(c=>`<div class="anim stat-card bg-white dark:bg-slate-900 border bor
   },100);
 }
 
-async function refreshDashboard(){
-
-    // refresh semua cache yang dipakai dashboard
-    booksCache = await getBooks(true);
-    studentsCache = await getStudents(true);
-    borrowsCache = await getBorrows(true);
-    visitorsCache = await getVisitors(true);
-    finesCache = await getFines(true);
-    historyCache = await getHistory(true);
-
-    renderedPages.delete('dashboard');
-
-    await renderDashboard();
-
-}
-
 // ===== BOOKS =====
 let booksPage=1,booksSearch='',booksCategory='';
 async function renderBooks(){
-  let books = booksCache;
+  let books = await getBooks();
   if(booksSearch)
     books=books.filter(b=>
         b.title.toLowerCase().includes(booksSearch)||
@@ -1206,30 +921,6 @@ async function saveBook(e,id){
     b => b.id === id
     );
 
-    const borrowed =
-        oldBook.stockTotal - oldBook.stockAvailable;
-
-    const newStockTotal =
-        Number(f.get('stockTotal'));
-
-    if(newStockTotal < borrowed){
-
-        hideLoader();
-
-        btn.disabled = false;
-        btn.textContent = 'Simpan';
-
-        toast(
-            `Stok tidak boleh kurang dari ${borrowed} buku karena masih dipinjam`,
-            'error'
-        );
-
-        return;
-    }
-
-    const newStockAvailable =
-        newStockTotal - borrowed;
-
     payload = {
     action : "update",
     sheet : "Buku",
@@ -1242,8 +933,8 @@ async function saveBook(e,id){
         f.get('year'),
         f.get('category'),
         f.get('rack'),
-        newStockTotal,
-        newStockAvailable
+        Number(f.get('stockTotal')),
+        oldBook.stockAvailable
     ]
     };
 
@@ -1307,22 +998,6 @@ async function saveBook(e,id){
 
   }
 
-  // booksCache = await getBooks(true);
-
-  // renderedPages.delete('books');
-
-  // await renderBooks();
-
-  // hideLoader();
-
-  // closeModal();
-
-  // toast(
-  //     id
-  //     ? "Buku berhasil diperbarui"
-  //     : "Buku berhasil ditambahkan"
-  // );
-
   await fetch(API_URL,{
     method:'POST',
     mode:'no-cors',
@@ -1332,18 +1007,15 @@ async function saveBook(e,id){
     body:JSON.stringify(payload)
   });
 
-  booksCache = await getBooks(true);
+  booksCache = await getBooks();
 
   hideLoader();
   closeModal();
 
-  await renderBooks();
-  await refreshDashboard();
-
   toast(
     id
-      ? 'Buku berhasil diperbarui'
-      : 'Buku berhasil ditambahkan'
+      ? 'Buku berhasil diperbarui, tunggu refresh'
+      : 'Buku berhasil ditambahkan, tunggu refresh'
   );
 
   setTimeout(async()=>{
@@ -1439,15 +1111,15 @@ async function confirmDeleteBook(id){
     })
   });
 
-  booksCache = await getBooks(true);
   closeModal();
-  await renderBooks();
-  toast('Buku berhasil dihapus');
-  await refreshDashboard();
+
+  toast('Buku berhasil dihapus, tunggu refresh');
+
+  setTimeout(async ()=>{
+    await renderBooks();
+  },1000);
 
 }
-
-
 // ===== STUDENTS =====
 let studentsPage=1,studentsSearch='',studentsClass='';
 async function changeStudentsPage(page){
@@ -1458,12 +1130,11 @@ async function changeStudentsPage(page){
 
   studentsPage = page;
   await renderStudents();
-  await refreshDashboard();
   hideLoader();
 }
 
 async function renderStudents(){
-  let students = studentsCache;
+  let students = await getStudents();
   if(studentsSearch)students=students.filter(s=>s.name.toLowerCase().includes(studentsSearch)||s.nis.includes(studentsSearch));
   if(studentsClass)students=students.filter(s=>s.class===studentsClass);
   const perPage=10,totalPages=Math.ceil(students.length/perPage);
@@ -1629,20 +1300,23 @@ async function saveStudent(e,nis){
     body:JSON.stringify(payload)
   });
 
-  hideLoader();
-
+    hideLoader();
   // refresh cache member
-  studentsCache = await getStudents(true);
-
+    try{
+        studentsCache = await getStudents();
+    }catch(err){
+        console.error(err);
+    }
   closeModal();
-
-  await renderStudents();
-
   toast(
     nis
-      ? 'Member berhasil diperbarui'
-      : 'Member berhasil ditambahkan'
+      ? 'Member berhasil diperbarui, tunggu refresh'
+      : 'Member berhasil ditambahkan, tunggu refresh'
   );
+
+  setTimeout(async ()=>{
+    await renderStudents();
+  },1000);
 }
 
 async function deleteStudent(nis){
@@ -1718,22 +1392,20 @@ await new Promise(
     })
   });
 
-  studentsCache = await getStudents(true);
-
+  hideLoader();
   closeModal();
 
-  await renderStudents();
-  await refreshDashboard();
+  toast('Member berhasil dihapus, tunggu refresh');
 
-  toast('Member berhasil dihapus');
-
-  hideLoader();
+  setTimeout(async()=>{
+    await renderStudents();
+  },1000);
 
 }
 
 // ===== BORROW =====
 async function renderBorrow(){
-  const allBorrows = borrowsCache;
+  const allBorrows = await getBorrows();
     const borrows = allBorrows.filter(
         b => b.status !== 'Selesai'
     );
@@ -1757,9 +1429,13 @@ async function renderBorrow(){
 }
 
 async function openBorrowForm(){
-  const students = studentsCache;
-  const books = booksCache;
-  const settings = settingsCache;
+    const students = studentsCache;
+    const books = booksCache;
+//   const students = (await getStudents())
+//     .filter(s => s.active);
+//   const books = (await getBooks())
+//     .filter(b => b.stockAvailable > 0);
+  const settings = getSettings();
   const today=getToday();
   const due=new Date();due.setDate(due.getDate()+settings.loanDays);
   openModal('Pinjam Buku',`
@@ -1790,7 +1466,7 @@ async function saveBorrow(e){
   const students = await getStudents();
   const books = await getBooks();
   const borrows = await getBorrows();
-  const settings = await getSettings();
+  const settings = getSettings();
   const student=students.find(s=>s.nis===f.get('nis'));
   const book=books.find(b=>b.id===f.get('bookId'));
     if(!student||!book){
@@ -1895,25 +1571,23 @@ async function saveBorrow(e){
         })
     });
 
-    booksCache = await getBooks(true);
-    borrowsCache = await getBorrows(true);
-    visitorsCache = await getVisitors(true);
-
-    closeModal();
-
-    await renderBorrow();
-    await renderReturn();
-    await renderBooks();
-    await refreshDashboard();
-
-    toast('Peminjaman berhasil');
-
+    booksCache = await getBooks();
     hideLoader();
+    closeModal();
+        console.log("BOOK", book);
+        console.log("STUDENT", student);
+        console.log("TRANSACTION", transactionId);
+        toast('Peminjaman berhasil, Tunggu data refresh');
+        setTimeout(async()=>{
+        await renderBorrow();
+        await renderDashboard();
+        renderSidebar();
+    },1000);
 }
 
 // ===== RETURN =====
 async function renderReturn(){
-  const borrows = borrowsCache
+  const borrows = (await getBorrows())
     .filter(b => b.status !== 'Selesai');
   const today = new Date(getToday());
   document.getElementById('page-return').innerHTML=`
@@ -1943,7 +1617,7 @@ async function returnBook(transactionId){
     try  {
   const borrows = await getBorrows();
   const books = await getBooks();
-  const settings = await getSettings();
+  const settings = getSettings();
 
   const borrow = borrows.find(
     b => b.transactionId === transactionId
@@ -2064,26 +1738,21 @@ async function returnBook(transactionId){
     });
     }
 
-    booksCache = await getBooks(true);
-    borrowsCache = await getBorrows(true);
-    historyCache = await getHistory(true);
-    finesCache = await getFines(true);
+    booksCache = await getBooks();
 
-    closeModal();
+  toast(
+    late
+      ? `Buku dikembalikan. Denda ${formatCurrency(fine)}`
+      : 'Buku berhasil dikembalikan'
+  );
 
+  setTimeout(async()=>{
     await renderReturn();
     await renderBorrow();
-    await renderFines();
-    await renderBooks();
-    await refreshDashboard();
+    await renderDashboard();
+  },1000);
 
-    toast(
-      late
-        ? `Buku dikembalikan. Denda ${formatCurrency(fine)}`
-        : 'Buku berhasil dikembalikan'
-    );
-
-    hideLoader();
+  hideLoader();
 
   } catch(err){
         console.error(err);
@@ -2098,38 +1767,27 @@ async function returnBook(transactionId){
     }
 }
 
-// ------------------------------ HISTORY -------------------------------
-
-async function getHistory(forceRefresh = false) {
-
-  if (historyCache.length && !forceRefresh) {
-    return historyCache;
-  }
-
+async function getHistory() {
   const res = await fetch(API_URL + "?sheet=Riwayat");
   const json = await res.json();
   const rows = json.data;
-
-  historyCache = rows
+  return rows
     .slice(1)
     .filter(r => r[0])
     .map(r => ({
-      studentName: r[0],
-      bookId: r[1],
-      bookTitle: r[2],
-      borrowDate: r[3],
-      returnDate: r[4],
-      fine: Number(r[5] || 0)
+        studentName: r[0],
+        bookId: r[1],
+        bookTitle: r[2],
+        borrowDate: r[3],
+        returnDate: r[4],
+        fine: Number(r[5] || 0)
     }));
-
-  return historyCache;
 }
 
 // ===== HISTORY =====
 let historyFilter='all';
 async function renderHistory(){
   let borrows = await getHistory();
-  // let borrows = historyCache;
   const today=new Date(getToday());
   if(historyFilter==='today')borrows=borrows.filter(b=>b.returnDate===getToday());
   else if(historyFilter==='week'){const w=new Date(today);w.setDate(w.getDate()-7);borrows=borrows.filter(b=>new Date(b.returnDate)>=w)}
@@ -2301,16 +1959,13 @@ async function saveVisitor(e){
         })
     });
 
-    visitorsCache = await getVisitors(true);
-
-    closeModal();
-
-    await renderVisitors();
-    await refreshDashboard();
-
-    toast('Pengunjung berhasil ditambahkan');
-
     hideLoader();
+
+  closeModal();
+  toast('Pengunjung berhasil ditambahkan, tunggu data refresh');
+  setTimeout(async()=>{
+    await renderVisitors();
+  },1000);
 }
 
 // ===== STATS =====
@@ -2400,7 +2055,7 @@ async function renderStats(){
 async function renderFines(){
   const fines = await getFines();
     const borrows = await getBorrows();
-    const settings = await getSettings();
+    const settings = getSettings();
 
     const today = new Date();
     today.setHours(0,0,0,0);
@@ -2497,7 +2152,6 @@ async function renderFines(){
                         </button>`
                         :
                         `<button
-                        id="pay-${f.transactionId}"
                         onclick="payFine('${f.transactionId}')"
                         class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded-lg font-medium transition-colors">
                         Bayar
@@ -2512,100 +2166,31 @@ async function renderFines(){
 </div>`;
 }
 
-
-let paymentProcessing = false;
-
 async function payFine(transactionId){
-
-    if(paymentProcessing) return;
-
-    paymentProcessing = true;
-
-    const btn = document.getElementById(
-        `pay-${transactionId}`
-    );
-
-    btn.disabled = true;
-    btn.textContent = "Memproses...";
-
-    toast("Memproses pembayaran...","info");
-
-    showLoader();
-
-    try{
-
-        await fetch(API_URL,{
-            method:'POST',
-            mode:'no-cors',
-            headers:{
-                'Content-Type':'application/json'
-            },
-            body:JSON.stringify({
-                action:'payFine',
-                sheet:'Denda',
-                transactionId
-            })
-        });
-
-        finesCache = await getFines(true);
-
-        await renderFines();
-        await refreshDashboard();
-
-        toast("Denda berhasil dibayar");
-
-        paymentProcessing = false;
-
-        hideLoader();
-
-    }catch(err){
-
-        hideLoader();
-
-        paymentProcessing = false;
-
-        btn.disabled = false;
-        btn.textContent = "Bayar";
-
-        toast(
-            "Pembayaran gagal",
-            "error"
-        );
-
-    }
-
+  await fetch(API_URL,{
+    method:'POST',
+    mode:'no-cors',
+    headers:{
+      'Content-Type':'application/json'
+    },
+    body:JSON.stringify({
+      action:'payFine',
+      sheet:'Denda',
+      transactionId
+    })
+  });
+  toast('Denda berhasil dibayar, tunggu refresh');
+  setTimeout(async()=>{
+    await renderFines();
+  },1000);
 }
-// async function payFine(transactionId){
-//   await fetch(API_URL,{
-//     method:'POST',
-//     mode:'no-cors',
-//     headers:{
-//       'Content-Type':'application/json'
-//     },
-//     body:JSON.stringify({
-//       action:'payFine',
-//       sheet:'Denda',
-//       transactionId
-//     })
-//   });
-//   toast('Denda berhasil dibayar, tunggu refresh');
-//   setTimeout(async()=>{
-//     await renderFines();
-//   },1000);
-// }
 
 //  onclick="payFine('${b.id}')"
 
-async function getFines(forceRefresh = false) {
-
-    if (finesCache.length && !forceRefresh) {
-        return finesCache;
-    }
-
+async function getFines() {
     const res = await fetch(API_URL + "?sheet=Denda");
     const json = await res.json();
-
-    finesCache = json.data
+    return json.data
         .slice(1)
         .filter(r => r[0])
         .map(r => ({
@@ -2616,28 +2201,14 @@ async function getFines(forceRefresh = false) {
             bookTitle: r[4],
             fine: Number(r[5] || 0),
             status: r[6]
-        }));
-
-    return finesCache;
-
+    }));
 }
 
 // function payFine(id){const borrows=getBorrows();const b=borrows.find(br=>br.id===id);if(b){b.finePaid=true;save(KEYS.borrows,borrows);renderFines();renderSidebar();toast('Denda dibayar')}}
 
 // ===== SETTINGS =====
-
-async function getSettingsSheet() {
-
-  const res = await fetch(API_URL + "?sheet=Pengaturan");
-  const json = await res.json();
-  const rows = json.data;
-
-  return rows;
-
-}
-
-async function renderSettings(){
-    const s = await getSettings();
+function renderSettings(){
+  const s=getSettings();
   document.getElementById('page-settings').innerHTML=`
 <div class="max-w-2xl space-y-4">
   <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
@@ -2662,174 +2233,31 @@ async function renderSettings(){
   <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
     <h3 class="font-semibold text-sm mb-4">Backup & Restore</h3>
     <div class="flex flex-wrap gap-3">
-
-    <button
-      disabled
-      title="Segera hadir"
-      class="px-4 py-2 bg-gray-300 dark:bg-slate-700 text-gray-500 dark:text-gray-400 text-sm rounded-lg font-medium cursor-not-allowed flex items-center gap-2 opacity-70">
-      <i data-lucide="download" class="w-4 h-4"></i>
-      Export Data (Soon)
-    </button>
-
-    <button
-      disabled
-      title="Segera hadir"
-      class="px-4 py-2 bg-gray-300 dark:bg-slate-700 text-gray-500 dark:text-gray-400 text-sm rounded-lg font-medium cursor-not-allowed flex items-center gap-2 opacity-70">
-      <i data-lucide="upload" class="w-4 h-4"></i>
-      Import Data (Soon)
-    </button>
-
-  </div>
+      <button onclick="exportData()" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm rounded-lg font-medium transition-colors flex items-center gap-2"><i data-lucide="download" class="w-4 h-4"></i>Export Data</button>
+      <label class="px-4 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-sm rounded-lg font-medium cursor-pointer transition-colors flex items-center gap-2"><i data-lucide="upload" class="w-4 h-4"></i>Import Data<input type="file" accept=".json" onchange="importData(event)" class="hidden"></label>
+    </div>
   </div>
   <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
     <h3 class="font-semibold text-sm mb-4">Lainnya</h3>
     <div class="flex flex-wrap gap-3">
       <button onclick="document.documentElement.classList.toggle('dark');localStorage.setItem('darkMode',document.documentElement.classList.contains('dark'))" class="px-4 py-2 bg-gray-100 dark:bg-slate-700 text-sm rounded-lg font-medium transition-colors">Toggle Dark Mode</button>
-      <button
-        disabled
-        title="Segera hadir"
-        class="px-4 py-2 bg-gray-300 dark:bg-slate-700 text-gray-500 dark:text-gray-400 text-sm rounded-lg font-medium cursor-not-allowed opacity-70">
-        Reset Semua Data
-    </button>
+      <button onclick="confirmReset()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg font-medium transition-colors">Reset Semua Data</button>
     </div>
   </div>
 </div>`;
   lucide.createIcons();
 }
 
-async function saveLibSettings(e){
-
-  e.preventDefault();
-
-  const btn = e.target.querySelector('button[type="submit"]');
-
-  btn.disabled = true;
-  btn.textContent = 'Menyimpan...';
-
-  showLoader();
-
-  const f = new FormData(e.target);
-
-  await fetch(API_URL,{
-    method:'POST',
-    mode:'no-cors',
-    headers:{
-      'Content-Type':'application/json'
-    },
-    body:JSON.stringify({
-      action:'saveSettings',
-      sheet:'Pengaturan',
-      data:{
-        NamaPerpustakaan:f.get('libName'),
-        NamaSekolah:f.get('schoolName'),
-        Alamat:f.get('address'),
-        Telepon:f.get('phone')
-      }
-    })
-  });
-
-  settingsCache = await getSettings(true);
-
-  await renderSidebar();
-  await renderDashboard();
-  await renderSettings();
-
-  toast('Identitas berhasil disimpan');
-
-  btn.disabled = false;
-  btn.textContent = 'Simpan Identitas';
-
-  hideLoader();
-
+function saveLibSettings(e){
+  e.preventDefault();const f=new FormData(e.target);const s=getSettings();
+  s.libName=f.get('libName');s.schoolName=f.get('schoolName');s.address=f.get('address');s.phone=f.get('phone');
+  saveSettings(s);toast('Identitas disimpan, tunggu refresh');renderSidebar();
 }
-
-async function saveLoanSettings(e){
-
-  e.preventDefault();
-
-  const btn = e.target.querySelector('button[type="submit"]');
-
-  btn.disabled = true;
-  btn.textContent = 'Menyimpan...';
-
-  showLoader();
-
-  const f = new FormData(e.target);
-
-  await fetch(API_URL,{
-    method:'POST',
-    mode:'no-cors',
-    headers:{
-      'Content-Type':'application/json'
-    },
-    body:JSON.stringify({
-      action:'saveSettings',
-      sheet:'Pengaturan',
-      data:{
-        DendaPerHari:Number(f.get('finePerDay')),
-        LamaPinjam:Number(f.get('loanDays')),
-        MaksPinjam:Number(f.get('maxBorrow'))
-      }
-    })
-  });
-
-  settingsCache = await getSettings(true);
-
-  await renderSettings();
-  await renderBorrow();
-  await renderReturn();
-  await renderFines();
-  await renderDashboard();
-
-  toast('Pengaturan berhasil disimpan');
-
-  btn.disabled = false;
-  btn.textContent = 'Simpan Pengaturan';
-
-  hideLoader();
-
+function saveLoanSettings(e){
+  e.preventDefault();const f=new FormData(e.target);const s=getSettings();
+  s.finePerDay=parseInt(f.get('finePerDay'));s.loanDays=parseInt(f.get('loanDays'));s.maxBorrow=parseInt(f.get('maxBorrow'));
+  saveSettings(s);toast('Pengaturan disimpan, tunggu refresh');
 }
-
-// EXPORT DATABASE -------------------------------------------
-
-async function exportDatabase(){
-
-    showLoader();
-
-    try{
-
-        const res = await fetch(
-            API_URL + "?action=exportExcel"
-        );
-
-        const json = await res.json();
-
-        window.open(
-            json.url,
-            "_blank"
-        );
-
-        toast(
-            "Download dimulai"
-        );
-
-    }catch(err){
-
-        console.error(err);
-
-        toast(
-            "Export gagal",
-            "error"
-        );
-
-    }finally{
-
-        hideLoader();
-
-    }
-
-}
-
 function confirmReset(){openModal('Reset Data',`<p class="text-sm mb-4">Yakin ingin menghapus semua data? Tindakan ini tidak bisa dibatalkan.</p><div class="flex gap-2"><button onclick="localStorage.clear();location.reload()" class="flex-1 py-2 bg-red-600 text-white rounded-lg text-sm font-medium">Reset</button><button onclick="closeModal()" class="flex-1 py-2 bg-gray-100 dark:bg-slate-700 rounded-lg text-sm">Batal</button></div>`)}
 
 function exportData(){
@@ -2984,10 +2412,10 @@ document.addEventListener('click',e=>{
 lucide.createIcons();
 if(localStorage.getItem('darkMode')==='true')document.documentElement.classList.add('dark');
 document.getElementById('dark-toggle').addEventListener('click',()=>{document.documentElement.classList.toggle('dark');localStorage.setItem('darkMode',document.documentElement.classList.contains('dark'))});
-// (async()=>{
-//   await renderSidebar();
-//   await navigateTo('dashboard');
-// })();
+(async()=>{
+  await renderSidebar();
+  await navigateTo('dashboard');
+})();
 </script>
  <script>
  (function(){function c(){var b=a.contentDocument||a.contentWindow.document;
@@ -3031,17 +2459,10 @@ async()=>{
 
     showLoader();
 
-    // Ambil data yang benar-benar dibutuhkan saat startup
-    await preloadEssentialData();
-
-    await renderSidebar();
+    studentsCache = await getStudents();
+    booksCache = await getBooks();
 
     hideLoader();
-
-    await navigateTo('dashboard');
-
-    // Ambil data lain di background (tidak ditunggu)
-    refreshCache();
 
 });
         // document.addEventListener('DOMContentLoaded',async()=>{
