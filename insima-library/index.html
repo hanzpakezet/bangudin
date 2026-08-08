@@ -12,6 +12,7 @@
 tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['DM Sans','sans-serif']},colors:{primary:{50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a'}}}}}
 </script>
   <style>
+
     /* #page-loader{box-shadow:0 0 8px rgba(37,99,235,.5);} */
 body{font-family:'DM Sans',sans-serif}
 .page-section{display:none}.page-section.active{display:block}
@@ -200,13 +201,23 @@ style="display:flex;">
     <div class="flex items-center justify-between">
      <div class="flex items-center gap-2.5"><span class="text-xl">📚</span>
       <div>
-       <h1 data-template-id="app-title" class="canva-text text-sm font-bold tracking-wide leading-tight"></h1>
-       <p data-template-id="app-subtitle" class="canva-text text-[10px] mt-0.5"></p>
+        <h1
+          data-template-id="app-title"
+          class="canva-text text-sm font-bold tracking-wide leading-tight">
+        </h1>
+
+        <p
+          data-template-id="app-subtitle"
+          class="canva-text text-[10px] mt-0.5">
+        </p>
       </div>
      </div><button class="lg:hidden text-white/70 hover:text-white p-1" onclick="toggleSidebar()" aria-label="Tutup"><i data-lucide="x" class="w-5 h-5"></i></button>
     </div>
    </div>
    <nav class="flex-1 p-3 space-y-0.5 overflow-y-auto" id="sidebar-nav" aria-label="Menu utama"></nav>
+   <div class="px-4 py-3 text-[10px] text-white/40 text-center border-t border-white/10">
+      Copyright © 2026 bangudin.my.id
+    </div>
   </aside>
   <div id="mobile-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
   <div class="flex-1 flex flex-col min-w-0">
@@ -331,7 +342,7 @@ function toggleProfileMenu(){
 
 function logout(){
     localStorage.removeItem('isLoggedIn');
-    window.location.replace("https://bangudin.my.id/insima-library/");
+    window.location.replace("https://script.google.com/macros/s/AKfycbysOTftBSKarIS0aX3Ljm7BBpNPjqwTHLMryKGMhmH3Wi2838hl2y5CxzikYvotngnb/exec");
 }
 // function logout(){
 //   localStorage.removeItem(
@@ -700,9 +711,9 @@ const menuItems=[
 
 async function renderSidebar(){
 
-  const nav=document.getElementById('sidebar-nav');
+  const nav = document.getElementById('sidebar-nav');
 
-  nav.innerHTML=menuItems.map(m=>{
+  nav.innerHTML = menuItems.map(m => {
     const badge=m.badge?m.badge():0;
     return `
       <button class="sidebar-item w-full text-left px-3 py-2 flex items-center gap-3 text-[13px] font-medium text-white/70 rounded-lg" data-page="${m.id}">
@@ -732,6 +743,41 @@ async function renderSidebar(){
 }
 
 let currentPage='dashboard';
+
+// ============================================= AUTO LOGOUT 6 JAM ==============================================
+
+const AUTO_LOGOUT_TIME = 6 * 60 * 60 * 1000;
+let inactivityTimer;
+function resetInactivityTimer(){
+  clearTimeout(inactivityTimer);
+  if(localStorage.getItem('isLoggedIn') !== 'true'){
+    return;
+  }
+  inactivityTimer = setTimeout(() => {
+    localStorage.removeItem('isLoggedIn');
+    window.location.replace(
+      "https://script.google.com/macros/s/AKfycbysOTftBSKarIS0aX3Ljm7BBpNPjqwTHLMryKGMhmH3Wi2838hl2y5CxzikYvotngnb/exec"
+    );
+  }, AUTO_LOGOUT_TIME);
+}
+
+[
+  'click',
+  'mousemove',
+  'keydown',
+  'scroll',
+  'touchstart',
+  'touchmove'
+].forEach(event => {
+  document.addEventListener(
+    event,
+    resetInactivityTimer,
+    { passive: true }
+  );
+});
+
+// ====================================================================================================
+
 const renderedPages = new Set();
 
 async function navigateTo(page){
@@ -1954,6 +2000,55 @@ async function returnBook(transactionId){
     return;
   }
 
+  // Catat aktivitas pengembalian sebagai pengunjung
+const visitors = await getVisitors();
+
+const alreadyReturnedToday = visitors.some(v =>
+  v.nis === borrow.nis &&
+  v.date === getToday() &&
+  v.purpose === 'Mengembalikan Buku'
+);
+
+if(!alreadyReturnedToday){
+
+  const now = new Date();
+
+  const currentTime =
+    String(now.getHours()).padStart(2,'0')
+    + ':' +
+    String(now.getMinutes()).padStart(2,'0');
+
+  const students = await getStudents();
+
+  const student = students.find(
+    s => s.nis === borrow.nis
+  );
+
+  if(student){
+
+    await fetch(API_URL,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({
+        action:'add',
+        sheet:'Pengunjung',
+        data:[
+          getToday(),
+          student.nis,
+          student.name,
+          student.class,
+          currentTime,
+          'Mengembalikan Buku'
+        ]
+      })
+    });
+
+  }
+}
+
   const today = new Date(getToday());
   const late = Math.max(
     0,
@@ -3016,6 +3111,8 @@ async()=>{
       document.getElementById(
         'app-container'
       ).style.display='';
+
+      resetInactivityTimer();
 
     }else{
 
