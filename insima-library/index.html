@@ -1091,7 +1091,7 @@ async function refreshDashboard(){
 }
 
 // ===== BOOKS =====
-let booksPage=1,booksSearch='',booksCategory='';
+let booksPage=1,booksSearch='',booksCategory='',booksPerPage=10;
 async function renderBooks(){
   let books = booksCache;
   if(booksSearch)
@@ -1101,8 +1101,17 @@ async function renderBooks(){
         b.isbn.includes(booksSearch)
     );
   if(booksCategory)books=books.filter(b=>b.category===booksCategory);
-  const perPage=10,totalPages=Math.ceil(books.length/perPage);
-  const pageBooks=books.slice((booksPage-1)*perPage,booksPage*perPage);
+  const perPage = booksPerPage;
+  const totalPages = Math.max(1, Math.ceil(books.length / perPage));
+
+  if(booksPage > totalPages){
+    booksPage = totalPages;
+  }
+
+  const pageBooks = books.slice(
+    (booksPage - 1) * perPage,
+    booksPage * perPage
+  );
   const categories = [...new Set(books.map(b => b.category))];
   document.getElementById('page-books').innerHTML=`
 <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
@@ -1146,6 +1155,22 @@ async function renderBooks(){
 <div class="flex justify-between items-center mt-4 text-sm">
     <span class="text-gray-500 text-xs">${books.length} buku</span>
     <div class="flex items-center gap-1">
+
+    <div class="flex items-center gap-2 text-xs mb-3">
+      <span> Tampilkan </span>
+
+      <select
+        onchange="booksPerPage=Number(this.value);booksPage=1;renderBooks()"
+        class="px-2 py-1 border rounded bg-white dark:bg-slate-800"
+      >
+        <option value="10" ${booksPerPage===10?'selected':''}>10</option>
+        <option value="25" ${booksPerPage===25?'selected':''}>25</option>
+        <option value="50" ${booksPerPage===50?'selected':''}>50</option>
+        <option value="100" ${booksPerPage===100?'selected':''}>100</option>
+      </select>
+
+      <span>data</span>
+    </div>
 
     <button
     onclick="changeBooksPage(1)"
@@ -1512,8 +1537,19 @@ async function renderStudents(){
   let students = studentsCache;
   if(studentsSearch)students=students.filter(s=>s.name.toLowerCase().includes(studentsSearch)||s.nis.includes(studentsSearch));
   if(studentsClass)students=students.filter(s=>s.class===studentsClass);
-  const perPage=10,totalPages=Math.ceil(students.length/perPage);
-  const pageStudents=students.slice((studentsPage-1)*perPage,studentsPage*perPage);
+  // const perPage=10,totalPages=Math.ceil(students.length/perPage);
+  // const pageStudents=students.slice((studentsPage-1)*perPage,studentsPage*perPage);
+  const perPage = window.studentsPerPage || 10;
+  const totalPages = Math.max(1, Math.ceil(students.length / perPage));
+
+  if(studentsPage > totalPages){
+    studentsPage = totalPages;
+  }
+
+  const pageStudents = students.slice(
+    (studentsPage - 1) * perPage,
+    studentsPage * perPage
+  );
   const classes=[...new Set(students.map(s=>s.class))].sort();
   document.getElementById('page-students').innerHTML=`
 <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
@@ -1539,6 +1575,22 @@ ${students.length} member
 </span>
 
 <div class="flex items-center gap-1">
+
+<div class="flex items-center gap-2 text-xs mb-3">
+  <span>Tampilkan</span>
+
+  <select
+    onchange="window.studentsPerPage=Number(this.value);studentsPage=1;renderStudents()"
+    class="px-2 py-1 border rounded bg-white dark:bg-slate-800"
+  >
+    <option value="10" ${(window.studentsPerPage || 10)===10?'selected':''}>10</option>
+    <option value="25" ${window.studentsPerPage===25?'selected':''}>25</option>
+    <option value="50" ${window.studentsPerPage===50?'selected':''}>50</option>
+    <option value="100" ${window.studentsPerPage===100?'selected':''}>100</option>
+  </select>
+
+  <span>data</span>
+</div>
 
 <button
 onclick="changeStudentsPage(1)"
