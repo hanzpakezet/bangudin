@@ -1,0 +1,6333 @@
+<!doctype html>
+<html lang="id">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Informasi Taman Baca</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <script>tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['DM Sans','sans-serif']},colors:{primary:{50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a'}}}}}</script>
+  
+  <!----------------------------------- KONEKSI KE DATABASE SUPABASE --------------------------------------->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://dwmdysqjskvexqnlirvm.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY =
+        'sb_publishable_Fs_qJLULZz0GmxO3bHbqrQ_GQAvfbfq';
+    const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
+    console.log('Supabase client berhasil dibuat');
+    
+    async function testSupabase() {
+        const { data, error } = await supabaseClient
+            .from('books')
+            .select('*');
+
+        if (error) {
+            console.error('❌ Supabase error:', error);
+            return;
+        }
+
+        console.log('✅ Koneksi Supabase berhasil!');
+        console.log('📚 Data buku:', data);
+    }
+
+    testSupabase();
+
+  </script>
+
+  <!-- ----------------------------------------------------------------------------------------------------->
+
+  <style>
+
+    /* #page-loader{box-shadow:0 0 8px rgba(37,99,235,.5);} */
+body{font-family:'DM Sans',sans-serif}
+.page-section{display:none}.page-section.active{display:block}
+.sidebar-item{transition:all .15s;border-left:3px solid transparent}
+.sidebar-item:hover{background:rgba(255,255,255,.05)}
+.sidebar-item.active{background:rgba(37,99,235,.15);border-left-color:#3b82f6;color:#fff}
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+#login-screen input{
+    transition:.2s;
+}
+
+#login-screen input:focus{
+    transform:translateY(-1px);
+}
+
+#login-screen button{
+    transition:.2s;
+}
+
+#login-screen button:hover{
+    transform:translateY(-2px);
+}
+#sidebar-el{transition:transform .3s ease}
+@media(max-width:1023px){#sidebar-el{transform:translateX(-100%);position:fixed}#sidebar-el.open{transform:translateX(0)}}
+@media(min-width:1024px){#sidebar-el{transform:translateX(0)!important;position:fixed;width: 240px;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:fadeUp .4s ease both}
+.stat-card{transition:transform .2s,box-shadow .2s}.stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.modern-table thead{position:sticky;top:0;z-index:5}
+.modern-table tbody tr:nth-child(even){background:rgba(0,0,0,.015)}
+.dark .modern-table tbody tr:nth-child(even){background:rgba(255,255,255,.02)}
+.modern-table tbody tr{transition:background .15s}
+.modern-table tbody tr:hover{background:rgba(37,99,235,.04)}
+.dark .modern-table tbody tr:hover{background:rgba(59,130,246,.08)}
+.toast{animation:slideIn .3s ease,fadeOut .3s ease 2.7s}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes fadeOut{to{opacity:0}}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.dark ::-webkit-scrollbar-thumb{background:#475569}
+</style>
+ <body data-template-id="__page-root" class="min-h-screen flex bg-slate-50 dark:bg-slate-950 dark:text-gray-100">
+
+<!-- --------------------------------------- LOGIN FORM ------------------------------------------------ -->
+
+<div id="login-screen"
+class="fixed inset-0 bg-slate-100 z-50"
+style="display:flex;">
+
+<div class="w-screen h-screen flex flex-col lg:flex-row">
+
+    <!-- KIRI -->
+    <div class="hidden lg:flex lg:w-[70%] relative bg-primary-600 overflow-hidden">
+
+        <!-- banner login -->
+        <img
+        src="https://raw.githubusercontent.com/hanzpakezet/bangudin/main/simastama/banner-baru.png"        
+        alt="Banner"
+        class="absolute inset-0 w-full h-full object-cover"
+        style="object-position: 80% center;">
+        <!-- src="https://drive.google.com/file/d/1VdS1iG260qOcNK2El2Ms3t_7YV39Ccor&sz=w2000" -->
+
+        <div class="absolute inset-0 bg-black/40"></div>
+
+        <div
+        class="absolute bottom-12 left-12 right-12 text-white">
+
+            <h1 class="text-6xl font-bold mb-4" id="landing-library-name">
+                Taman Baca Lentera Senja
+            </h1>
+
+            <div class="text-xl opacity-90 max-w-2xl">
+
+                <p class="mb-2">
+                    Sistem Informasi Taman Baca
+                </p>
+
+                <p class="mb-4 font-semibold">
+                    Dipersembahkan Oleh :
+                </p>
+
+                <div class="grid grid-cols-2 gap-x-12 gap-y-1 text-lg">
+
+                    <div>Tim KKN Desa Bantar INSIMA 2026</div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- KANAN -->
+    <div class="w-full lg:w-[30%] bg-white flex items-center justify-center">
+        <div class="w-[85%] sm:w-[80%]">
+            <div class="mb-10">
+
+                <!-- logo utama -->
+                <img
+                src="https://raw.githubusercontent.com/hanzpakezet/bangudin/main/simastama/logo-baru.png"
+                class="h-56 mb-8"
+                alt="Logo">
+                <!-- 
+                src="https://drive.google.com/file/d/1bdfclJIkhTk1Setx9YV40M9ANvD1--pa"  -->
+
+                <h2 class="text-4xl font-bold tracking-tight text-slate-900">
+                    Selamat Datang
+                </h2>
+
+                <p class="text-slate-500 mt-2">
+                    Silakan login untuk melanjutkan
+                </p>
+
+            </div>
+
+            <form onsubmit="login(event)">
+
+                <div class="mb-6">
+
+                    <label class="text-sm font-medium">
+                        Username
+                    </label>
+
+                    <input
+                    type="text"
+                    id="username"
+                    required
+                    class="mt-2 w-full py-3 bg-transparent border-0 border-b border-slate-300 focus:border-primary-600 focus:ring-0 focus:outline-none">
+
+                </div>
+
+                <div class="mb-8">
+
+                    <label class="text-sm font-medium">
+                        Password
+                    </label>
+
+                    <input
+                    type="password"
+                    id="password"
+                    required
+                    class="mt-2 w-full py-3 bg-transparent border-0 border-b border-slate-300 focus:border-primary-600 focus:ring-0 focus:outline-none">
+
+                </div>
+
+                <button
+                type="submit"
+                class="w-full py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-semibold transition">
+
+                    Masuk
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+<!------------------------------------------------- APLIKASI UTAMA ------------------------------------------------------------->
+
+<div id="app-container" style="display:none;"></div>
+
+    <div id="page-loader" style="position:fixed;top:0;left:0;width:0%;height:3px;background:#2563EB;z-index:99999;transition:width .3s ease;"></div>
+  <aside
+    data-template-id="sidebar"
+    class="canva-sidebar w-60 shrink-0 flex flex-col fixed top-0 left-0 h-screen z-30 bg-slate-900"
+    id="sidebar-el">
+   <div class="p-5 border-b border-white/10">
+    <div class="flex items-center justify-between">
+     <div class="flex items-center gap-2.5"><span class="text-xl">📚</span>
+      <div>
+        <h1
+          data-template-id="app-title"
+          class="canva-text text-sm font-bold tracking-wide leading-tight">
+        </h1>
+
+        <p
+          data-template-id="app-subtitle"
+          class="canva-text text-[10px] mt-0.5">
+        </p>
+      </div>
+     </div><button class="lg:hidden text-white/70 hover:text-white p-1" onclick="toggleSidebar()" aria-label="Tutup"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+   </div>
+   <nav class="flex-1 p-3 space-y-0.5 overflow-y-auto" id="sidebar-nav" aria-label="Menu utama"></nav>
+   <div class="px-4 py-3 text-[10px] text-white/40 text-center border-t border-white/10">
+      Copyright © 2026 bangudin.my.id
+    </div>
+  </aside>
+  <div id="mobile-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+  <div class="flex-1 flex flex-col min-w-0">
+   <header data-template-id="header-bar" class="canva-header h-14 border-b flex items-center justify-between px-4 lg:px-6 sticky top-0 z-10 backdrop-blur-xl">
+    <div class="flex items-center gap-3"><button class="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" onclick="toggleSidebar()" aria-label="Menu"><i data-lucide="menu" class="w-5 h-5"></i></button>
+     <h2 data-template-id="page-heading" class="canva-text font-semibold text-sm" id="page-heading">Dashboard</h2>
+    </div>
+    <div class="flex items-center gap-2">
+     <div class="relative hidden sm:block"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i> <input id="global-search" type="text" placeholder="Cari..." class="pl-9 pr-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-slate-700 dark:bg-slate-800 w-52 focus:outline-none focus:ring-2 focus:ring-primary-600/20">
+      <div id="search-results" class="absolute top-full left-0 w-full mt-1 bg-white dark:bg-slate-800 rounded-lg shadow-xl border dark:border-slate-700 hidden max-h-60 overflow-y-auto z-50"></div>
+     </div>
+     <div id="header-clock" class="hidden md:flex flex-col items-end text-[11px] text-gray-500 dark:text-gray-400"><span id="clock-time" class="font-semibold text-xs text-gray-700 dark:text-gray-200"></span><span id="clock-date"></span>
+     </div>
+     <div class="relative"><button onclick="toggleNotif()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 relative" aria-label="Notifikasi"><i data-lucide="bell" class="w-4.5 h-4.5"></i><span id="notif-badge" class="absolute top-0.5 right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] rounded-full flex items-center justify-center font-bold hidden"></span></button>
+      <div id="notif-dropdown" class="absolute right-0 top-full mt-1 w-80 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border dark:border-slate-700 hidden z-50 max-h-80 overflow-y-auto">
+       <div class="p-3 border-b dark:border-slate-700 font-semibold text-sm">
+        Notifikasi
+       </div>
+       <div id="notif-list" class="p-2 space-y-1"></div>
+      </div>
+     </div><button id="dark-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" aria-label="Dark mode"><i data-lucide="moon" class="w-4.5 h-4.5 dark:hidden"></i><i data-lucide="sun" class="w-4.5 h-4.5 hidden dark:block"></i></button>
+     <div class="relative">
+        <button
+            onclick="toggleProfileMenu()"
+            class="w-7 h-7 rounded-full bg-primary-600 flex items-center justify-center text-white text-xs font-bold hover:opacity-90">
+            A
+        </button>
+        <div
+            id="profile-menu"
+            class="hidden absolute right-0 mt-2 w-40 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 z-50">
+            <button
+                onclick="logout()"
+                class="w-full text-left px-4 py-3 text-red-500 hover:bg-gray-50 dark:hover:bg-slate-700">
+                Logout
+            </button>
+        </div>
+        </div>
+     <!-- <div class="w-7 h-7 rounded-full bg-primary-600 flex items-center justify-center text-white text-xs font-bold">
+      A
+     </div> -->
+    </div>
+   </header>
+   <main class="flex-1 overflow-auto p-4 lg:p-6 lg:ml-60" id="main-content">
+    <section class="page-section active" id="page-dashboard"></section>
+    <section class="page-section" id="page-books"></section>
+    <section class="page-section" id="page-students"></section>
+    <section class="page-section" id="page-borrow"></section>
+    <section class="page-section" id="page-return"></section>
+    <section class="page-section" id="page-history"></section>
+    <section class="page-section" id="page-visitors"></section>
+    <section class="page-section" id="page-stats"></section>
+    <section class="page-section" id="page-fines"></section>
+    <section class="page-section" id="page-settings"></section>
+   </main>
+  </div>
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+  <div id="modal" class="fixed inset-0 z-50 hidden">
+   <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal()"></div>
+   <div class="absolute inset-4 lg:inset-auto lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 lg:w-full lg:max-w-lg bg-white dark:bg-slate-800 rounded-xl shadow-2xl flex flex-col max-h-[90vh] border dark:border-slate-700">
+    <div class="flex items-center justify-between p-4 border-b dark:border-slate-700">
+     <h3 id="modal-title" class="font-semibold text-base"></h3><button onclick="closeModal()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <div id="modal-body" class="p-4 overflow-y-auto flex-1"></div>
+   </div>
+  </div>
+
+<!-------------------------------------------- JAVA SCRIPT  --------------------------------->
+
+
+  <script>
+
+let booksCache = [];
+let studentsCache = [];
+let borrowsCache = [];
+let visitorsCache = [];
+let finesCache = [];
+let settingsCache = null;
+let historyCache = [];
+
+// MENU LOGOUT
+function toggleProfileMenu(){
+  document
+    .getElementById('profile-menu')
+    .classList
+    .toggle('hidden');
+}
+
+function logout() {
+
+    localStorage.removeItem('isLoggedIn');
+
+    // Sembunyikan aplikasi
+    document.getElementById(
+        'app-container'
+    ).style.display = 'none';
+
+    // Tampilkan halaman login
+    document.getElementById(
+        'login-screen'
+    ).style.display = '';
+
+    // Bersihkan form login
+    const username =
+        document.getElementById('username');
+
+    const password =
+        document.getElementById('password');
+
+    if (username) {
+        username.value = '';
+    }
+
+    if (password) {
+        password.value = '';
+    }
+}
+document.addEventListener(
+'click',
+function(e){
+  const menu =
+    document.getElementById(
+      'profile-menu'
+    );
+  if(
+    !e.target.closest('#profile-menu')
+    &&
+    !e.target.closest(
+      '[onclick="toggleProfileMenu()"]'
+    )
+  ){
+    menu?.classList.add(
+      'hidden'
+    );
+  }
+});
+
+// ----------------------------------------- JS CRUD ---------------------------------
+
+// =========================================================
+// SUPABASE DATA LAYER
+// =========================================================
+
+async function getBooks(forceRefresh = false) {
+
+    if (booksCache.length && !forceRefresh) {
+        return booksCache;
+    }
+
+    const { data, error } = await supabaseClient
+        .from('books')
+        .select('*')
+        .order('id', { ascending: true });
+
+    if (error) {
+        console.error('getBooks:', error);
+        toast('Gagal mengambil data buku', 'error');
+        return booksCache = [];
+    }
+
+    booksCache = (data || []).map(b => ({
+        id: b.id,
+        title: b.title || '',
+        isbn: b.isbn || '',
+        author: b.author || '',
+        publisher: b.publisher || '',
+        year: b.year,
+        category: b.category || '',
+        rack: b.rack || '',
+        stockTotal: Number(b.stock_total || 0),
+        stockAvailable: Number(b.stock_available || 0)
+    }));
+
+    return booksCache;
+}
+
+
+// =========================================================
+// SETTINGS
+// =========================================================
+
+async function getSettings(forceRefresh = false) {
+
+    if (settingsCache && !forceRefresh) {
+        return settingsCache;
+    }
+
+    const { data, error } = await supabaseClient
+        .from('settings')
+        .select('key,value');
+
+    if (error) {
+        console.error('getSettings:', error);
+
+        return settingsCache = {
+            libName: 'PERPUSTAKAAN INSIMA',
+            schoolName: 'SMA INSIMA',
+            address: '',
+            phone: '',
+            finePerDay: 1000,
+            loanDays: 7,
+            maxBorrow: 3
+        };
+    }
+
+    const settings = {};
+
+    (data || []).forEach(row => {
+        settings[row.key] = row.value;
+    });
+
+    settingsCache = {
+        libName: settings.NamaPerpustakaan || '',
+        schoolName: settings.NamaSekolah || '',
+        address: settings.Alamat || '',
+        phone: settings.Telepon || '',
+        finePerDay: Number(settings.DendaPerHari || 1000),
+        loanDays: Number(settings.LamaPinjam || 7),
+        maxBorrow: Number(settings.MaksPinjam || 3)
+    };
+
+    return settingsCache;
+}
+
+
+// =========================================================
+// STUDENTS / MEMBERS
+// =========================================================
+
+async function getStudents(forceRefresh = false) {
+
+    if (studentsCache.length && !forceRefresh) {
+        return studentsCache;
+    }
+
+    const { data, error } = await supabaseClient
+        .from('students')
+        .select('*')
+        .order('name', { ascending: true });
+
+    if (error) {
+        console.error('getStudents:', error);
+        toast('Gagal mengambil data member', 'error');
+        return studentsCache = [];
+    }
+
+    studentsCache = (data || []).map(s => ({
+        nis: s.nis,
+        name: s.name || '',
+        class: s.class || '',
+        gender: s.gender || '',
+        active: s.active === true
+    }));
+
+    return studentsCache;
+}
+
+
+// =========================================================
+// BORROWINGS
+// =========================================================
+
+async function getBorrows(forceRefresh = false) {
+
+    if (!settingsCache) {
+        settingsCache = await getSettings(true);
+    }
+
+    if (borrowsCache.length && !forceRefresh) {
+        return borrowsCache;
+    }
+
+    const { data, error } = await supabaseClient
+        .from('borrowings')
+        .select(`
+            transaction_id,
+            book_id,
+            student_nis,
+            borrow_date,
+            due_date,
+            return_date,
+            status,
+            books (
+                title
+            ),
+            students (
+                name
+            )
+        `)
+        .order('borrow_date', { ascending: false });
+
+    if (error) {
+        console.error('getBorrows:', error);
+        toast('Gagal mengambil data peminjaman', 'error');
+        return borrowsCache = [];
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    borrowsCache = (data || []).map(b => {
+
+        const due = new Date(b.due_date);
+        due.setHours(0, 0, 0, 0);
+
+        const lateDays = Math.max(
+            0,
+            Math.floor(
+                (today - due) / 86400000
+            )
+        );
+
+        let status = b.status;
+
+        if (
+            status !== 'Selesai' &&
+            lateDays > 0
+        ) {
+            status = 'Terlambat';
+        }
+
+        return {
+            transactionId: b.transaction_id,
+            bookId: b.book_id,
+            nis: b.student_nis,
+
+            studentName:
+                b.students?.name || '',
+
+            bookTitle:
+                b.books?.title || '',
+
+            borrowDate: b.borrow_date,
+            dueDate: b.due_date,
+            returnDate: b.return_date,
+
+            status,
+
+            lateDays,
+
+            fine:
+                lateDays *
+                Number(settingsCache.finePerDay || 0)
+        };
+    });
+
+    return borrowsCache;
+}
+
+
+// =========================================================
+// VISITORS
+// =========================================================
+
+async function getVisitors(forceRefresh = false) {
+
+    if (visitorsCache.length && !forceRefresh) {
+        return visitorsCache;
+    }
+
+    const { data, error } = await supabaseClient
+        .from('visitors')
+        .select('*')
+        .order('visit_date', {
+            ascending: false
+        })
+        .order('time_in', {
+            ascending: false
+        });
+
+    if (error) {
+        console.error('getVisitors:', error);
+        toast('Gagal mengambil data pengunjung', 'error');
+        return visitorsCache = [];
+    }
+
+    visitorsCache = (data || []).map(v => ({
+        id: v.id,
+        date: v.visit_date,
+        nis: v.student_nis,
+        name: v.name || '',
+        class: v.class || '',
+        time: v.time_in || '',
+        purpose: v.purpose || ''
+    }));
+
+    return visitorsCache;
+}
+
+
+// =========================================================
+// HISTORY
+// =========================================================
+
+async function getHistory(forceRefresh = false) {
+
+    if (historyCache.length && !forceRefresh) {
+        return historyCache;
+    }
+
+    const { data, error } = await supabaseClient
+        .from('history')
+        .select('*')
+        .order('return_date', {
+            ascending: false
+        });
+
+    if (error) {
+        console.error('getHistory:', error);
+        toast('Gagal mengambil riwayat', 'error');
+        return historyCache = [];
+    }
+
+    historyCache = (data || []).map(h => ({
+        studentName: h.student_name || '',
+        bookId: h.book_id || '',
+        bookTitle: h.book_title || '',
+        borrowDate: h.borrow_date,
+        returnDate: h.return_date,
+        fine: Number(h.fine || 0),
+        transactionId: h.transaction_id || ''
+    }));
+
+    return historyCache;
+}
+
+
+// =========================================================
+// FINES
+// =========================================================
+
+async function getFines(forceRefresh = false) {
+
+    if (finesCache.length && !forceRefresh) {
+        return finesCache;
+    }
+
+    const { data, error } = await supabaseClient
+        .from('fines')
+        .select('*')
+        .order('created_at', {
+            ascending: false
+        });
+
+    if (error) {
+        console.error('getFines:', error);
+        toast('Gagal mengambil data denda', 'error');
+        return finesCache = [];
+    }
+
+    finesCache = (data || []).map(f => ({
+        transactionId: f.transaction_id,
+        nis: f.student_nis,
+        studentName: f.student_name || '',
+        class: f.class || '',
+        bookTitle: f.book_title || '',
+        fine: Number(f.fine || 0),
+        status: f.status,
+        paidAt: f.paid_at
+    }));
+
+    return finesCache;
+}
+
+function getToday() {
+    const today = new Date();
+
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+
+async function refreshCache(){
+    booksCache = await getBooks(true);
+    studentsCache = await getStudents(true);
+    borrowsCache = await getBorrows(true);
+    visitorsCache = await getVisitors(true);
+    settingsCache = await getSettings(true);
+    finesCache = await getFines(true);
+    historyCache = await getHistory(true);
+
+    console.log("CACHE");
+    console.log("Books :", booksCache.length);
+    console.log("Students :", studentsCache.length);
+    console.log("Borrows :", borrowsCache.length);
+    console.log("Visitors :", visitorsCache.length);
+}
+
+async function preloadEssentialData(){
+    await getSettings(true);
+    await Promise.all([
+        getBooks(true),
+        getStudents(true),
+        getBorrows(true),
+        getVisitors(true)
+    ]);
+}
+
+// ====-----------------------------------------= UI UTILS ---------------------------------------------=====
+function toast(msg,type='success'){
+  const colors={success:'bg-emerald-600',error:'bg-red-600',warning:'bg-amber-600',info:'bg-primary-600'};
+  const el=document.createElement('div');el.className=`toast ${colors[type]} text-white px-4 py-2.5 rounded-lg shadow-lg text-sm font-medium`;el.textContent=msg;document.getElementById('toast-container').appendChild(el);setTimeout(()=>el.remove(),3000);
+}
+function openModal(title,html){document.getElementById('modal-title').textContent=title;document.getElementById('modal-body').innerHTML=html;document.getElementById('modal').classList.remove('hidden');lucide.createIcons()}
+function closeModal(){document.getElementById('modal').classList.add('hidden')}
+function formatDate(d){if(!d)return'-';return new Date(d).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}
+function formatCurrency(n){return'Rp'+Number(n).toLocaleString('id-ID')}
+
+
+// LOADER
+function showLoader(){
+  const loader =
+    document.getElementById('page-loader');
+  loader.style.width = '30%';
+  setTimeout(()=>{
+    loader.style.width = '70%';
+  },200);
+}
+
+function hideLoader(){
+  const loader =
+    document.getElementById('page-loader');
+  loader.style.width = '100%';
+  setTimeout(()=>{
+    loader.style.width = '0%';
+  },300);
+}
+
+
+function showTableLoading(page){
+  const el =
+    document.getElementById('page-' + page);
+  if(!el) return;
+  el.innerHTML = `
+  <div class="flex flex-col items-center justify-center py-12">
+    <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600"></div>
+    <p class="mt-3 text-sm text-gray-500">
+      Memuat data...
+    </p>
+  </div>`;
+}
+
+// Clock
+function updateClock(){const now=new Date();document.getElementById('clock-time').textContent=now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});document.getElementById('clock-date').textContent=now.toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}
+setInterval(updateClock,1000);updateClock();
+
+// Notifications
+function toggleNotif(){const dd=document.getElementById('notif-dropdown');dd.classList.toggle('hidden');if(!dd.classList.contains('hidden'))renderNotifications()}
+async function renderNotifications(){
+  const borrows = await getBorrows();
+  const settings = getSettings();
+  const overdue = borrows.filter(b=>b.status==='Terlambat');
+  const dueSoon = borrows.filter(b=>b.status==='Jatuh Tempo');
+  const unpaidFines = borrows.filter(b=>b.fine>0&&!b.finePaid);
+  let items=[];
+  overdue.forEach(b=>items.push({text:`${b.studentName} - "${b.bookTitle}" terlambat`,type:'red',page:'borrow'}));
+  dueSoon.forEach(b=>items.push({text:`${b.studentName} - "${b.bookTitle}" jatuh tempo`,type:'yellow',page:'borrow'}));
+  unpaidFines.slice(0,5).forEach(b=>items.push({text:`Denda ${b.studentName}: ${formatCurrency(b.fine)}`,type:'orange',page:'fines'}));
+  const list=document.getElementById('notif-list');
+  if(!items.length){list.innerHTML='<p class="text-sm text-gray-400 p-3 text-center">Tidak ada notifikasi</p>';return}
+  list.innerHTML=items.slice(0,10).map(i=>`<button onclick="navigateTo('${i.page}');toggleNotif()" class="w-full text-left p-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 text-sm flex items-start gap-2"><span class="w-2 h-2 rounded-full mt-1.5 shrink-0 bg-${i.type}-500"></span><span>${i.text}</span></button>`).join('');
+}
+document.addEventListener('click',e=>{if(!e.target.closest('#notif-dropdown')&&!e.target.closest('[aria-label="Notifikasi"]'))document.getElementById('notif-dropdown').classList.add('hidden')});
+
+// Nav
+const menuItems=[
+  {id:'dashboard',icon:'layout-dashboard',label:'Dashboard'},
+  {id:'books',icon:'book',label:'Data Buku'},
+  {id:'students',icon:'graduation-cap',label:'Data Member'},
+  {id:'borrow',icon:'arrow-right-left',label:'Peminjaman'}, //,badge:()=>getBorrows().filter(b=>b.status==='Terlambat').length
+  {id:'return',icon:'undo-2',label:'Pengembalian'},
+  {id:'history',icon:'clock',label:'Riwayat'},
+  {id:'visitors',icon:'users',label:'Pengunjung'},
+  {id:'stats',icon:'bar-chart-3',label:'Statistik'},
+  {id:'fines',icon:'coins',label:'Denda'}, // ,badge:()=>getBorrows().filter(b=>b.fine>0&&!b.finePaid).length
+  {id:'settings',icon:'settings',label:'Pengaturan'},
+];
+
+async function renderSidebar(){
+
+  const nav = document.getElementById('sidebar-nav');
+
+  nav.innerHTML = menuItems.map(m => {
+    const badge=m.badge?m.badge():0;
+    return `
+      <button class="sidebar-item w-full text-left px-3 py-2 flex items-center gap-3 text-[13px] font-medium text-white/70 rounded-lg" data-page="${m.id}">
+        <i data-lucide="${m.icon}" class="w-4 h-4"></i>
+        <span class="flex-1">${m.label}</span>
+        ${badge?`<span class="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">${badge}</span>`:''}
+      </button>
+    `;
+  }).join('');
+
+  lucide.createIcons();
+
+  nav.querySelectorAll('.sidebar-item').forEach(btn=>
+    btn.addEventListener('click',()=>navigateTo(btn.dataset.page))
+  );
+
+  const borrows = await getBorrows();
+
+  const today = new Date(getToday());
+    today.setHours(0, 0, 0, 0);
+
+    const overdue = borrows.filter(b => {
+
+      if (b.status === 'Selesai') {
+        return false;
+      }
+
+      const due = new Date(b.dueDate);
+      due.setHours(0, 0, 0, 0);
+
+      return today > due;
+    }).length;
+
+  const nb=document.getElementById('notif-badge');
+  nb.textContent=overdue||'';
+  nb.classList.toggle('hidden',!overdue);
+
+}
+
+let currentPage='dashboard';
+
+// ============================================= AUTO LOGOUT 6 JAM ==============================================
+
+const AUTO_LOGOUT_TIME = 6 * 60 * 60 * 1000;
+let inactivityTimer;
+function resetInactivityTimer(){
+  clearTimeout(inactivityTimer);
+  if(localStorage.getItem('isLoggedIn') !== 'true'){
+    return;
+  }
+  inactivityTimer = setTimeout(() => {
+    localStorage.removeItem('isLoggedIn');
+    window.location.replace(
+      "https://script.google.com/macros/s/AKfycbysOTftBSKarIS0aX3Ljm7BBpNPjqwTHLMryKGMhmH3Wi2838hl2y5CxzikYvotngnb/exec"
+    );
+  }, AUTO_LOGOUT_TIME);
+}
+
+[
+  'click',
+  'mousemove',
+  'keydown',
+  'scroll',
+  'touchstart',
+  'touchmove'
+].forEach(event => {
+  document.addEventListener(
+    event,
+    resetInactivityTimer,
+    { passive: true }
+  );
+});
+
+// ====================================================================================================
+
+const renderedPages = new Set();
+
+async function navigateTo(page){
+
+  currentPage = page;
+
+  document.querySelectorAll('.page-section')
+    .forEach(p => p.classList.remove('active'));
+
+  document.getElementById('page-'+page)
+    .classList.add('active');
+
+  document.getElementById('page-heading').textContent =
+    menuItems.find(m=>m.id===page)?.label || '';
+
+  document.querySelectorAll('.sidebar-item')
+    .forEach(b =>
+      b.classList.toggle('active', b.dataset.page===page)
+    );
+
+  // Tambahan
+  if(!renderedPages.has(page)){
+      await renderPage(page, false);
+      renderedPages.add(page);
+  }
+  toggleSidebar(true);
+}
+
+function toggleSidebar(forceClose){
+  const sb=document.getElementById('sidebar-el'),ov=document.getElementById('mobile-overlay');
+  if(forceClose===true){sb.classList.remove('open');ov.classList.add('hidden')}
+  else{sb.classList.toggle('open');ov.classList.toggle('hidden')}
+}
+
+async function renderPage(page, forceLoading = false){
+
+  if(renderedPages.has(page) && !forceLoading){
+    return;
+  }
+  if(forceLoading){
+    showLoader();
+  }
+
+  const r={
+    dashboard:renderDashboard,
+    books:renderBooks,
+    students:renderStudents,
+    borrow:renderBorrow,
+    return:renderReturn,
+    history:renderHistory,
+    visitors:renderVisitors,
+    stats:renderStats,
+    fines:renderFines,
+    settings:renderSettings
+  };
+
+  try{
+
+    if(forceLoading){
+
+      const pageElement = document.getElementById(`page-${page}`);
+
+      pageElement.innerHTML = `
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-10 text-center">
+          <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent mb-4"></div>
+
+          <p class="text-gray-500 dark:text-gray-400 font-medium">
+            Memuat data...
+          </p>
+        </div>
+      `;
+
+    }
+
+    if(r[page]){
+      await r[page]();
+      renderedPages.add(page);
+    }
+
+  }finally{
+
+    if(forceLoading){
+      hideLoader();
+    }
+
+  }
+
+}
+
+// async function renderPage(page){
+//   showLoader();
+//   // showTableLoading(page); // render dengan loading memuat data
+//   const r={
+//     dashboard:renderDashboard,
+//     books:renderBooks,
+//     students:renderStudents,
+//     borrow:renderBorrow,
+//     return:renderReturn,
+//     history:renderHistory,
+//     visitors:renderVisitors,
+//     stats:renderStats,
+//     fines:renderFines,
+//     settings:renderSettings
+//   };
+//   try{
+//     const pageElement = document.getElementById(`page-${page}`);
+
+//     pageElement.innerHTML = `
+//         <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-10 text-center">
+//             <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent mb-4"></div>
+
+//             <p class="text-gray-500 dark:text-gray-400 font-medium">
+//                 Memuat data...
+//             </p>
+//         </div>
+//     `;
+//     if(r[page])
+//       await r[page]();
+//   }finally{
+//     hideLoader();
+//   }
+// }
+
+// ===== DASHBOARD =====
+async function renderDashboard(){
+
+  console.log("Dashboard Render");
+  console.log({
+      books: booksCache.length,
+      students: studentsCache.length,
+      borrows: borrowsCache.length,
+      visitors: visitorsCache.length
+  });
+  
+    // baru ke gs ======================================
+  const books = booksCache;
+  const students = studentsCache;
+  const borrows = borrowsCache;
+  const visitors = visitorsCache;
+  const settings = settingsCache || await getSettings(true);
+  const fines = finesCache;
+
+  //   const books=getBooks(),students=getStudents(),borrows=getBorrows(),visitors=getVisitors(),settings=getSettings();
+  const totalBooks=books.reduce((s,b)=>s+b.stockTotal,0);
+  const totalStudents=students.length;
+  const borrowed=borrows.filter(b=>b.status!=='Selesai').length;
+  
+    const overdue = borrows.filter(b =>b.status !== 'Selesai' && Math.max( 0, Math.ceil(
+      (new Date(getToday()) - new Date(b.dueDate)) / 864e5 )) > 0
+    ).length;
+
+  // const totalFines=borrows.filter(b=>b.fine>0&&!b.finePaid).reduce((s,b)=>s+b.fine,0);
+  const DENDA_PER_HARI = Number(settings.finePerDay);
+
+  const activeLate = borrows.reduce((total,b)=>{
+    if(b.status === 'Selesai')
+    return total;
+    const terlambatHari = Math.max(
+    0,
+    Math.floor(
+    (new Date(getToday()) - new Date(b.dueDate))
+    / 86400000
+    )
+    );
+        return total + (terlambatHari * DENDA_PER_HARI);
+    },0);
+
+    const unpaidFine = fines
+    .filter(f => f.status === 'Belum Dibayar')
+    .reduce((total,f)=>total + f.fine,0);
+
+
+    const totalFines = Number(activeLate || 0) + Number(unpaidFine || 0);
+  const todayStr=getToday();
+  // const visitorsToday=visitors.filter(v=>v.date===todayStr).length;
+  const todayDate = new Date();
+  const todayFormatted =
+    String(todayDate.getDate()).padStart(2,'0') + '/' +
+    String(todayDate.getMonth()+1).padStart(2,'0') + '/' +
+    todayDate.getFullYear();
+
+    const visitorsToday = visitors.filter(
+        v => v.date === getToday()
+    ).length;
+  const totalTransactions=borrows.length;
+  const overdueList = borrows
+  .filter(b => {
+    if (b.status === 'Selesai') return false;
+
+    const due = new Date(b.dueDate);
+    const today = new Date(getToday());
+
+    due.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    return today > due;
+  })
+  .slice(0, 5);
+  // const overdueList=borrows.filter(b=>b.status==='Terlambat').slice(0,5);
+  const recentActivity=borrows.slice().sort((a,b)=>b.borrowDate>a.borrowDate?1:-1).slice(0,5);
+//  ========================================================
+
+  const stats=[
+    {label:'Total Buku',value:totalBooks,icon:'book-open'},
+    {label:'Total Member',value:totalStudents,icon:'users'},
+    {label:'Dipinjam',value:borrowed,icon:'arrow-right-left'},
+    {label:'Terlambat',value:overdue,icon:'alert-triangle'},
+    {label:'Denda Aktif',value:formatCurrency(totalFines),icon:'coins'},
+    {label:'Pengunjung Hari Ini',value:visitorsToday,icon:'eye'},
+  ];
+
+  document.getElementById('page-dashboard').innerHTML=`
+<div class="anim mb-6 p-6 rounded-xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+  <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Selamat Datang di</p>
+  <h2 class="text-xl font-bold text-gray-900 dark:text-white mt-1">${settings.libName}</h2>
+  <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Sistem Informasi Perpustakaan Digital</p>
+  <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+    ${settings.schoolName}
+    ${settings.address ? ` • ${settings.address}` : ''}
+    ${settings.phone ? ` • HP. ${settings.phone}` : ''}
+  </div>
+  <div class="flex flex-wrap gap-4 mt-4">
+    <span class="text-sm text-gray-600 dark:text-gray-300 font-medium"><i data-lucide="book" class="w-4 h-4 inline mr-1 text-primary-600"></i>${totalBooks} Buku</span>
+    <span class="text-sm text-gray-600 dark:text-gray-300 font-medium"><i data-lucide="users" class="w-4 h-4 inline mr-1 text-primary-600"></i>${totalStudents} Member</span>
+    <span class="text-sm text-gray-600 dark:text-gray-300 font-medium"><i data-lucide="arrow-right-left" class="w-4 h-4 inline mr-1 text-primary-600"></i>${totalTransactions} Transaksi</span>
+  </div>
+</div>
+<div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-6">
+${stats.map(c=>`<div class="anim stat-card bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 rounded-xl">
+  <div class="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center mb-3"><i data-lucide="${c.icon}" class="w-4 h-4 text-primary-600"></i></div>
+  <p class="text-xl font-bold text-gray-900 dark:text-white">${c.value}</p>
+  <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">${c.label}</p>
+</div>`).join('')}
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+  <button onclick="navigateTo('books');setTimeout(()=>openBookForm(),100)" class="flex flex-col items-center gap-2 p-3 rounded-xl border border-primary-200 dark:border-primary-800 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors"><i data-lucide="plus" class="w-5 h-5 text-primary-600"></i><span class="text-xs font-medium text-primary-700 dark:text-primary-300">Tambah Buku</span></button>
+  <button onclick="navigateTo('students');setTimeout(()=>openStudentForm(),100)" class="flex flex-col items-center gap-2 p-3 rounded-xl border border-primary-200 dark:border-primary-800 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors"><i data-lucide="user-plus" class="w-5 h-5 text-primary-600"></i><span class="text-xs font-medium text-primary-700 dark:text-primary-300">Tambah Member</span></button>
+  <button onclick="navigateTo('borrow');setTimeout(()=>openBorrowForm(),100)" class="flex flex-col items-center gap-2 p-3 rounded-xl border border-primary-200 dark:border-primary-800 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors"><i data-lucide="book-open" class="w-5 h-5 text-primary-600"></i><span class="text-xs font-medium text-primary-700 dark:text-primary-300">Pinjam Buku</span></button>
+  <button onclick="navigateTo('return')" class="flex flex-col items-center gap-2 p-3 rounded-xl border border-primary-200 dark:border-primary-800 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors"><i data-lucide="undo-2" class="w-5 h-5 text-primary-600"></i><span class="text-xs font-medium text-primary-700 dark:text-primary-300">Pengembalian</span></button>
+  <button onclick="navigateTo('visitors');setTimeout(()=>openVisitorForm(),100)" class="flex flex-col items-center gap-2 p-3 rounded-xl border border-primary-200 dark:border-primary-800 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors"><i data-lucide="user-check" class="w-5 h-5 text-primary-600"></i><span class="text-xs font-medium text-primary-700 dark:text-primary-300">Pengunjung</span></button>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+  <div class="anim bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5"><h3 class="font-semibold text-sm mb-3">Peminjaman Bulanan</h3><canvas id="chart-monthly" height="160"></canvas></div>
+  <div class="anim bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5"><h3 class="font-semibold text-sm mb-3">Buku Terpopuler</h3><canvas id="chart-popular" height="160"></canvas></div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+  <div class="anim bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5"><h3 class="font-semibold text-sm mb-3 text-red-600">Buku Terlambat</h3>
+  ${overdueList.length?`<div class="space-y-2">${overdueList.map(b=>`<div class="flex justify-between items-center text-sm p-2.5 rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20"><span class="font-medium text-gray-800 dark:text-gray-200">${b.studentName}</span><span class="text-xs text-gray-500 hidden sm:inline">${b.bookTitle}</span><span class="text-xs font-bold text-red-600 bg-red-100 dark:bg-red-900/30 px-2 py-0.5 rounded-full">${Math.ceil((new Date(getToday())-new Date(b.dueDate))/864e5)}hr</span></div>`).join('')}</div>`:'<p class="text-sm text-gray-400">Tidak ada</p>'}
+  </div>
+  <div class="anim bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5"><h3 class="font-semibold text-sm mb-3">Aktivitas Terbaru</h3>
+  <div class="space-y-2">${recentActivity.map(b=>`<div class="flex justify-between items-center text-sm p-2.5 rounded-lg bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700"><span class="font-medium">${b.studentName}</span><span class="text-xs px-2 py-0.5 rounded-full font-medium ${b.status==='Selesai'?'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300':b.status==='Terlambat'?'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300':'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'}">${b.status}</span></div>`).join('')}</div>
+  </div>
+</div>`;
+  lucide.createIcons();
+  setTimeout(()=>{
+    const monthlyData = [0,0,0,0,0,0,0,0,0,0,0,0];
+        borrows.forEach(b => {
+        if(!b.borrowDate) return;
+        const month =
+            new Date(b.borrowDate).getMonth();
+        monthlyData[month]++;
+        });
+
+        const ctx1 =
+        document.getElementById('chart-monthly');
+
+        if(ctx1)
+        new Chart(ctx1,{
+        type:'bar',
+        data:{
+            labels:[
+            'Jan','Feb','Mar','Apr',
+            'Mei','Jun','Jul','Agu',
+            'Sep','Okt','Nov','Des'
+            ],
+            datasets:[{
+            label:'Peminjaman',
+            data:monthlyData,
+            backgroundColor:'#2563EB',
+            borderRadius:6
+            }]
+        },
+        options:{
+            responsive:true,
+            plugins:{
+            legend:{display:false}
+            },
+            scales:{
+            y:{
+                beginAtZero:true,
+                grid:{
+                color:'rgba(0,0,0,.04)'
+                }
+            },
+            x:{
+                grid:{display:false}
+            }
+            }
+        }
+        });
+    // const ctx1=document.getElementById('chart-monthly');
+    // if(ctx1)new Chart(ctx1,{type:'bar',data:{labels:['Jan','Feb','Mar','Apr','Mei','Jun'],datasets:[{label:'Peminjaman',data:[12,18,15,22,20,borrows.filter(b=>b.borrowDate.startsWith('2026-06')).length],backgroundColor:'#2563EB',borderRadius:6}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.04)'}},x:{grid:{display:false}}}}});
+    const popular={};borrows.forEach(b=>{popular[b.bookTitle]=(popular[b.bookTitle]||0)+1});
+    const top5=Object.entries(popular).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const ctx2=document.getElementById('chart-popular');
+    if(ctx2)new Chart(ctx2,{type:'doughnut',data:{labels:top5.map(t=>t[0]),datasets:[{data:top5.map(t=>t[1]),backgroundColor:['#1d4ed8','#2563eb','#3b82f6','#60a5fa','#93c5fd']}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}}}});
+  },100);
+}
+
+async function refreshDashboard(){
+
+    // refresh semua cache yang dipakai dashboard
+    booksCache = await getBooks(true);
+    studentsCache = await getStudents(true);
+    borrowsCache = await getBorrows(true);
+    visitorsCache = await getVisitors(true);
+    finesCache = await getFines(true);
+    historyCache = await getHistory(true);
+
+    renderedPages.delete('dashboard');
+
+    await renderDashboard();
+
+}
+
+// ===== BOOKS =====
+let booksPage=1,
+    booksSearch='',
+    booksCategory='',
+    booksRack='',
+    booksSort='',
+    booksSortDirection='asc',
+    booksPerPage=25;
+async function renderBooks(){
+  let books = booksCache;
+  if(booksSearch)
+    books=books.filter(b=>
+        b.title.toLowerCase().includes(booksSearch)||
+        b.id.toLowerCase().includes(booksSearch)||
+        b.isbn.includes(booksSearch)
+    );
+  if(booksCategory)books=books.filter(b=>b.category===booksCategory);
+  if(booksRack)books=books.filter(b=>b.rack===booksRack);
+
+  if(booksSort){
+
+    books.sort((a,b)=>{
+
+        let valueA;
+        let valueB;
+
+        switch(booksSort){
+
+            case 'id':
+                valueA = a.id || '';
+                valueB = b.id || '';
+                break;
+
+            case 'title':
+                valueA = a.title || '';
+                valueB = b.title || '';
+                break;
+
+            case 'author':
+                valueA = a.author || '';
+                valueB = b.author || '';
+                break;
+
+            case 'isbn':
+                valueA = a.isbn || '';
+                valueB = b.isbn || '';
+                break;
+
+            case 'stock':
+                valueA = Number(a.stockTotal || 0);
+                valueB = Number(b.stockTotal || 0);
+                break;
+
+            default:
+                return 0;
+        }
+
+        if(booksSort === 'stock'){
+
+            return booksSortDirection === 'asc'
+                ? valueA - valueB
+                : valueB - valueA;
+
+        }
+
+        return booksSortDirection === 'asc'
+            ? String(valueA).localeCompare(
+                String(valueB),
+                'id',
+                {numeric:true}
+            )
+            : String(valueB).localeCompare(
+                String(valueA),
+                'id',
+                {numeric:true}
+            );
+
+    });
+
+    }
+
+  const perPage = booksPerPage;
+  const totalPages = Math.max(1, Math.ceil(books.length / perPage));
+
+  if(booksPage > totalPages){
+    booksPage = totalPages;
+  }
+
+  const pageBooks = books.slice(
+    (booksPage - 1) * perPage,
+    booksPage * perPage
+  );
+  const categories = [...new Set(books.map(b => b.category))];
+  const racks = [...new Set(
+    booksCache
+        .map(b => b.rack)
+        .filter(Boolean)
+)].sort();
+  document.getElementById('page-books').innerHTML=`
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
+<div class="flex flex-wrap gap-3 mb-4 items-center justify-between">
+  <div class="flex gap-2 flex-wrap">
+    <input type="text" placeholder="Cari buku..." value="${booksSearch}" class="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-700 rounded-lg dark:bg-slate-800 focus:ring-2 focus:ring-primary-600/20 focus:outline-none" oninput="booksSearch=this.value.toLowerCase();booksPage=1;renderBooks()">
+    <select class="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-700 rounded-lg dark:bg-slate-800" onchange="booksCategory=this.value;booksPage=1;renderBooks()"><option value="">Semua Kategori</option>${categories.map(c=>`<option ${c===booksCategory?'selected':''}>${c}</option>`).join('')}</select>
+    <select
+        class="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-700 rounded-lg dark:bg-slate-800"
+        onchange="booksRack=this.value;booksPage=1;renderBooks()"
+    >
+        <option value="">
+            Semua Rak
+        </option>
+
+        ${racks.map(r=>`
+            <option
+                value="${r}"
+                ${r===booksRack?'selected':''}
+            >
+                Rak ${r}
+            </option>
+        `).join('')}
+
+    </select>
+
+    <select
+        class="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-700 rounded-lg dark:bg-slate-800"
+        onchange="booksSort=this.value;booksPage=1;renderBooks()"
+    >
+        <option value="">
+            Urutkan
+        </option>
+
+        <option
+            value="id"
+            ${booksSort==='id'?'selected':''}
+        >
+            Kode Buku
+        </option>
+
+        <option
+            value="title"
+            ${booksSort==='title'?'selected':''}
+        >
+            Nama Buku
+        </option>
+
+        <option
+            value="author"
+            ${booksSort==='author'?'selected':''}
+        >
+            Nama Pengarang
+        </option>
+
+        <option
+            value="isbn"
+            ${booksSort==='isbn'?'selected':''}
+        >
+            ISBN
+        </option>
+
+        <option
+            value="stock"
+            ${booksSort==='stock'?'selected':''}
+        >
+            Jumlah Buku
+        </option>
+
+    </select>
+
+    <button
+        onclick="
+            booksSortDirection =
+                booksSortDirection === 'asc'
+                    ? 'desc'
+                    : 'asc';
+
+            booksPage=1;
+            renderBooks();
+        "
+        class="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700"
+        title="Ubah arah urutan"
+    >
+        ${booksSortDirection==='asc' ? 'A-Z' : 'Z-A'}
+    </button>
+  </div>
+  <button onclick="openBookForm()" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm rounded-lg transition-colors flex items-center gap-2 font-medium"><i data-lucide="plus" class="w-4 h-4"></i>Tambah</button>
+</div>
+
+<!-- KONTROL PAGINATION -->
+<div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+
+    <!-- JUMLAH DATA -->
+    <div class="flex items-center gap-2 text-xs text-gray-500">
+
+        <span>Tampilkan</span>
+
+        <select
+            onchange="booksPerPage=Number(this.value);booksPage=1;renderBooks()"
+            class="px-2 py-1.5 border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-xs"
+        >
+            <option value="25" ${booksPerPage===25?'selected':''}>
+                25
+            </option>
+
+            <option value="50" ${booksPerPage===50?'selected':''}>
+                50
+            </option>
+
+            <option value="100" ${booksPerPage===100?'selected':''}>
+                100
+            </option>
+        </select>
+
+        <span>data</span>
+
+    </div>
+
+
+    <!-- PAGINATION -->
+    <div class="flex items-center gap-1">
+
+        <button
+            onclick="changeBooksPage(1)"
+            ${booksPage===1?'disabled':''}
+            class="px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 text-xs hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Halaman pertama"
+        >
+            ⏮
+        </button>
+
+
+        <button
+            onclick="changeBooksPage(${Math.max(1,booksPage-1)})"
+            ${booksPage===1?'disabled':''}
+            class="px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 text-xs hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Sebelumnya"
+        >
+            ◀
+        </button>
+
+
+        <span class="px-2 text-xs text-gray-500">
+            ${booksPage} / ${totalPages}
+        </span>
+
+
+        <button
+            onclick="changeBooksPage(${Math.min(totalPages,booksPage+1)})"
+            ${booksPage===totalPages?'disabled':''}
+            class="px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 text-xs hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Berikutnya"
+        >
+            ▶
+        </button>
+
+
+        <button
+            onclick="changeBooksPage(${totalPages})"
+            ${booksPage===totalPages?'disabled':''}
+            class="px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 text-xs hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Halaman terakhir"
+        >
+            ⏭
+        </button>
+
+    </div>
+
+</div>
+
+<div class="overflow-x-auto rounded-lg border border-gray-100 dark:border-slate-700">
+<table class="modern-table w-full text-sm"><thead class="bg-gray-50 dark:bg-slate-800"><tr class="text-left">
+<th class="py-2.5 px-3 font-medium text-xs text-gray-500 dark:text-gray-400 uppercase">ID</th>
+<th class="py-2.5 px-3 font-medium text-xs text-gray-500 dark:text-gray-400 uppercase">Judul</th>
+<th class="py-2.5 px-3 font-medium text-xs text-gray-500 dark:text-gray-400 uppercase">ISBN</th>
+<th class="py-2.5 px-3 font-medium text-xs text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">Pengarang</th>
+<th class="py-2.5 px-3 font-medium text-xs text-gray-500 dark:text-gray-400 uppercase hidden lg:table-cell">Kategori</th>
+<th class="py-2.5 px-3 font-medium text-xs text-gray-500 dark:text-gray-400 uppercase">Rak</th>
+<th class="py-2.5 px-3 font-medium text-xs text-gray-500 dark:text-gray-400 uppercase">Stok</th>
+<th class="py-2.5 px-3 font-medium text-xs text-gray-500 dark:text-gray-400 uppercase">Aksi</th>
+</tr></thead>
+<tbody>${pageBooks.map(b=>`<tr>
+<td class="py-2.5 px-3 text-xs font-mono text-gray-500">${b.id}</td>
+<td class="py-2.5 px-3">
+  <div class="font-medium">${b.title}</div>
+  <div class="text-xs text-gray-400">
+    (${b.publisher || '-'}, ${b.year || '-'})
+  </div>
+</td>
+<td class="py-2.5 px-3 font-medium">${b.isbn || '-'}</td>
+<td class="py-2.5 px-3 hidden md:table-cell text-gray-500">${b.author}</td>
+<td class="py-2.5 px-3 hidden lg:table-cell">
+    <span class="px-2 py-0.5 rounded text-xs bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 font-medium">${b.category}</span></td>
+<td class="py-2.5 px-3 text-center">${b.rack}</td>
+<td class="py-2.5 px-3"><span class="font-semibold ${b.stockAvailable<2?'text-red-600':'text-gray-900 dark:text-white'}">${b.stockAvailable}</span>
+    <span class="text-gray-400">/${b.stockTotal}</span></td>
+<td class="py-2.5 px-3 flex gap-2">
+    <button
+        onclick="openBookForm('${b.id}')"
+        class="text-primary-600 hover:text-primary-800 text-xs font-medium"
+    >
+        Edit
+    </button>
+
+    <button
+        onclick="confirmDeleteBook('${b.id}')"
+        class="text-red-500 hover:text-red-700 text-xs font-medium"
+    >
+        Hapus
+    </button>
+</td>
+</tr>`).join('')}</tbody>
+</table>`;
+  lucide.createIcons();
+}
+
+async function changeBooksPage(page){
+  showLoader();
+  await new Promise(
+    requestAnimationFrame
+  );
+  booksPage = page;
+  await renderBooks();
+  hideLoader();
+}
+
+async function openBookForm(id){
+    toast(
+  id
+    ? 'Membuka data buku, tunggu...'
+    : 'Membuka form buku, tunggu...'
+);
+  const books = await getBooks();
+  const book = id
+    ? books.find(b => b.id === id)
+    : null;
+  const categories=['Antropologi', 'Buku Anak', 'Buku Anak Islami', 'Buku Latihan Soal', 'Dongeng', 'Ensiklopedia Anak', 'Fiksi', 'Ilmu Sosial', 'Kamus Bahasa', 'Manajemen Pendidikan', 'Matematika', 'Matematika & Sains', 'Metodologi', 'Olahraga', 'Panduan Belajar', 'Parenting', 'Pendidikan Agama Islam', 'Pendidikan Anak', 'Pendidikan Anak Usia Dini (PAUD)', 'Pendidikan Bahasa Dasar', 'Pendidikan Dasar', 'Pendidikan Sains Dasar', 'Pengembangan Diri', 'Psikologi', 'Referensi', 'Sains', 'Sastra', 'Sejarah', 'Studi Agama Islam', 'Teknologi Informasi '];
+  openModal(book?'Edit Buku':'Tambah Buku',`
+<form onsubmit="saveBook(event,'${id||''}')"><div class="grid grid-cols-2 gap-3">
+<div class="col-span-2"><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Judul</label><input name="title" value="${book?.title||''}" required class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700 focus:ring-2 focus:ring-primary-600/20 focus:outline-none"></div>
+<div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">ISBN</label><input name="isbn" value="${book?.isbn||''}" class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"></div>
+<div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Pengarang</label><input name="author" value="${book?.author||''}" required class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"></div>
+<div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Penerbit</label><input name="publisher" value="${book?.publisher||''}" class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"></div>
+<div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Tahun</label><input name="year" type="number" value="${book?.year||2024}" class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"></div>
+<div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Kategori</label><select name="category" class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700">${categories.map(c=>`<option ${c===book?.category?'selected':''}>${c}</option>`).join('')}</select></div>
+<div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Rak</label><input name="rack" value="${book?.rack||'A'}" class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"></div>
+<div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Stok Total</label><input name="stockTotal" type="number" value="${book?.stockTotal||1}" min="1" required class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"></div>
+</div><button type="submit" class="mt-4 w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-colors">Simpan</button></form>`);
+}
+
+async function saveBook(e, id) {
+    e.preventDefault();
+
+    const btn = e.target.querySelector(
+        'button[type="submit"]'
+    );
+
+    btn.disabled = true;
+    btn.textContent = 'Menyimpan...';
+
+    showLoader();
+
+    try {
+        const f = new FormData(e.target);
+
+        const title = f.get('title')?.trim();
+        const isbn = f.get('isbn')?.trim() || '';
+        const author = f.get('author')?.trim() || '';
+        const publisher = f.get('publisher')?.trim() || '';
+        const yearValue = f.get('year');
+        const category = f.get('category');
+        const rack = f.get('rack')?.trim() || '';
+        const newStockTotal = Number(f.get('stockTotal') || 0);
+
+        if (!title) {
+            throw new Error('Judul buku wajib diisi');
+        }
+
+        if (!category) {
+            throw new Error('Kategori buku wajib dipilih');
+        }
+
+        if (newStockTotal < 0) {
+            throw new Error('Stok tidak boleh negatif');
+        }
+
+
+        // =====================================================
+        // EDIT BUKU
+        // =====================================================
+
+        if (id) {
+
+            const books = await getBooks();
+
+            const oldBook = books.find(
+                b => b.id === id
+            );
+
+            if (!oldBook) {
+                throw new Error(
+                    'Data buku tidak ditemukan'
+                );
+            }
+
+            // Jumlah buku yang sedang dipinjam
+            const borrowed =
+                oldBook.stockTotal -
+                oldBook.stockAvailable;
+
+            // Tidak boleh mengurangi total stok
+            // di bawah jumlah yang sedang dipinjam
+            if (newStockTotal < borrowed) {
+
+                throw new Error(
+                    `Stok tidak boleh kurang dari ${borrowed} buku karena masih dipinjam`
+                );
+            }
+
+            const newStockAvailable =
+                newStockTotal - borrowed;
+
+
+            const { error } = await supabaseClient
+                .from('books')
+                .update({
+                    title: title,
+                    isbn: isbn,
+                    author: author,
+                    publisher: publisher,
+                    year: yearValue
+                        ? Number(yearValue)
+                        : null,
+                    category: category,
+                    rack: rack,
+                    stock_total: newStockTotal,
+                    stock_available: newStockAvailable
+                })
+                .eq('id', id);
+
+
+            if (error) {
+                console.error(
+                    'Supabase update book:',
+                    error
+                );
+
+                throw new Error(
+                    error.message ||
+                    'Gagal memperbarui buku'
+                );
+            }
+
+
+            toast(
+                'Buku berhasil diperbarui'
+            );
+
+        }
+
+
+        // =====================================================
+        // TAMBAH BUKU
+        // =====================================================
+
+        else {
+
+            const books = await getBooks();
+
+            const categoryCode = {
+                'Fiksi': 'FS',
+                'Non-Fiksi': 'NF',
+                'Sejarah': 'SJ',
+                'Sains': 'SN',
+                'Matematika': 'MT',
+                'Bahasa': 'BH',
+                'Agama': 'AG',
+                'Teknologi': 'TK',
+                'Seni': 'SE',
+                'Olahraga': 'OR'
+            };
+
+
+            const code =
+                categoryCode[category] || 'BK';
+
+
+            // Cari ID terbesar pada kategori tersebut
+            const sameCategory =
+                books.filter(
+                    b => b.id?.startsWith(code)
+                );
+
+
+            const lastNumber =
+                sameCategory.length
+                    ? Math.max(
+                        ...sameCategory.map(
+                            b => {
+                                const number =
+                                    Number(
+                                        b.id.substring(
+                                            code.length
+                                        )
+                                    );
+
+                                return Number.isFinite(
+                                    number
+                                )
+                                    ? number
+                                    : 0;
+                            }
+                        )
+                    )
+                    : 0;
+
+
+            const newId =
+                code +
+                String(lastNumber + 1)
+                    .padStart(4, '0');
+
+
+            // Cegah ID duplikat
+            const existing =
+                books.find(
+                    b => b.id === newId
+                );
+
+            if (existing) {
+                throw new Error(
+                    `ID buku ${newId} sudah digunakan`
+                );
+            }
+
+
+            const { error } =
+                await supabaseClient
+                    .from('books')
+                    .insert({
+                        id: newId,
+                        title: title,
+                        isbn: isbn,
+                        author: author,
+                        publisher: publisher,
+                        year: yearValue
+                            ? Number(yearValue)
+                            : null,
+                        category: category,
+                        rack: rack,
+                        stock_total: newStockTotal,
+                        stock_available: newStockTotal
+                    });
+
+
+            if (error) {
+                console.error(
+                    'Supabase insert book:',
+                    error
+                );
+
+                throw new Error(
+                    error.message ||
+                    'Gagal menambahkan buku'
+                );
+            }
+
+
+            toast(
+                `Buku ${newId} berhasil ditambahkan`
+            );
+        }
+
+
+        // =====================================================
+        // REFRESH CACHE + UI
+        // =====================================================
+
+        booksCache =
+            await getBooks(true);
+
+        closeModal();
+
+        await renderBooks();
+
+        await refreshDashboard();
+
+    }
+
+    catch (err) {
+
+        console.error(
+            'saveBook error:',
+            err
+        );
+
+        toast(
+            err.message ||
+            'Gagal menyimpan buku',
+            'error'
+        );
+
+    }
+
+    finally {
+
+        hideLoader();
+
+        btn.disabled = false;
+        btn.textContent = 'Simpan';
+
+    }
+}
+
+async function confirmDeleteBook(bookId) {
+
+    showLoader();
+
+    try {
+
+        // ==========================================
+        // CARI DATA BUKU
+        // ==========================================
+
+        const books =
+            await getBooks(true);
+
+        const book =
+            books.find(
+                b => b.id === bookId
+            );
+
+        if (!book) {
+
+            toast(
+                'Buku tidak ditemukan',
+                'error'
+            );
+
+            return;
+        }
+
+
+        // ==========================================
+        // CEK PEMINJAMAN AKTIF
+        // ==========================================
+
+        const {
+            data: activeBorrows,
+            error: borrowError
+        } = await supabaseClient
+            .from('borrowings')
+            .select('transaction_id')
+            .eq('book_id', bookId)
+            .neq('status', 'Selesai')
+            .limit(1);
+
+
+        if (borrowError) {
+
+            throw new Error(
+                borrowError.message ||
+                'Gagal memeriksa peminjaman buku'
+            );
+
+        }
+
+
+        // ==========================================
+        // MASIH DIPINJAM
+        // JANGAN BUKA POPUP
+        // ==========================================
+
+        if (
+            activeBorrows &&
+            activeBorrows.length > 0
+        ) {
+
+            toast(
+                'Buku masih sedang dipinjam dan tidak dapat dihapus',
+                'error'
+            );
+
+            return;
+        }
+
+
+        // ==========================================
+        // AMAN
+        // BARU TAMPILKAN POPUP
+        // ==========================================
+
+        openModal(
+            'Hapus Buku',
+            `
+                <p class="text-sm mb-4">
+                    Yakin ingin menghapus buku ini?
+                </p>
+
+                <div class="bg-gray-50 dark:bg-slate-800 rounded-lg p-3 mb-4">
+
+                    <div class="font-medium text-sm">
+                        ${book.title || '-'}
+                    </div>
+
+                    <div class="text-xs text-gray-500 mt-1">
+                        ID Buku: ${book.id || '-'}
+                    </div>
+
+                    <div class="text-xs text-gray-500">
+                        Pengarang: ${book.author || '-'}
+                    </div>
+
+                    <div class="text-xs text-gray-500">
+                        Kategori: ${book.category || '-'}
+                    </div>
+
+                    <div class="text-xs text-gray-500">
+                        Stok: ${book.stockAvailable || 0}/${book.stockTotal || 0}
+                    </div>
+
+                </div>
+
+                <p class="text-xs text-gray-400 mb-4">
+                    Buku tidak memiliki peminjaman aktif
+                    dan dapat dihapus.
+                </p>
+
+                <div class="flex gap-2">
+
+                    <button
+                        id="btn-delete-book"
+                        onclick="deleteBook('${book.id}')"
+                        class="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium"
+                    >
+                        Hapus
+                    </button>
+
+                    <button
+                        onclick="closeModal()"
+                        class="flex-1 py-2 bg-gray-100 dark:bg-slate-700 rounded-lg text-sm font-medium"
+                    >
+                        Batal
+                    </button>
+
+                </div>
+            `
+        );
+
+        lucide.createIcons();
+
+    }
+
+    catch (err) {
+
+        console.error(
+            'confirmDeleteBook error:',
+            err
+        );
+
+        toast(
+            err.message ||
+            'Gagal memeriksa buku',
+            'error'
+        );
+
+    }
+
+    finally {
+
+        hideLoader();
+
+    }
+}
+
+async function deleteBook(bookId) {
+
+    const btn =
+        document.getElementById(
+            'btn-delete-book'
+        );
+
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Menghapus...';
+    }
+
+    showLoader();
+
+    try {
+
+        // ==========================================
+        // CEK LAGI SEBELUM DELETE
+        // ==========================================
+
+        const {
+            data: activeBorrows,
+            error: borrowError
+        } = await supabaseClient
+            .from('borrowings')
+            .select('transaction_id')
+            .eq('book_id', bookId)
+            .neq('status', 'Selesai')
+            .limit(1);
+
+
+        if (borrowError) {
+
+            throw new Error(
+                borrowError.message ||
+                'Gagal memeriksa peminjaman buku'
+            );
+
+        }
+
+
+        if (
+            activeBorrows &&
+            activeBorrows.length > 0
+        ) {
+
+            closeModal();
+
+            toast(
+                'Buku masih sedang dipinjam dan tidak dapat dihapus',
+                'error'
+            );
+
+            return;
+        }
+
+
+        // ==========================================
+        // DELETE BUKU
+        // ==========================================
+
+        const {
+            error
+        } = await supabaseClient
+            .from('books')
+            .delete()
+            .eq('id', bookId);
+
+
+        if (error) {
+
+            throw new Error(
+                error.message ||
+                'Gagal menghapus buku'
+            );
+
+        }
+
+
+        // ==========================================
+        // REFRESH CACHE
+        // ==========================================
+
+        booksCache =
+            await getBooks(true);
+
+
+        // ==========================================
+        // REFRESH UI
+        // ==========================================
+
+        closeModal();
+
+        await renderBooks();
+
+        await refreshDashboard();
+
+        toast(
+            'Buku berhasil dihapus'
+        );
+
+    }
+
+    catch (err) {
+
+        console.error(
+            'deleteBook error:',
+            err
+        );
+
+
+        if (err.code === '23503') {
+
+            toast(
+                'Buku masih terhubung dengan transaksi dan tidak dapat dihapus',
+                'error'
+            );
+
+        } else {
+
+            toast(
+                err.message ||
+                'Gagal menghapus buku',
+                'error'
+            );
+
+        }
+
+    }
+
+    finally {
+
+        hideLoader();
+
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Hapus';
+        }
+
+    }
+}
+
+// ===== STUDENTS =====
+let studentsPage=1,studentsSearch='',studentsClass='',studentsGender='';
+async function changeStudentsPage(page){
+  showLoader();
+  await new Promise(
+    requestAnimationFrame
+  );
+
+  studentsPage = page;
+  await renderStudents();
+  await refreshDashboard();
+  hideLoader();
+}
+
+async function renderStudents(){
+  let students = studentsCache;
+  if(studentsSearch)students=students.filter(s=>s.name.toLowerCase().includes(studentsSearch)||s.nis.includes(studentsSearch));
+  if(studentsClass)students=students.filter(s=>s.class===studentsClass);
+  if(studentsGender)
+    students=students.filter(
+        s=>s.gender===studentsGender
+    );
+  // const perPage=10,totalPages=Math.ceil(students.length/perPage);
+  // const pageStudents=students.slice((studentsPage-1)*perPage,studentsPage*perPage);
+  const perPage = window.studentsPerPage || 25;
+  const totalPages = Math.max(1, Math.ceil(students.length / perPage));
+
+  if(studentsPage > totalPages){
+    studentsPage = totalPages;
+  }
+
+  const pageStudents = students.slice(
+    (studentsPage - 1) * perPage,
+    studentsPage * perPage
+  );
+  const classes=[...new Set(students.map(s=>s.class))].sort();
+  document.getElementById('page-students').innerHTML=`
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
+<div class="flex flex-wrap gap-3 mb-4 items-center justify-between">
+  <div class="flex gap-2 flex-wrap">
+    <input type="text" placeholder="Cari member/ID..." value="${studentsSearch}" class="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-700 rounded-lg dark:bg-slate-800 focus:ring-2 focus:ring-primary-600/20 focus:outline-none" oninput="studentsSearch=this.value.toLowerCase();studentsPage=1;renderStudents()">
+    <select class="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-700 rounded-lg dark:bg-slate-800" onchange="studentsClass=this.value;studentsPage=1;renderStudents()"><option value="">Semua Kategori</option>${classes.map(c=>`<option ${c===studentsClass?'selected':''}>${c}</option>`).join('')}</select>
+    <select
+        class="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-700 rounded-lg dark:bg-slate-800"
+        onchange="studentsGender=this.value;studentsPage=1;renderStudents()"
+    >
+        <option value="">Semua JK</option>
+        <option value="Laki-laki" ${studentsGender==='Laki-laki'?'selected':''}>
+            Laki-laki
+        </option>
+        <option value="Perempuan" ${studentsGender==='Perempuan'?'selected':''}>
+            Perempuan
+        </option>
+    </select>
+  </div>
+  <button onclick="openStudentForm()" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm rounded-lg transition-colors flex items-center gap-2 font-medium"><i data-lucide="plus" class="w-4 h-4"></i>Tambah</button>
+</div>
+
+<!-- KONTROL PAGINATION -->
+<div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+
+    <!-- JUMLAH DATA -->
+    <div class="flex items-center gap-2 text-xs text-gray-500">
+
+        <span>Tampilkan</span>
+
+        <select
+            onchange="window.studentsPerPage=Number(this.value);studentsPage=1;renderStudents()"
+            class="px-2 py-1.5 border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-xs"
+        >
+            <option
+                value="25"
+                ${(window.studentsPerPage || 25)===25?'selected':''}
+            >
+                25
+            </option>
+
+            <option
+                value="50"
+                ${window.studentsPerPage===50?'selected':''}
+            >
+                50
+            </option>
+
+            <option
+                value="100"
+                ${window.studentsPerPage===100?'selected':''}
+            >
+                100
+            </option>
+        </select>
+
+        <span>data</span>
+
+    </div>
+
+
+    <!-- PAGINATION -->
+    <div class="flex items-center gap-1">
+
+        <button
+            onclick="changeStudentsPage(1)"
+            ${studentsPage===1?'disabled':''}
+            class="px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 text-xs hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Halaman pertama"
+        >
+            ⏮
+        </button>
+
+
+        <button
+            onclick="changeStudentsPage(${Math.max(1,studentsPage-1)})"
+            ${studentsPage===1?'disabled':''}
+            class="px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 text-xs hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Sebelumnya"
+        >
+            ◀
+        </button>
+
+
+        <span class="px-2 text-xs text-gray-500">
+            ${studentsPage} / ${totalPages}
+        </span>
+
+
+        <button
+            onclick="changeStudentsPage(${Math.min(totalPages,studentsPage+1)})"
+            ${studentsPage===totalPages?'disabled':''}
+            class="px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 text-xs hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Berikutnya"
+        >
+            ▶
+        </button>
+
+
+        <button
+            onclick="changeStudentsPage(${totalPages})"
+            ${studentsPage===totalPages?'disabled':''}
+            class="px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 text-xs hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Halaman terakhir"
+        >
+            ⏭
+        </button>
+
+    </div>
+
+</div>
+
+<div class="overflow-x-auto rounded-lg border border-gray-100 dark:border-slate-700"><table class="modern-table w-full text-sm"><thead class="bg-gray-50 dark:bg-slate-800"><tr class="text-left">
+<th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">ID Member</th><th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">Nama</th><th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase hidden md:table-cell">Kategori</th><th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase hidden lg:table-cell">JK</th><th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">Status</th><th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">Aksi</th>
+</tr></thead><tbody>${pageStudents.map(s=>`<tr>
+<td class="py-2.5 px-3 text-xs font-mono text-gray-500">${s.nis}</td><td class="py-2.5 px-3 font-medium">${s.name}</td><td class="py-2.5 px-3 hidden md:table-cell">${s.class}</td><td class="py-2.5 px-3 hidden lg:table-cell text-xs">${s.gender==='Laki-laki'?'L':'P'}</td>
+<td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-xs font-medium ${s.active?'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300':'bg-gray-100 text-gray-500'}">${s.active?'Aktif':'Nonaktif'}</span></td>
+<td class="py-2.5 px-3 flex gap-2">
+    <button
+        onclick="openStudentForm('${s.nis}')"
+        class="text-primary-600 hover:text-primary-800 text-xs font-medium"
+    >
+        Edit
+    </button>
+
+    <button
+        onclick="confirmDeleteStudent('${s.nis}')"
+        class="text-red-500 hover:text-red-700 text-xs font-medium"
+    >
+        Hapus
+    </button>
+</td>
+</tr>`).join('')}</tbody></table></div>`;
+
+lucide.createIcons();
+}
+
+async function openStudentForm(nis){
+    toast(
+    nis
+        ? 'Memuat data member...'
+        : 'Memuat form member...'
+    );
+  const students = await getStudents();
+  const s = nis
+    ? students.find(st => st.nis === nis)
+    : null;
+  const classes=['Anak-anak', 'Remaja', 'Umum'];
+  openModal(s?'Edit Member':'Tambah Member',`
+<form onsubmit="saveStudent(event,'${nis||''}')">
+    <div class="space-y-3">
+        <div>
+            <label class="text-xs font-medium text-gray-600 dark:text-gray-300">ID Member</label>
+            <input name="nis" value="${s?.nis||''}" ${s?'readonly':''} required class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700 ${s?'bg-gray-50 dark:bg-slate-600':''}">
+        </div>
+        <div>
+            <label class="text-xs font-medium text-gray-600 dark:text-gray-300">Nama</label>
+            <input name="name" value="${s?.name||''}" required class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700">
+        </div>
+        <div>
+            <label class="text-xs font-medium text-gray-600 dark:text-gray-300">Kategori</label>
+            <select name="class" class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700">${classes.map(c=>`<option ${c===s?.class?'selected':''}>${c}</option>`).join('')}</select>
+        </div>
+        <div>
+            <label class="text-xs font-medium text-gray-600 dark:text-gray-300">Jenis Kelamin</label>
+            <select name="gender" class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"><option ${s?.gender==='Laki-laki'?'selected':''}>Laki-laki</option><option ${s?.gender==='Perempuan'?'selected':''}>Perempuan</option></select>
+        </div>
+    </div>
+    <button type="submit" class="mt-4 w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-colors">Simpan</button>
+</form>`);
+}
+
+async function saveStudent(e, nis) {
+    e.preventDefault();
+
+    const btn = e.target.querySelector(
+        'button[type="submit"]'
+    );
+
+    btn.disabled = true;
+    btn.textContent = 'Menyimpan...';
+
+    showLoader();
+
+    try {
+        const f = new FormData(e.target);
+
+        const studentNis = f.get('nis')?.trim();
+        const name = f.get('name')?.trim();
+        const className = f.get('class')?.trim() || '';
+        const gender = f.get('gender') || '';
+
+        // ================================================
+        // VALIDASI
+        // ================================================
+
+        if (!nis && !studentNis) {
+            throw new Error('NIS wajib diisi');
+        }
+
+        if (!name) {
+            throw new Error('Nama siswa wajib diisi');
+        }
+
+
+        // ================================================
+        // UPDATE SISWA
+        // ================================================
+
+        if (nis) {
+
+            const { error } = await supabaseClient
+                .from('students')
+                .update({
+                    name: name,
+                    class: className,
+                    gender: gender,
+                    active: true
+                })
+                .eq('nis', nis);
+
+            if (error) {
+                console.error(
+                    'Supabase update student:',
+                    error
+                );
+
+                throw new Error(
+                    error.message ||
+                    'Gagal memperbarui data siswa'
+                );
+            }
+
+            toast('Member berhasil diperbarui');
+        }
+
+
+        // ================================================
+        // TAMBAH SISWA
+        // ================================================
+
+        else {
+
+            // Cek apakah NIS sudah ada
+            const { data: existing, error: checkError } =
+                await supabaseClient
+                    .from('students')
+                    .select('nis')
+                    .eq('nis', studentNis)
+                    .maybeSingle();
+
+            if (checkError) {
+                console.error(
+                    'Supabase check student:',
+                    checkError
+                );
+
+                throw new Error(
+                    checkError.message ||
+                    'Gagal memeriksa NIS'
+                );
+            }
+
+            if (existing) {
+                throw new Error(
+                    'ID sudah terdaftar'
+                );
+            }
+
+
+            // Insert siswa
+            const { error } =
+                await supabaseClient
+                    .from('students')
+                    .insert({
+                        nis: studentNis,
+                        name: name,
+                        class: className,
+                        gender: gender,
+                        active: true
+                    });
+
+            if (error) {
+                console.error(
+                    'Supabase insert student:',
+                    error
+                );
+
+                throw new Error(
+                    error.message ||
+                    'Gagal menambahkan siswa'
+                );
+            }
+
+            toast('Member berhasil ditambahkan');
+        }
+
+
+        // ================================================
+        // REFRESH CACHE
+        // ================================================
+
+        studentsCache =
+            await getStudents(true);
+
+
+        // ================================================
+        // REFRESH UI
+        // ================================================
+
+        closeModal();
+
+        await renderStudents();
+
+        await refreshDashboard();
+
+    }
+
+    catch (err) {
+
+        console.error(
+            'saveStudent error:',
+            err
+        );
+
+        toast(
+            err.message ||
+            'Gagal menyimpan data siswa',
+            'error'
+        );
+
+    }
+
+    finally {
+
+        hideLoader();
+
+        btn.disabled = false;
+        btn.textContent = 'Simpan';
+    }
+}
+
+async function deleteStudent(nis) {
+
+    const btn =
+        document.getElementById(
+            'btn-delete-student'
+        );
+
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Menghapus...';
+    }
+
+    showLoader();
+
+    try {
+
+        // ==========================================
+        // CEK LAGI SEBELUM DELETE
+        // ==========================================
+
+        const {
+            data: activeBorrows,
+            error: borrowError
+        } = await supabaseClient
+            .from('borrowings')
+            .select('transaction_id')
+            .eq('student_nis', nis)
+            .neq('status', 'Selesai')
+            .limit(1);
+
+
+        if (borrowError) {
+            throw new Error(
+                borrowError.message
+            );
+        }
+
+
+        if (
+            activeBorrows &&
+            activeBorrows.length > 0
+        ) {
+
+            closeModal();
+
+            toast(
+                'Member masih memiliki buku yang sedang dipinjam',
+                'error'
+            );
+
+            return;
+        }
+
+
+        // ==========================================
+        // DELETE
+        // ==========================================
+
+        const {
+            error
+        } = await supabaseClient
+            .from('students')
+            .delete()
+            .eq('nis', nis);
+
+
+        if (error) {
+            throw new Error(
+                error.message ||
+                'Gagal menghapus member'
+            );
+        }
+
+
+        // ==========================================
+        // REFRESH
+        // ==========================================
+
+        studentsCache =
+            await getStudents(true);
+
+        closeModal();
+
+        await renderStudents();
+
+        await refreshDashboard();
+
+        toast(
+            'Member berhasil dihapus'
+        );
+
+    }
+
+    catch (err) {
+
+        console.error(
+            'deleteStudent error:',
+            err
+        );
+
+        toast(
+            err.message ||
+            'Gagal menghapus member',
+            'error'
+        );
+
+    }
+
+    finally {
+
+        hideLoader();
+
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Hapus';
+        }
+
+    }
+}
+
+async function confirmDeleteStudent(nis) {
+
+    showLoader();
+
+    try {
+
+        // ==========================================
+        // CARI DATA MEMBER
+        // ==========================================
+
+        const students =
+            await getStudents(true);
+
+        const student =
+            students.find(
+                s => s.nis === nis
+            );
+
+        if (!student) {
+
+            toast(
+                'Member tidak ditemukan',
+                'error'
+            );
+
+            return;
+        }
+
+
+        // ==========================================
+        // CEK PEMINJAMAN AKTIF
+        // ==========================================
+
+        const {
+            data: activeBorrows,
+            error: borrowError
+        } = await supabaseClient
+            .from('borrowings')
+            .select('transaction_id')
+            .eq('student_nis', nis)
+            .neq('status', 'Selesai')
+            .limit(1);
+
+
+        if (borrowError) {
+
+            throw new Error(
+                borrowError.message ||
+                'Gagal memeriksa peminjaman member'
+            );
+
+        }
+
+
+        // ==========================================
+        // JIKA MASIH MEMINJAM
+        // JANGAN BUKA POPUP
+        // ==========================================
+
+        if (
+            activeBorrows &&
+            activeBorrows.length > 0
+        ) {
+
+            toast(
+                'Member masih memiliki buku yang sedang dipinjam',
+                'error'
+            );
+
+            return;
+        }
+
+
+        // ==========================================
+        // TIDAK ADA PINJAMAN AKTIF
+        // BARU BUKA POPUP
+        // ==========================================
+
+        openModal(
+            'Hapus Member',
+            `
+                <p class="text-sm mb-4">
+                    Yakin ingin menghapus member ini?
+                </p>
+
+                <div class="bg-gray-50 dark:bg-slate-800 rounded-lg p-3 mb-4">
+
+                    <div class="font-medium text-sm">
+                        ${student.name || '-'}
+                    </div>
+
+                    <div class="text-xs text-gray-500 mt-1">
+                        ID Member: ${student.nis || '-'}
+                    </div>
+
+                    <div class="text-xs text-gray-500">
+                        Kelas: ${student.class || '-'}
+                    </div>
+
+                </div>
+
+                <p class="text-xs text-gray-400 mb-4">
+                    Member tidak memiliki peminjaman aktif
+                    dan dapat dihapus.
+                </p>
+
+                <div class="flex gap-2">
+
+                    <button
+                        id="btn-delete-student"
+                        onclick="deleteStudent('${student.nis}')"
+                        class="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium"
+                    >
+                        Hapus
+                    </button>
+
+                    <button
+                        onclick="closeModal()"
+                        class="flex-1 py-2 bg-gray-100 dark:bg-slate-700 rounded-lg text-sm font-medium"
+                    >
+                        Batal
+                    </button>
+
+                </div>
+            `
+        );
+
+        lucide.createIcons();
+
+    }
+
+    catch (err) {
+
+        console.error(
+            'confirmDeleteStudent error:',
+            err
+        );
+
+        toast(
+            err.message ||
+            'Gagal memeriksa member',
+            'error'
+        );
+
+    }
+
+    finally {
+
+        hideLoader();
+
+    }
+}
+
+// ===== BORROW =====
+async function renderBorrow(){
+  const allBorrows = borrowsCache;
+    const borrows = allBorrows.filter(
+        b => b.status !== 'Selesai'
+    );
+    borrows.sort(
+        (a,b) =>
+        Number(b.transactionId.replace('TR','')) -
+        Number(a.transactionId.replace('TR',''))
+    );
+  document.getElementById('page-borrow').innerHTML=`
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
+<div class="flex justify-between items-center mb-4">
+  <h3 class="font-semibold text-sm">Peminjaman Aktif (${borrows.length})</h3>
+  <button onclick="openBorrowForm()" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm rounded-lg transition-colors flex items-center gap-2 font-medium"><i data-lucide="plus" class="w-4 h-4"></i>Pinjam Buku</button>
+</div>
+<div class="overflow-x-auto rounded-lg border border-gray-100 dark:border-slate-700"><table class="modern-table w-full text-sm"><thead class="bg-gray-50 dark:bg-slate-800"><tr class="text-left">
+<th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">ID</th><th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">Member</th><th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">Buku</th><th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase hidden md:table-cell">Pinjam</th><th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase hidden md:table-cell">Jatuh Tempo</th><th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">Status</th>
+</tr></thead><tbody>${borrows.map(b=>{
+  const sc=b.status==='Terlambat'?'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300':b.status==='Jatuh Tempo'?'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300':'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
+  return`<tr><td class="py-2.5 px-3 text-xs font-mono text-gray-500">${b.transactionId}</td><td class="py-2.5 px-3">${b.studentName}</td><td class="py-2.5 px-3">${b.bookTitle}</td><td class="py-2.5 px-3 hidden md:table-cell text-xs">${formatDate(b.borrowDate)}</td><td class="py-2.5 px-3 hidden md:table-cell text-xs">${formatDate(b.dueDate)}</td><td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-xs font-medium ${sc}">${b.status}</span></td></tr>`}).join('')}</tbody></table></div></div>`;
+  lucide.createIcons();
+}
+
+async function openBorrowForm(){
+  const students = studentsCache;
+  const books = booksCache;
+  const settings = settingsCache;
+  const today=getToday();
+  const due=new Date();due.setDate(due.getDate()+settings.loanDays);
+  openModal('Pinjam Buku',`
+<form onsubmit="saveBorrow(event)"><div class="space-y-3">
+<div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Member</label><select name="nis" required class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"><option value="">-- Pilih Member --</option>${students.map(s=>`<option value="${s.nis}">${s.nis} - ${s.name}</option>`).join('')}</select></div>
+<div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Buku</label><select name="bookId" required class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"><option value="">-- Pilih Buku --</option>${books.map(b=>`<option value="${b.id}">${b.id} - ${b.title} (stok: ${b.stockAvailable})</option>`).join('')}</select></div>
+<div class="grid grid-cols-2 gap-3"><div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Tgl Pinjam</label><input name="borrowDate" type="date" value="${today}" readonly class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700 bg-gray-50 dark:bg-slate-600"></div>
+<div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Tgl Kembali</label><input name="dueDate" type="date" value="${due.toISOString().split('T')[0]}" readonly class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700 bg-gray-50 dark:bg-slate-600"></div></div>
+<p class="text-xs text-gray-400">Lama pinjam: ${settings.loanDays} hari | Maks: ${settings.maxBorrow} buku/Member</p>
+</div><button type="submit" class="mt-4 w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-colors">Simpan Peminjaman</button></form>`);
+}
+
+async function saveBorrow(e) {
+    e.preventDefault();
+
+    const btn = e.target.querySelector(
+        'button[type="submit"]'
+    );
+
+    btn.disabled = true;
+    btn.textContent = 'Menyimpan...';
+
+    showLoader();
+
+    try {
+        const f = new FormData(e.target);
+
+        const nis = f.get('nis')?.trim();
+        const bookId = f.get('bookId')?.trim();
+
+        const borrowDate =
+            f.get('borrowDate') ||
+            getToday();
+
+        const dueDate =
+            f.get('dueDate') ||
+            null;
+
+
+        // =================================================
+        // VALIDASI DASAR
+        // =================================================
+
+        if (!nis) {
+            throw new Error(
+                'Member belum dipilih'
+            );
+        }
+
+        if (!bookId) {
+            throw new Error(
+                'Buku belum dipilih'
+            );
+        }
+
+
+        // =================================================
+        // CEK MEMBER
+        // =================================================
+
+        const students =
+            await getStudents(true);
+
+        const student =
+            students.find(
+                s => s.nis === nis
+            );
+
+        if (!student) {
+            throw new Error(
+                'Member tidak ditemukan'
+            );
+        }
+
+
+        // =================================================
+        // CEK BUKU
+        // =================================================
+
+        const books =
+            await getBooks(true);
+
+        const book =
+            books.find(
+                b => b.id === bookId
+            );
+
+        if (!book) {
+            throw new Error(
+                'Buku tidak ditemukan'
+            );
+        }
+
+
+        // =================================================
+        // PINJAM
+        // =================================================
+        //
+        // Semua proses berikut dilakukan oleh PostgreSQL:
+        //
+        // - cek member aktif
+        // - cek stok
+        // - cek batas peminjaman
+        // - generate transaction ID
+        // - insert borrowing
+        // - kurangi stok
+        // - catat pengunjung
+        //
+        // dalam SATU transaksi database.
+        // =================================================
+
+        const {
+            data,
+            error
+        } = await supabaseClient.rpc(
+            'create_borrowing',
+            {
+                p_book_id: bookId,
+                p_nis: nis,
+                p_borrow_date: borrowDate,
+                p_due_date: dueDate
+            }
+        );
+
+
+        if (error) {
+
+            console.error(
+                'create_borrowing error:',
+                error
+            );
+
+            throw new Error(
+                error.message ||
+                'Gagal melakukan peminjaman'
+            );
+        }
+
+
+        // =================================================
+        // HASIL TRANSAKSI
+        // =================================================
+
+        console.log(
+            'Peminjaman berhasil:',
+            data
+        );
+
+
+        // =================================================
+        // REFRESH CACHE
+        // =================================================
+
+        booksCache =
+            await getBooks(true);
+
+        borrowsCache =
+            await getBorrows(true);
+
+        visitorsCache =
+            await getVisitors(true);
+
+
+        // =================================================
+        // REFRESH UI
+        // =================================================
+
+        closeModal();
+
+        await renderBorrow();
+
+        await renderReturn();
+
+        await renderVisitors();
+
+        await renderBooks();
+
+        await refreshDashboard();
+
+
+        toast(
+            `Peminjaman berhasil · ${data.transaction_id}`
+        );
+
+    }
+
+    catch (err) {
+
+        console.error(
+            'saveBorrow error:',
+            err
+        );
+
+        toast(
+            err.message ||
+            'Gagal melakukan peminjaman',
+            'error'
+        );
+
+    }
+
+    finally {
+
+        hideLoader();
+
+        btn.disabled = false;
+        btn.textContent = 'Simpan';
+
+    }
+}
+
+// ===== RETURN =====
+async function renderReturn(){
+  const borrows = borrowsCache
+    .filter(b => b.status !== 'Selesai');
+  const today = new Date(getToday());
+  document.getElementById('page-return').innerHTML=`
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
+<h3 class="font-semibold text-sm mb-4">Pengembalian Buku (${borrows.length} aktif)</h3>
+<div class="overflow-x-auto rounded-lg border border-gray-100 dark:border-slate-700"><table class="modern-table w-full text-sm"><thead class="bg-gray-50 dark:bg-slate-800"><tr class="text-left">
+<th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">Member</th><th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">Buku</th><th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase hidden md:table-cell">Jatuh Tempo</th><th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">Terlambat</th><th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">Aksi</th>
+</tr></thead><tbody>${borrows.map(b=>{const late=Math.max(0,Math.ceil((today-new Date(b.dueDate))/864e5));
+  return`<tr><td class="py-2.5 px-3">${b.studentName}</td><td class="py-2.5 px-3">${b.bookTitle}</td><td class="py-2.5 px-3 hidden md:table-cell text-xs">${formatDate(b.dueDate)}</td><td class="py-2.5 px-3 ${late?'text-red-600 font-bold':''}">${late?late+' hari':'-'}</td><td class="py-2.5 px-3"><button id="return-${b.transactionId}" onclick="returnBook('${b.transactionId}')" class="px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs rounded-lg font-medium transition-colors">Kembalikan</button></td></tr>`}).join('')}</tbody></table></div></div>`;
+}
+
+async function returnBook(transactionId) {
+
+    const btn =
+        document.getElementById(
+            `return-${transactionId}`
+        );
+
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Mengembalikan...';
+    }
+
+    showLoader();
+
+    try {
+
+        // =================================================
+        // VALIDASI TRANSAKSI
+        // =================================================
+
+        const borrows =
+            await getBorrows(true);
+
+        const borrow =
+            borrows.find(
+                b =>
+                    b.transactionId ===
+                    transactionId
+            );
+
+        if (!borrow) {
+            throw new Error(
+                'Data peminjaman tidak ditemukan'
+            );
+        }
+
+
+        // =================================================
+        // SATU TRANSAKSI DATABASE
+        // =================================================
+        //
+        // PostgreSQL akan:
+        //
+        // 1. Mengunci transaksi
+        // 2. Mengambil buku
+        // 3. Mengambil member
+        // 4. Menghitung keterlambatan
+        // 5. Menghitung denda
+        // 6. Mengubah status → Selesai
+        // 7. Menambah stok
+        // 8. Membuat riwayat
+        // 9. Membuat denda jika terlambat
+        // 10. Mencatat pengunjung
+        //
+        // Semuanya dalam SATU transaksi.
+        // =================================================
+
+        const {
+            data,
+            error
+        } = await supabaseClient.rpc(
+            'return_borrowing',
+            {
+                p_transaction_id:
+                    transactionId
+            }
+        );
+
+
+        if (error) {
+
+            console.error(
+                'return_borrowing error:',
+                error
+            );
+
+            throw new Error(
+                error.message ||
+                'Gagal mengembalikan buku'
+            );
+        }
+
+
+        // =================================================
+        // HASIL
+        // =================================================
+
+        console.log(
+            'Pengembalian berhasil:',
+            data
+        );
+
+
+        // =================================================
+        // REFRESH CACHE
+        // =================================================
+
+        booksCache =
+            await getBooks(true);
+
+        borrowsCache =
+            await getBorrows(true);
+
+        historyCache =
+            await getHistory(true);
+
+        finesCache =
+            await getFines(true);
+
+        visitorsCache =
+            await getVisitors(true);
+
+
+        // =================================================
+        // REFRESH UI
+        // =================================================
+
+        closeModal();
+
+        await renderReturn();
+
+        await renderBorrow();
+
+        await renderVisitors();
+
+        await renderFines();
+
+        await renderBooks();
+
+        await refreshDashboard();
+
+
+        // =================================================
+        // NOTIFIKASI
+        // =================================================
+
+        const lateDays =
+            Number(data?.late_days || 0);
+
+        const fine =
+            Number(data?.fine || 0);
+
+        toast(
+            lateDays > 0
+                ? `Buku dikembalikan. Denda ${formatCurrency(fine)}`
+                : 'Buku berhasil dikembalikan'
+        );
+
+    }
+
+    catch (err) {
+
+        console.error(
+            'returnBook error:',
+            err
+        );
+
+        toast(
+            err.message ||
+            'Gagal mengembalikan buku',
+            'error'
+        );
+
+    }
+
+    finally {
+
+        hideLoader();
+
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent =
+                'Kembalikan';
+        }
+
+    }
+}
+
+// ========================================== HISTORY ============================================
+let historyFilter='all';
+let historyPage = 1;
+let historyPageSize = 25;
+let historySortBy = 'latest';
+let historySortDirection = 'asc';
+
+function getProcessedHistory() {
+
+    let history = [
+        ...(historyCache || [])
+    ];
+
+    const today = new Date(getToday());
+    today.setHours(0, 0, 0, 0);
+
+
+    // ================================================
+    // FILTER WAKTU
+    // ================================================
+
+    if (historyFilter === 'today') {
+
+        history = history.filter(
+            h => h.returnDate === getToday()
+        );
+
+    }
+
+    else if (historyFilter === 'week') {
+
+        const w = new Date(today);
+
+        w.setDate(
+            w.getDate() - 7
+        );
+
+        history = history.filter(h => {
+
+            if (!h.returnDate) {
+                return false;
+            }
+
+            return new Date(h.returnDate) >= w;
+        });
+
+    }
+
+    else if (historyFilter === 'month') {
+
+        history = history.filter(
+            h =>
+                h.returnDate &&
+                h.returnDate.startsWith(
+                    getToday().slice(0, 7)
+                )
+        );
+
+    }
+
+
+    // ================================================
+    // SORTING
+    // ================================================
+
+    history.sort((a, b) => {
+
+        // --------------------------------------------
+        // TERBARU / TERLAMA
+        // --------------------------------------------
+
+        if (
+            historySortBy === 'latest' ||
+            historySortBy === 'oldest'
+        ) {
+
+            const dateA =
+                new Date(
+                    a.returnDate ||
+                    a.borrowDate ||
+                    '1970-01-01'
+                );
+
+            const dateB =
+                new Date(
+                    b.returnDate ||
+                    b.borrowDate ||
+                    '1970-01-01'
+                );
+
+            return historySortBy === 'latest'
+                ? dateB - dateA
+                : dateA - dateB;
+        }
+
+
+        // --------------------------------------------
+        // NAMA MEMBER / NAMA BUKU
+        // --------------------------------------------
+
+        let valueA = '';
+        let valueB = '';
+
+        if (
+            historySortBy === 'name'
+        ) {
+
+            valueA =
+                a.studentName || '';
+
+            valueB =
+                b.studentName || '';
+
+        }
+
+        else if (
+            historySortBy === 'book'
+        ) {
+
+            valueA =
+                a.bookTitle || '';
+
+            valueB =
+                b.bookTitle || '';
+
+        }
+
+
+        const result =
+            String(valueA).localeCompare(
+                String(valueB),
+                'id',
+                {
+                    numeric: true,
+                    sensitivity: 'base'
+                }
+            );
+
+
+        return historySortDirection === 'asc'
+            ? result
+            : -result;
+
+    });
+
+
+    return history;
+}
+
+async function renderHistory() {
+
+    // Pastikan cache terbaru
+    historyCache = await getHistory(true);
+
+    const processedHistory =
+        getProcessedHistory();
+
+    const totalHistory =
+        processedHistory.length;
+
+    // ================================================
+    // PAGINATION
+    // ================================================
+
+    const totalPages =
+        Math.max(
+            1,
+            Math.ceil(
+                totalHistory /
+                historyPageSize
+            )
+        );
+
+    if (historyPage > totalPages) {
+        historyPage = totalPages;
+    }
+
+    const start =
+        (historyPage - 1) *
+        historyPageSize;
+
+    const end =
+        start + historyPageSize;
+
+    const pageHistory =
+        processedHistory.slice(
+            start,
+            end
+        );
+
+
+    // ================================================
+    // RENDER
+    // ================================================
+
+    document.getElementById(
+        'page-history'
+    ).innerHTML = `
+
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
+
+            <!-- ===================================== -->
+            <!-- TOOLBAR -->
+            <!-- ===================================== -->
+
+            <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+
+                <!-- FILTER WAKTU -->
+
+                <div class="flex flex-wrap gap-2">
+
+                    <button
+                        onclick="changeHistoryFilter('all')"
+                        class="px-3 py-1.5 text-xs rounded-lg font-medium transition-colors
+                        ${
+                            historyFilter === 'all'
+                                ? 'bg-primary-600 text-white'
+                                : 'bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700'
+                        }"
+                    >
+                        Semua
+                    </button>
+
+                    <button
+                        onclick="changeHistoryFilter('today')"
+                        class="px-3 py-1.5 text-xs rounded-lg font-medium transition-colors
+                        ${
+                            historyFilter === 'today'
+                                ? 'bg-primary-600 text-white'
+                                : 'bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700'
+                        }"
+                    >
+                        Hari Ini
+                    </button>
+
+                    <button
+                        onclick="changeHistoryFilter('week')"
+                        class="px-3 py-1.5 text-xs rounded-lg font-medium transition-colors
+                        ${
+                            historyFilter === 'week'
+                                ? 'bg-primary-600 text-white'
+                                : 'bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700'
+                        }"
+                    >
+                        7 Hari
+                    </button>
+
+                    <button
+                        onclick="changeHistoryFilter('month')"
+                        class="px-3 py-1.5 text-xs rounded-lg font-medium transition-colors
+                        ${
+                            historyFilter === 'month'
+                                ? 'bg-primary-600 text-white'
+                                : 'bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700'
+                        }"
+                    >
+                        Bulan Ini
+                    </button>
+
+                </div>
+
+
+                <!-- SORT + JUMLAH -->
+
+                <div class="flex flex-wrap items-center gap-2">
+
+                    <span class="text-xs text-gray-500">
+                        Tampilkan
+                    </span>
+
+                    <select
+                        onchange="changeHistoryPageSize(this.value)"
+                        class="border border-gray-200 dark:border-slate-700 rounded-lg px-2 py-1.5 text-xs bg-white dark:bg-slate-800"
+                    >
+
+                        <option
+                            value="25"
+                            ${historyPageSize === 25 ? 'selected' : ''}
+                        >
+                            25
+                        </option>
+
+                        <option
+                            value="50"
+                            ${historyPageSize === 50 ? 'selected' : ''}
+                        >
+                            50
+                        </option>
+
+                        <option
+                            value="100"
+                            ${historyPageSize === 100 ? 'selected' : ''}
+                        >
+                            100
+                        </option>
+
+                    </select>
+
+                    <span class="text-xs text-gray-500">
+                        log
+                    </span>
+
+
+                    <!-- SORT BERDASARKAN -->
+
+                    <select
+                        onchange="changeHistorySort(this.value)"
+                        class="border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs bg-white dark:bg-slate-800"
+                        title="Urutkan berdasarkan"
+                    >
+
+                        <option
+                            value="latest"
+                            ${historySortBy === 'latest' ? 'selected' : ''}
+                        >
+                            Terbaru
+                        </option>
+
+                        <option
+                            value="oldest"
+                            ${historySortBy === 'oldest' ? 'selected' : ''}
+                        >
+                            Terlama
+                        </option>
+
+                        <option
+                            value="name"
+                            ${historySortBy === 'name' ? 'selected' : ''}
+                        >
+                            Nama Member
+                        </option>
+
+                        <option
+                            value="book"
+                            ${historySortBy === 'book' ? 'selected' : ''}
+                        >
+                            Nama Buku
+                        </option>
+
+                    </select>
+
+
+                    <!-- A-Z / Z-A -->
+
+                    <select
+                        onchange="changeHistorySortDirection(this.value)"
+                        class="border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs bg-white dark:bg-slate-800"
+                        title="Arah urutan"
+                    >
+
+                        <option
+                            value="asc"
+                            ${historySortDirection === 'asc' ? 'selected' : ''}
+                        >
+                            A-Z
+                        </option>
+
+                        <option
+                            value="desc"
+                            ${historySortDirection === 'desc' ? 'selected' : ''}
+                        >
+                            Z-A
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- ===================================== -->
+            <!-- TABLE -->
+            <!-- ===================================== -->
+
+            <div class="overflow-x-auto rounded-lg border border-gray-100 dark:border-slate-700">
+
+                <table class="modern-table w-full text-sm">
+
+                    <thead class="bg-gray-50 dark:bg-slate-800">
+
+                        <tr class="text-left">
+
+                            <th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">
+                                Nama
+                            </th>
+
+                            <th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">
+                                Buku
+                            </th>
+
+                            <th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase hidden md:table-cell">
+                                Pinjam
+                            </th>
+
+                            <th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase hidden md:table-cell">
+                                Kembali
+                            </th>
+
+                            <th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">
+                                Denda
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        ${
+                            pageHistory.length
+
+                                ? pageHistory.map(
+                                    b => `
+
+                                        <tr>
+
+                                            <td class="py-2.5 px-3">
+                                                ${b.studentName || '-'}
+                                            </td>
+
+                                            <td class="py-2.5 px-3">
+                                                ${b.bookTitle || '-'}
+                                            </td>
+
+                                            <td class="py-2.5 px-3 hidden md:table-cell text-xs">
+                                                ${
+                                                    b.borrowDate
+                                                        ? formatDate(b.borrowDate)
+                                                        : '-'
+                                                }
+                                            </td>
+
+                                            <td class="py-2.5 px-3 hidden md:table-cell text-xs">
+                                                ${
+                                                    b.returnDate
+                                                        ? formatDate(b.returnDate)
+                                                        : '-'
+                                                }
+                                            </td>
+
+                                            <td class="py-2.5 px-3 text-xs">
+                                                ${
+                                                    b.fine
+                                                        ? formatCurrency(b.fine)
+                                                        : '-'
+                                                }
+                                            </td>
+
+                                        </tr>
+
+                                    `
+                                ).join('')
+
+                                : `
+
+                                    <tr>
+
+                                        <td
+                                            colspan="5"
+                                            class="py-10 text-center text-gray-400"
+                                        >
+                                            Belum ada riwayat pengembalian
+                                        </td>
+
+                                    </tr>
+
+                                `
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- ===================================== -->
+            <!-- PAGINATION -->
+            <!-- ===================================== -->
+
+            <div class="flex items-center justify-between mt-4">
+
+                <div class="text-xs text-gray-500">
+
+                    ${
+                        totalHistory > 0
+
+                            ? `
+                                Menampilkan
+                                ${start + 1}
+                                -
+                                ${Math.min(
+                                    end,
+                                    totalHistory
+                                )}
+                                dari
+                                ${totalHistory}
+                                log
+                              `
+
+                            : 'Tidak ada data'
+                    }
+
+                </div>
+
+
+                <div class="flex items-center gap-2">
+
+                    <button
+                        onclick="changeHistoryPage(${historyPage - 1})"
+                        ${historyPage <= 1 ? 'disabled' : ''}
+                        class="px-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        ← Sebelumnya
+                    </button>
+
+
+                    <span class="text-xs text-gray-500">
+                        Halaman
+                        ${historyPage}
+                        /
+                        ${totalPages}
+                    </span>
+
+
+                    <button
+                        onclick="changeHistoryPage(${historyPage + 1})"
+                        ${historyPage >= totalPages ? 'disabled' : ''}
+                        class="px-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        Berikutnya →
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+    lucide.createIcons();
+}
+
+function changeHistoryFilter(filter) {
+
+    historyFilter = filter;
+    historyPage = 1;
+
+    renderHistory();
+}
+
+
+function changeHistoryPage(page) {
+
+    const history =
+        getProcessedHistory();
+
+    const totalPages =
+        Math.max(
+            1,
+            Math.ceil(
+                history.length /
+                historyPageSize
+            )
+        );
+
+    if (page < 1) {
+        page = 1;
+    }
+
+    if (page > totalPages) {
+        page = totalPages;
+    }
+
+    historyPage = page;
+
+    renderHistory();
+}
+
+
+function changeHistoryPageSize(size) {
+
+    historyPageSize =
+        Number(size);
+
+    historyPage = 1;
+
+    renderHistory();
+}
+
+
+function changeHistorySort(sortBy) {
+
+    historySortBy =
+        sortBy;
+
+    historyPage = 1;
+
+    renderHistory();
+}
+
+
+function changeHistorySortDirection(direction) {
+
+    historySortDirection =
+        direction;
+
+    historyPage = 1;
+
+    renderHistory();
+}
+
+// ===== VISITORS =====
+
+let visitorsPage = 1;
+let visitorsPageSize = 25;
+let visitorsSortBy = 'latest';
+let visitorsSortDirection = 'asc';
+let visitorsPurposeFilter = 'all';
+
+function getProcessedVisitors() {
+
+    let visitors = [
+        ...(visitorsCache || [])
+    ];
+
+
+    // ================================================
+    // FILTER TUJUAN
+    // ================================================
+
+    if (
+        visitorsPurposeFilter !== 'all'
+    ) {
+
+        visitors = visitors.filter(
+            v =>
+                (v.purpose || '') ===
+                visitorsPurposeFilter
+        );
+
+    }
+
+
+    // ================================================
+    // SORTING
+    // ================================================
+
+    visitors.sort((a, b) => {
+
+        // --------------------------------------------
+        // TERBARU / TERLAMA
+        // --------------------------------------------
+
+        if (
+            visitorsSortBy === 'latest' ||
+            visitorsSortBy === 'oldest'
+        ) {
+
+            const dateA = new Date(
+                `${a.date || '1970-01-01'}T${a.time || '00:00:00'}`
+            );
+
+            const dateB = new Date(
+                `${b.date || '1970-01-01'}T${b.time || '00:00:00'}`
+            );
+
+            return visitorsSortBy === 'latest'
+                ? dateB - dateA
+                : dateA - dateB;
+        }
+
+
+        // --------------------------------------------
+        // NAMA MEMBER / ID MEMBER
+        // --------------------------------------------
+
+        let valueA = '';
+        let valueB = '';
+
+
+        if (
+            visitorsSortBy === 'name'
+        ) {
+
+            valueA = a.name || '';
+            valueB = b.name || '';
+
+        }
+
+
+        else if (
+            visitorsSortBy === 'nis'
+        ) {
+
+            valueA = a.nis || '';
+            valueB = b.nis || '';
+
+        }
+
+
+        // --------------------------------------------
+        // A-Z / Z-A
+        // --------------------------------------------
+
+        const result =
+            String(valueA).localeCompare(
+                String(valueB),
+                'id',
+                {
+                    numeric: true,
+                    sensitivity: 'base'
+                }
+            );
+
+
+        return visitorsSortDirection === 'asc'
+            ? result
+            : -result;
+
+    });
+
+
+    return visitors;
+}
+
+async function renderVisitors() {
+
+    const visitors = await getVisitors();
+
+    // Pastikan cache terbaru
+    visitorsCache = visitors;
+
+    const todayStr = getToday();
+
+    const todayVisitors =
+        visitors.filter(
+            v => v.date === todayStr
+        );
+
+
+    // ================================================
+    // PROSES FILTER + SORT
+    // ================================================
+
+    const processedVisitors =
+        getProcessedVisitors();
+
+    const totalVisitors =
+        processedVisitors.length;
+
+
+    const totalPages =
+        Math.max(
+            1,
+            Math.ceil(
+                totalVisitors /
+                visitorsPageSize
+            )
+        );
+
+
+    // Kalau halaman saat ini melebihi jumlah halaman
+    if (visitorsPage > totalPages) {
+        visitorsPage = totalPages;
+    }
+
+
+    const start =
+        (visitorsPage - 1) *
+        visitorsPageSize;
+
+    const end =
+        start + visitorsPageSize;
+
+
+    const pageVisitors =
+        processedVisitors.slice(
+            start,
+            end
+        );
+
+
+    // ================================================
+    // DAFTAR TUJUAN
+    // ================================================
+
+    const purposes = [
+        ...new Set(
+            visitors
+                .map(v => v.purpose)
+                .filter(Boolean)
+        )
+    ].sort(
+        (a, b) =>
+            a.localeCompare(
+                b,
+                'id',
+                {
+                    sensitivity: 'base'
+                }
+            )
+    );
+
+
+    // ================================================
+    // RENDER
+    // ================================================
+
+    document.getElementById(
+        'page-visitors'
+    ).innerHTML = `
+
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
+
+            <div class="flex justify-between items-center mb-4 gap-3 flex-wrap">
+
+                <h3 class="font-semibold text-sm">
+                    Buku Tamu (${todayVisitors.length} hari ini)
+                </h3>
+
+
+                <div class="flex items-center gap-2 flex-wrap">
+
+                    <!-- JUMLAH DATA -->
+
+                    <label class="text-xs text-gray-500">
+                        Tampilkan
+                    </label>
+
+                    <select
+                        onchange="changeVisitorsPageSize(this.value)"
+                        class="border border-gray-200 dark:border-slate-700 rounded-lg px-2 py-1.5 text-xs bg-white dark:bg-slate-800"
+                    >
+                        <option value="25"
+                            ${visitorsPageSize === 25 ? 'selected' : ''}>
+                            25
+                        </option>
+
+                        <option value="50"
+                            ${visitorsPageSize === 50 ? 'selected' : ''}>
+                            50
+                        </option>
+
+                        <option value="100"
+                            ${visitorsPageSize === 100 ? 'selected' : ''}>
+                            100
+                        </option>
+                    </select>
+
+                    <span class="text-xs text-gray-500">
+                        log
+                    </span>
+
+
+                    <!-- URUTKAN -->
+
+                    <select
+                        onchange="changeVisitorsSort(this.value)"
+                        class="border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs bg-white dark:bg-slate-800"
+                        title="Urutkan data"
+                    >
+                        <option value="latest"
+                            ${visitorsSortBy === 'latest' ? 'selected' : ''}>
+                            Terbaru
+                        </option>
+
+                        <option value="oldest"
+                            ${visitorsSortBy === 'oldest' ? 'selected' : ''}>
+                            Terlama
+                        </option>
+
+                        <option value="name"
+                            ${visitorsSortBy === 'name' ? 'selected' : ''}>
+                            Nama Member
+                        </option>
+
+                        <option value="nis"
+                            ${visitorsSortBy === 'nis' ? 'selected' : ''}>
+                            ID Member
+                        </option>
+                    </select>
+
+
+                    <!-- A-Z / Z-A -->
+
+                    <select
+                        onchange="changeVisitorsSortDirection(this.value)"
+                        class="border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs bg-white dark:bg-slate-800"
+                        title="Arah urutan"
+                    >
+
+                        <option value="asc"
+                            ${visitorsSortDirection === 'asc' ? 'selected' : ''}>
+                            A-Z
+                        </option>
+
+                        <option value="desc"
+                            ${visitorsSortDirection === 'desc' ? 'selected' : ''}>
+                            Z-A
+                        </option>
+
+                    </select>
+
+
+                    <!-- FILTER TUJUAN -->
+
+                    <select
+                        onchange="changeVisitorsPurposeFilter(this.value)"
+                        class="border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs bg-white dark:bg-slate-800"
+                        title="Filter tujuan"
+                    >
+
+                        <option value="all"
+                            ${visitorsPurposeFilter === 'all' ? 'selected' : ''}>
+                            Semua Tujuan
+                        </option>
+
+                        ${
+                            purposes.map(
+                                purpose => `
+                                    <option
+                                        value="${purpose.replace(/"/g, '&quot;')}"
+                                        ${visitorsPurposeFilter === purpose ? 'selected' : ''}
+                                    >
+                                        ${purpose}
+                                    </option>
+                                `
+                            ).join('')
+                        }
+
+                    </select>
+
+
+                    <!-- TAMBAH -->
+
+                    <button
+                        onclick="openVisitorForm()"
+                        class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm rounded-lg transition-colors flex items-center gap-2 font-medium"
+                    >
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        Tambah
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="overflow-x-auto rounded-lg border border-gray-100 dark:border-slate-700">
+
+                <table class="modern-table w-full text-sm">
+
+                    <thead class="bg-gray-50 dark:bg-slate-800">
+
+                        <tr class="text-left">
+
+                            <th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">
+                                Tanggal
+                            </th>
+
+                            <th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">
+                                ID Member
+                            </th>
+
+                            <th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">
+                                Nama Member
+                            </th>
+
+                            <th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">
+                                Kategori
+                            </th>
+
+                            <th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">
+                                Masuk
+                            </th>
+
+                            <th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase hidden md:table-cell">
+                                Tujuan
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        ${
+                            pageVisitors.length
+
+                                ? pageVisitors.map(v => `
+
+                                    <tr>
+
+                                        <td class="py-2.5 px-3">
+                                            ${v.date || '-'}
+                                        </td>
+
+                                        <td class="py-2.5 px-3">
+                                            ${v.nis || '-'}
+                                        </td>
+
+                                        <td class="py-2.5 px-3">
+                                            ${v.name || '-'}
+                                        </td>
+
+                                        <td class="py-2.5 px-3">
+                                            ${v.class || '-'}
+                                        </td>
+
+                                        <td class="py-2.5 px-3">
+                                            ${
+                                                v.time
+                                                    ? String(v.time).substring(0, 8)
+                                                    : '-'
+                                            }
+                                        </td>
+
+                                        <td class="py-2.5 px-3 hidden md:table-cell">
+                                            ${v.purpose || '-'}
+                                        </td>
+
+                                    </tr>
+
+                                `).join('')
+
+                                : `
+
+                                    <tr>
+
+                                        <td
+                                            colspan="6"
+                                            class="py-10 text-center text-gray-400"
+                                        >
+                                            Belum ada data pengunjung
+                                        </td>
+
+                                    </tr>
+
+                                `
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- PAGINATION -->
+
+            <div class="flex items-center justify-between mt-4">
+
+                <div class="text-xs text-gray-500">
+
+                    ${
+                        totalVisitors > 0
+
+                            ? `
+                                Menampilkan
+                                ${start + 1}
+                                -
+                                ${Math.min(
+                                    end,
+                                    totalVisitors
+                                )}
+                                dari
+                                ${totalVisitors}
+                                log
+                              `
+
+                            : 'Tidak ada data'
+                    }
+
+                </div>
+
+
+                <div class="flex items-center gap-2">
+
+                    <button
+                        onclick="changeVisitorsPage(${visitorsPage - 1})"
+                        ${visitorsPage <= 1 ? 'disabled' : ''}
+                        class="px-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        ← Sebelumnya
+                    </button>
+
+
+                    <span class="text-xs text-gray-500">
+                        Halaman
+                        ${visitorsPage}
+                        /
+                        ${totalPages}
+                    </span>
+
+
+                    <button
+                        onclick="changeVisitorsPage(${visitorsPage + 1})"
+                        ${visitorsPage >= totalPages ? 'disabled' : ''}
+                        class="px-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        Berikutnya →
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+    lucide.createIcons();
+}
+
+// ================================================
+// GANTI HALAMAN
+// ================================================
+
+function changeVisitorsPage(page) {
+
+    const visitors =
+        getProcessedVisitors();
+
+    const totalPages =
+        Math.max(
+            1,
+            Math.ceil(
+                visitors.length /
+                visitorsPageSize
+            )
+        );
+
+    if (page < 1) {
+        page = 1;
+    }
+
+    if (page > totalPages) {
+        page = totalPages;
+    }
+
+    visitorsPage = page;
+
+    renderVisitors();
+}
+
+
+// ================================================
+// GANTI JUMLAH LOG
+// ================================================
+
+function changeVisitorsPageSize(size) {
+
+    visitorsPageSize =
+        Number(size);
+
+    visitorsPage = 1;
+
+    renderVisitors();
+}
+
+function changeVisitorsSort(sortBy) {
+
+    visitorsSortBy =
+        sortBy;
+
+    visitorsPage = 1;
+
+    renderVisitors();
+}
+
+
+function changeVisitorsSortDirection(direction) {
+
+    visitorsSortDirection =
+        direction;
+
+    visitorsPage = 1;
+
+    renderVisitors();
+}
+
+
+function changeVisitorsPurposeFilter(purpose) {
+
+    visitorsPurposeFilter =
+        purpose;
+
+    visitorsPage = 1;
+
+    renderVisitors();
+}
+
+async function openVisitorForm(){
+  // const students = await getStudents();  // ambil data langsung
+  const students = studentsCache;  // ambil data dari cache
+  const purposes = [
+    'Membaca',
+    'Meminjam Buku',
+    'Mengembalikan Buku',
+    'Belajar',
+    'Referensi Tugas',
+    'Lainnya'
+  ];
+
+  openModal('Tambah Pengunjung',`
+    <form onsubmit="saveVisitor(event)">
+    <div class="space-y-3">
+
+    <div>
+    <label class="text-xs font-medium text-gray-600 dark:text-gray-300">
+    Member
+    </label>
+
+    <select
+    name="nis"
+    required
+    class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700">
+
+    <option value="">
+    -- Pilih Member --
+    </option>
+
+    ${students.map(s=>`
+    <option value="${s.nis}">
+    ${s.name} (${s.class})
+    </option>
+    `).join('')}
+
+    </select>
+    </div>
+
+    <div>
+    <label class="text-xs font-medium text-gray-600 dark:text-gray-300">
+    Tujuan
+    </label>
+
+    <select
+    name="purpose"
+    class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700">
+
+    ${purposes.map(p=>`
+    <option>${p}</option>
+    `).join('')}
+
+    </select>
+    </div>
+
+    </div>
+
+    <button
+    type="submit"
+    class="mt-4 w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-colors">
+    Simpan
+    </button>
+
+    </form>`);
+}
+
+async function saveVisitor(e) {
+
+    e.preventDefault();
+
+    const btn =
+        e.target.querySelector(
+            'button[type="submit"]'
+        );
+
+    btn.disabled = true;
+    btn.textContent = 'Menyimpan...';
+
+    showLoader();
+
+    try {
+
+        const f = new FormData(e.target);
+
+        // ============================================
+        // CARI MEMBER
+        // ============================================
+
+        const students =
+            await getStudents();
+
+        const student =
+            students.find(
+                s => s.nis === f.get('nis')
+            );
+
+        if (!student) {
+
+            toast(
+                'Member tidak ditemukan',
+                'error'
+            );
+
+            return;
+        }
+
+
+        // ============================================
+        // WAKTU KUNJUNGAN
+        // ============================================
+
+        const now = new Date();
+
+        const currentTime =
+            String(now.getHours()).padStart(2, '0')
+            + ':' +
+            String(now.getMinutes()).padStart(2, '0')
+            + ':' +
+            String(now.getSeconds()).padStart(2, '0');
+
+
+        // ============================================
+        // SIMPAN KE SUPABASE
+        // ============================================
+
+        const {
+            error
+        } = await supabaseClient
+            .from('visitors')
+            .insert({
+                visit_date: getToday(),
+                student_nis: student.nis,
+                name: student.name,
+                class: student.class,
+                time_in: currentTime,
+                purpose: f.get('purpose')
+            });
+
+
+        if (error) {
+
+            console.error(
+                'saveVisitor:',
+                error
+            );
+
+            throw new Error(
+                error.message ||
+                'Gagal menyimpan pengunjung'
+            );
+        }
+
+
+        // ============================================
+        // REFRESH CACHE
+        // ============================================
+
+        visitorsCache =
+            await getVisitors(true);
+
+
+        // ============================================
+        // REFRESH TAMPILAN
+        // ============================================
+
+        closeModal();
+
+        await renderVisitors();
+
+        await refreshDashboard();
+
+
+        toast(
+            'Pengunjung berhasil ditambahkan'
+        );
+
+    }
+
+    catch (err) {
+
+        console.error(
+            'saveVisitor error:',
+            err
+        );
+
+        toast(
+            err.message ||
+            'Gagal menyimpan pengunjung',
+            'error'
+        );
+
+    }
+
+    finally {
+
+        hideLoader();
+
+        btn.disabled = false;
+        btn.textContent = 'Simpan';
+
+    }
+}
+
+// ===== STATS =====
+async function renderStats(){
+  const borrows = await getBorrows();
+  const visitors = await getVisitors();
+  const books = await getBooks();
+  document.getElementById('page-stats').innerHTML=`
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+  <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5"><h3 class="font-semibold text-sm mb-3">Peminjaman per Bulan</h3><canvas id="stat-borrow-chart" height="180"></canvas></div>
+  <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5"><h3 class="font-semibold text-sm mb-3">Kategori Buku</h3><canvas id="stat-cat-chart" height="180"></canvas></div>
+  <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5"><h3 class="font-semibold text-sm mb-3">Pengunjung per Hari</h3><canvas id="stat-visitor-chart" height="180"></canvas></div>
+</div>`;
+  setTimeout(()=>{
+    // new Chart(document.getElementById('stat-borrow-chart'),{type:'line',data:{labels:['Jan','Feb','Mar','Apr','Mei','Jun'],datasets:[{label:'Peminjaman',data:[8,12,10,15,18,borrows.filter(b=>b.borrowDate.startsWith('2026-06')).length],borderColor:'#2563EB',backgroundColor:'rgba(37,99,235,.08)',tension:.4,fill:true,pointBackgroundColor:'#2563EB'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(0,0,0,.04)'}},x:{grid:{display:false}}}}});
+    const monthlyData = [0,0,0,0,0,0,0,0,0,0,0,0];
+        borrows.forEach(b=>{
+        if(!b.borrowDate) return;
+        const month =
+            new Date(b.borrowDate).getMonth();
+        monthlyData[month]++;
+        });
+
+        new Chart(
+        document.getElementById('stat-borrow-chart'),
+        {
+            type:'line',
+            data:{
+            labels:[
+                'Jan',
+                'Feb',
+                'Mar',
+                'Apr',
+                'Mei',
+                'Jun',
+                'Jul',
+                'Agu',
+                'Sep',
+                'Okt',
+                'Nov',
+                'Des'
+            ],
+            datasets:[{
+                label:'Peminjaman',
+                data:monthlyData,
+                borderColor:'#2563EB',
+                backgroundColor:'rgba(37,99,235,.08)',
+                tension:.4,
+                fill:true,
+                pointBackgroundColor:'#2563EB'
+            }]
+            },
+            options:{
+            responsive:true,
+            plugins:{
+                legend:{display:false}
+            },
+            scales:{
+                y:{
+                beginAtZero:true
+                }
+            }
+            }
+        }
+        );
+    const catCount={};books.forEach(b=>{catCount[b.category]=(catCount[b.category]||0)+b.stockTotal});
+    new Chart(document.getElementById('stat-cat-chart'),{type:'doughnut',data:{labels:Object.keys(catCount),datasets:[{data:Object.values(catCount),backgroundColor:['#1e3a8a','#1e40af','#1d4ed8','#2563eb','#3b82f6','#60a5fa','#93c5fd','#bfdbfe','#dbeafe','#eff6ff']}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}}}});
+    const days=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0])}
+    new Chart(document.getElementById('stat-visitor-chart'),
+    {type:'bar',data:{labels:days.map(d=>d.slice(5)),
+        datasets:[{label:'Pengunjung',
+        data: days.map(d => {
+        const [y,m,dd] = d.split('-');
+        const localDate = `${dd}/${m}/${y}`;
+
+        return visitors.filter(
+            v => v.date === localDate
+        ).length;
+        }),
+        backgroundColor:'#2563EB',borderRadius:4}]},
+        options:{responsive:true,plugins:{legend:{display:false}},
+        scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.04)'}},x:{grid:{display:false}}}}});
+  },100);
+}
+
+// ===== FINES =====
+async function renderFines(){
+  const fines = await getFines();
+    const borrows = await getBorrows();
+    const settings = await getSettings();
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const activeLate = borrows
+    .filter(b => b.status !== 'Selesai')
+    .map(b => {
+
+        const due = new Date(b.dueDate);
+        due.setHours(0,0,0,0);
+
+        const lateDays = Math.floor(
+        (today - due) / 86400000
+        );
+
+        if(lateDays <= 0) return null;
+
+        return {
+        transactionId: b.transactionId,
+        nis: b.nis,
+        studentName: b.studentName,
+        bookTitle: b.bookTitle,
+        fine: lateDays * settings.finePerDay,
+        status: 'Terlambat'
+        };
+    })
+    .filter(Boolean);
+
+    const unpaid = fines.filter(
+    f => f.status === 'Belum Dibayar'
+    );
+
+    const paid = fines.filter(
+    f => f.status === 'Sudah Dibayar'
+    );
+
+    const allActiveFines = [
+    ...activeLate,
+    ...unpaid
+    ];
+
+    const totalUnpaid =
+    allActiveFines.reduce(
+        (s,f)=>s+f.fine,
+        0
+    );
+  const totalPaid = paid.reduce((s,f) => s + f.fine, 0);
+  document.getElementById('page-fines').innerHTML=`
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div class="stat-card bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-xl">
+            <p class="text-xs text-gray-500">Belum Dibayar</p>
+            <p class="text-2xl font-bold text-red-600 mt-1">${formatCurrency(totalUnpaid)}</p>
+        </div>
+        <div class="stat-card bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-xl">
+            <p class="text-xs text-gray-500">Sudah Dibayar</p>
+            <p class="text-2xl font-bold text-emerald-600 mt-1">${formatCurrency(totalPaid)}</p></div>
+        </div>
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
+            <h3 class="font-semibold text-sm mb-4">Daftar Denda Belum Dibayar</h3>
+            <div class="overflow-x-auto rounded-lg border border-gray-100 dark:border-slate-700">
+        <table class="modern-table w-full text-sm">
+        <thead class="bg-gray-50 dark:bg-slate-800">
+            <tr class="text-left">
+                <th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">ID Transaksi</th>
+                <th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">Member</th>
+                <th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">Buku</th>
+                <th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">Denda</th>
+                <th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">Status</th>
+                <th class="py-2.5 px-3 font-medium text-xs text-gray-500 uppercase">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>${allActiveFines.map(f=>
+            `<tr>
+                <td class="py-2.5 px-3 text-xs font-mono">${f.transactionId}</td>
+                <td class="py-2.5 px-3">${f.studentName}</td>
+                <td class="py-2.5 px-3">${f.bookTitle}</td>
+                <td class="py-2.5 px-3 font-bold text-red-600">${formatCurrency(f.fine)}</td>
+                <td class="py-2.5 px-3">
+                    <span class="px-2 py-1 rounded text-xs font-medium ${
+                        f.status === 'Terlambat'
+                            ? 'bg-yellow-100 text-yellow-700'
+                            : 'bg-red-100 text-red-700'
+                        }">${f.status}
+                    </span>
+                </td>
+                <td class="py-2.5 px-3">
+                    ${
+                        f.status === 'Terlambat'
+                        ?
+                        `<button
+                        disabled
+                        class="px-3 py-1.5 bg-gray-300 text-gray-500 text-xs rounded-lg font-medium cursor-not-allowed">
+                        Kembalikan Dulu
+                        </button>`
+                        :
+                        `<button
+                        id="pay-${f.transactionId}"
+                        onclick="payFine('${f.transactionId}')"
+                        class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded-lg font-medium transition-colors">
+                        Bayar
+                        </button>`
+                    }
+                </td>
+            </tr>`).join('')}
+        </tbody>
+    </table>
+</div> 
+<p class="mt-3 text-xs text-gray-400">Denda per hari: ${formatCurrency(settings.finePerDay)}</p>
+</div>`;
+}
+
+let paymentProcessing = false;
+
+async function payFine(transactionId) {
+
+    if (paymentProcessing) return;
+
+    paymentProcessing = true;
+
+    const btn = document.getElementById(
+        `pay-${transactionId}`
+    );
+
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Memproses...";
+    }
+
+    toast(
+        "Memproses pembayaran...",
+        "info"
+    );
+
+    showLoader();
+
+    try {
+
+        // ================================================
+        // UPDATE STATUS DENDA
+        // ================================================
+
+        const { error } = await supabaseClient
+            .from('fines')
+            .update({
+                status: 'Sudah Dibayar',
+                paid_at: new Date().toISOString()
+            })
+            .eq('transaction_id', transactionId)
+            .eq('status', 'Belum Dibayar');
+
+        if (error) {
+
+            console.error(
+                'Supabase payFine:',
+                error
+            );
+
+            throw new Error(
+                error.message ||
+                'Gagal memproses pembayaran'
+            );
+        }
+
+
+        // ================================================
+        // REFRESH DATA
+        // ================================================
+
+        finesCache =
+            await getFines(true);
+
+
+        // ================================================
+        // REFRESH UI
+        // ================================================
+
+        await renderFines();
+
+        await refreshDashboard();
+
+
+        toast(
+            "Denda berhasil dibayar"
+        );
+
+    }
+
+    catch (err) {
+
+        console.error(
+            'payFine error:',
+            err
+        );
+
+        toast(
+            err.message ||
+            "Pembayaran gagal",
+            "error"
+        );
+
+    }
+
+    finally {
+
+        hideLoader();
+
+        paymentProcessing = false;
+
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = "Bayar";
+        }
+
+    }
+}
+
+// ===== SETTINGS =====
+
+async function renderSettings(){
+    const s = await getSettings();
+  document.getElementById('page-settings').innerHTML=`
+<div class="max-w-2xl space-y-4">
+  <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
+    <h3 class="font-semibold text-sm mb-4">Identitas Perpustakaan</h3>
+    <form onsubmit="saveLibSettings(event)" class="space-y-3">
+      <div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Nama Perpustakaan</label><input name="libName" value="${s.libName}" class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"></div>
+      <div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Nama Sekolah</label><input name="schoolName" value="${s.schoolName}" class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"></div>
+      <div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Alamat</label><input name="address" value="${s.address||''}" class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"></div>
+      <div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Telepon</label><input name="phone" value="${s.phone||''}" class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"></div>
+      <button type="submit" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm rounded-lg font-medium transition-colors">Simpan Identitas</button>
+    </form>
+  </div>
+  <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
+    <h3 class="font-semibold text-sm mb-4">Pengaturan Peminjaman</h3>
+    <form onsubmit="saveLoanSettings(event)" class="space-y-3">
+      <div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Denda per Hari (Rp)</label><input name="finePerDay" type="number" value="${s.finePerDay}" min="0" class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"></div>
+      <div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Lama Pinjam (hari)</label><select name="loanDays" class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"><option ${s.loanDays===3?'selected':''} value="3">3 hari</option><option ${s.loanDays===7?'selected':''} value="7">7 hari</option><option ${s.loanDays===14?'selected':''} value="14">14 hari</option><option ${s.loanDays===30?'selected':''} value="30">30 hari</option></select></div>
+      <div><label class="text-xs font-medium text-gray-600 dark:text-gray-300">Maks Buku per Member</label><select name="maxBorrow" class="w-full mt-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"><option ${s.maxBorrow===2?'selected':''} value="2">2</option><option ${s.maxBorrow===3?'selected':''} value="3">3</option><option ${s.maxBorrow===5?'selected':''} value="5">5</option></select></div>
+      <button type="submit" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm rounded-lg font-medium transition-colors">Simpan Pengaturan</button>
+    </form>
+  </div>
+  <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
+    <h3 class="font-semibold text-sm mb-4">Backup & Restore</h3>
+    <div class="flex flex-wrap gap-3">
+
+    <button
+      onclick="exportData()"
+      title="Export database"
+      class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm rounded-lg font-medium cursor-pointer flex items-center gap-2 transition-colors">
+      <i data-lucide="download" class="w-4 h-4"></i>
+      Export Data
+    </button>
+
+    <button
+        disabled
+        title="Import sementara dinonaktifkan"
+        class="px-4 py-2 bg-gray-300 dark:bg-slate-700 text-gray-500 dark:text-gray-400 text-sm rounded-lg font-medium cursor-not-allowed flex items-center gap-2 opacity-70"
+    >
+        <i data-lucide="upload" class="w-4 h-4"></i>
+        Import Data (Excel)
+    </button>
+
+    <input
+      type="file"
+      id="import-excel-input"
+      accept=".xlsx,.xls"
+      class="hidden"
+      onchange="importExcel(this)"
+    >
+
+  </div>
+  </div>
+  <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5">
+    <h3 class="font-semibold text-sm mb-4">Lainnya</h3>
+    <div class="flex flex-wrap gap-3">
+      <button onclick="document.documentElement.classList.toggle('dark');localStorage.setItem('darkMode',document.documentElement.classList.contains('dark'))" class="px-4 py-2 bg-gray-100 dark:bg-slate-700 text-sm rounded-lg font-medium transition-colors">Toggle Dark Mode</button>
+      <button
+            onclick="openChangePasswordModal()"
+            class="px-4 py-2 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-900 dark:text-white text-sm rounded-lg font-medium transition-colors"
+        >
+            Ganti Password
+        </button>
+      <button
+        disabled
+        title="Segera hadir"
+        class="px-4 py-2 bg-gray-300 dark:bg-slate-700 text-gray-500 dark:text-gray-400 text-sm rounded-lg font-medium cursor-not-allowed opacity-70">
+        Reset Semua Data
+    </button>
+    </div>
+  </div>
+</div>`;
+  lucide.createIcons();
+}
+
+// --------------------- buton import aktif --------------------
+// <button
+//       onclick="document.getElementById('import-excel-input').click()"
+//       title="Import database dari Excel"
+//       class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm rounded-lg font-medium cursor-pointer flex items-center gap-2 transition-colors">
+//       <i data-lucide="upload" class="w-4 h-4"></i>
+//       Import Data (Excel)
+// </button>
+// -------------------------------------------
+
+async function saveLibSettings(e) {
+
+    e.preventDefault();
+
+    const btn =
+        e.target.querySelector(
+            'button[type="submit"]'
+        );
+
+    btn.disabled = true;
+    btn.textContent = 'Menyimpan...';
+
+    showLoader();
+
+    try {
+
+        const f = new FormData(e.target);
+
+        const settingsToSave = [
+            {
+                key: 'NamaPerpustakaan',
+                value: f.get('libName')?.trim() || ''
+            },
+            {
+                key: 'NamaSekolah',
+                value: f.get('schoolName')?.trim() || ''
+            },
+            {
+                key: 'Alamat',
+                value: f.get('address')?.trim() || ''
+            },
+            {
+                key: 'Telepon',
+                value: f.get('phone')?.trim() || ''
+            }
+        ];
+
+        const {
+            error
+        } = await supabaseClient
+            .from('settings')
+            .upsert(
+                settingsToSave,
+                {
+                    onConflict: 'key'
+                }
+            );
+
+        if (error) {
+            console.error(
+                'saveLibSettings:',
+                error
+            );
+
+            throw new Error(
+                error.message ||
+                'Gagal menyimpan identitas perpustakaan'
+            );
+        }
+
+        // Refresh cache
+        settingsCache =
+            await getSettings(true);
+
+        // Refresh tampilan
+        await renderSidebar();
+        await renderDashboard();
+        await renderSettings();
+        updateLandingLibraryName();
+
+        toast(
+            'Identitas berhasil disimpan'
+        );
+
+    }
+
+    catch (err) {
+
+        console.error(
+            'saveLibSettings error:',
+            err
+        );
+
+        toast(
+            err.message ||
+            'Gagal menyimpan identitas',
+            'error'
+        );
+
+    }
+
+    finally {
+
+        hideLoader();
+
+        btn.disabled = false;
+        btn.textContent =
+            'Simpan Identitas';
+
+    }
+}
+
+async function saveLoanSettings(e) {
+
+    e.preventDefault();
+
+    const btn =
+        e.target.querySelector(
+            'button[type="submit"]'
+        );
+
+    btn.disabled = true;
+    btn.textContent = 'Menyimpan...';
+
+    showLoader();
+
+    try {
+
+        const f = new FormData(e.target);
+
+        const finePerDay =
+            Number(
+                f.get('finePerDay') || 0
+            );
+
+        const loanDays =
+            Number(
+                f.get('loanDays') || 0
+            );
+
+        const maxBorrow =
+            Number(
+                f.get('maxBorrow') || 0
+            );
+
+
+        // ============================================
+        // VALIDASI
+        // ============================================
+
+        if (finePerDay < 0) {
+            throw new Error(
+                'Denda per hari tidak boleh negatif'
+            );
+        }
+
+        if (loanDays <= 0) {
+            throw new Error(
+                'Lama pinjam harus lebih dari 0 hari'
+            );
+        }
+
+        if (maxBorrow <= 0) {
+            throw new Error(
+                'Maksimal peminjaman harus lebih dari 0'
+            );
+        }
+
+
+        // ============================================
+        // DATA SETTINGS
+        // ============================================
+
+        const settingsToSave = [
+            {
+                key: 'DendaPerHari',
+                value: String(finePerDay)
+            },
+            {
+                key: 'LamaPinjam',
+                value: String(loanDays)
+            },
+            {
+                key: 'MaksPinjam',
+                value: String(maxBorrow)
+            }
+        ];
+
+
+        // ============================================
+        // SIMPAN KE SUPABASE
+        // ============================================
+
+        const {
+            error
+        } = await supabaseClient
+            .from('settings')
+            .upsert(
+                settingsToSave,
+                {
+                    onConflict: 'key'
+                }
+            );
+
+
+        if (error) {
+
+            console.error(
+                'saveLoanSettings:',
+                error
+            );
+
+            throw new Error(
+                error.message ||
+                'Gagal menyimpan pengaturan peminjaman'
+            );
+        }
+
+
+        // ============================================
+        // REFRESH CACHE
+        // ============================================
+
+        settingsCache =
+            await getSettings(true);
+
+
+        // ============================================
+        // REFRESH SEMUA BAGIAN
+        // YANG TERPENGARUH SETTING
+        // ============================================
+
+        await renderSettings();
+
+        await renderBorrow();
+
+        await renderReturn();
+
+        await renderFines();
+
+        await renderDashboard();
+
+
+        toast(
+            'Pengaturan peminjaman berhasil disimpan'
+        );
+
+    }
+
+    catch (err) {
+
+        console.error(
+            'saveLoanSettings error:',
+            err
+        );
+
+        toast(
+            err.message ||
+            'Gagal menyimpan pengaturan',
+            'error'
+        );
+
+    }
+
+    finally {
+
+        hideLoader();
+
+        btn.disabled = false;
+        btn.textContent =
+            'Simpan Pengaturan';
+
+    }
+}
+
+// ======================================================
+// EXPORT DATABASE KE EXCEL
+// ======================================================
+
+async function exportData() {
+
+    showLoader();
+
+    try {
+
+        const [
+            booksRes,
+            studentsRes,
+            borrowingsRes,
+            visitorsRes,
+            historyRes,
+            finesRes,
+            settingsRes
+        ] = await Promise.all([
+
+            supabaseClient
+                .from('books')
+                .select('*'),
+
+            supabaseClient
+                .from('students')
+                .select('*'),
+
+            supabaseClient
+                .from('borrowings')
+                .select('*'),
+
+            supabaseClient
+                .from('visitors')
+                .select('*'),
+
+            supabaseClient
+                .from('history')
+                .select('*'),
+
+            supabaseClient
+                .from('fines')
+                .select('*'),
+
+            supabaseClient
+                .from('settings')
+                .select('*')
+
+        ]);
+
+
+        // ==============================================
+        // CEK ERROR
+        // ==============================================
+
+        const results = [
+            booksRes,
+            studentsRes,
+            borrowingsRes,
+            visitorsRes,
+            historyRes,
+            finesRes,
+            settingsRes
+        ];
+
+        const error =
+            results.find(r => r.error)?.error;
+
+        if (error) {
+            throw new Error(error.message);
+        }
+
+
+        // ==============================================
+        // DATA JSON SEMENTARA
+        // ==============================================
+
+        const data = {
+
+            Buku:
+                booksRes.data || [],
+
+            Siswa:
+                studentsRes.data || [],
+
+            Peminjaman:
+                borrowingsRes.data || [],
+
+            Pengunjung:
+                visitorsRes.data || [],
+
+            Riwayat:
+                historyRes.data || [],
+
+            Denda:
+                finesRes.data || [],
+
+            Pengaturan:
+                settingsRes.data || []
+
+        };
+
+
+        // ==============================================
+        // BUAT WORKBOOK
+        // ==============================================
+
+        const workbook =
+            XLSX.utils.book_new();
+
+
+        // ==============================================
+        // MASUKKAN SETIAP TABEL KE SHEET
+        // ==============================================
+
+        Object.entries(data).forEach(
+            ([sheetName, rows]) => {
+
+                const worksheet =
+                    rows.length
+                        ? XLSX.utils.json_to_sheet(rows)
+                        : XLSX.utils.aoa_to_sheet([[]]);
+
+                XLSX.utils.book_append_sheet(
+                    workbook,
+                    worksheet,
+                    sheetName
+                );
+
+            }
+        );
+
+
+        // ==============================================
+        // DOWNLOAD EXCEL
+        // ==============================================
+
+        XLSX.writeFile(
+            workbook,
+            `backup-perpustakaan-${getToday()}.xlsx`
+        );
+
+
+        toast(
+            'Database berhasil diexport ke Excel'
+        );
+
+    }
+
+    catch (err) {
+
+        console.error(
+            'Export Excel error:',
+            err
+        );
+
+        toast(
+            'Export gagal: ' + err.message,
+            'error'
+        );
+
+    }
+
+    finally {
+
+        hideLoader();
+
+    }
+}
+
+// ======================================================
+// IMPORT DATABASE DARI EXCEL
+// ======================================================
+
+async function importExcel(input) {
+
+    const file = input.files[0];
+
+    if (!file) {
+        return;
+    }
+
+
+    // Reset input agar file yang sama bisa dipilih lagi
+    input.value = '';
+
+
+    // ==============================================
+    // KONFIRMASI
+    // ==============================================
+
+    const confirmed = confirm(
+        'Import database dari file Excel ini?\n\n' +
+        'Data akan dimasukkan ke database Supabase.\n\n' +
+        'Pastikan file berasal dari backup aplikasi ini.'
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    showLoader();
+
+
+    try {
+
+        // ==========================================
+        // BACA FILE EXCEL
+        // ==========================================
+
+        const buffer =
+            await file.arrayBuffer();
+
+        const workbook =
+            XLSX.read(
+                buffer,
+                {
+                    type: 'array'
+                }
+            );
+
+
+        // ==========================================
+        // KONVERSI EXCEL → JSON
+        // ==========================================
+
+        const data = {};
+
+
+        const sheetMap = {
+
+            Buku: 'Buku',
+
+            Siswa: 'Siswa',
+
+            Peminjaman: 'Peminjaman',
+
+            Pengunjung: 'Pengunjung',
+
+            Riwayat: 'Riwayat',
+
+            Denda: 'Denda',
+
+            Pengaturan: 'Pengaturan'
+
+        };
+
+
+        Object.entries(sheetMap).forEach(
+            ([sheetName, key]) => {
+
+                const worksheet =
+                    workbook.Sheets[sheetName];
+
+                if (!worksheet) {
+
+                    data[key] = [];
+
+                    return;
+
+                }
+
+
+                data[key] =
+                    XLSX.utils.sheet_to_json(
+                        worksheet,
+                        {
+                            defval: null
+                        }
+                    );
+
+            }
+        );
+
+
+        // ==========================================
+        // CEK APAKAH FILE VALID
+        // ==========================================
+
+        const totalRows =
+            Object.values(data)
+                .reduce(
+                    (total, rows) =>
+                        total + rows.length,
+                    0
+                );
+
+
+        if (totalRows === 0) {
+
+            throw new Error(
+                'File Excel tidak memiliki data.'
+            );
+
+        }
+
+
+        // ==========================================
+        // IMPORT KE SUPABASE
+        // ==========================================
+
+        // 1. Buku
+        if (data.Buku.length) {
+
+            const { error } =
+                await supabaseClient
+                    .from('books')
+                    .upsert(
+                        data.Buku
+                    );
+
+            if (error) {
+                throw new Error(
+                    'Import Buku: ' +
+                    error.message
+                );
+            }
+        }
+
+
+        // 2. Member
+        if (data.Siswa.length) {
+
+            const { error } =
+                await supabaseClient
+                    .from('students')
+                    .upsert(
+                        data.Siswa
+                    );
+
+            if (error) {
+                throw new Error(
+                    'Import Member: ' +
+                    error.message
+                );
+            }
+        }
+
+
+        // 3. Peminjaman
+        if (data.Peminjaman.length) {
+
+            const { error } =
+                await supabaseClient
+                    .from('borrowings')
+                    .upsert(
+                        data.Peminjaman
+                    );
+
+            if (error) {
+                throw new Error(
+                    'Import Peminjaman: ' +
+                    error.message
+                );
+            }
+        }
+
+
+        // 4. Pengunjung
+        if (data.Pengunjung.length) {
+
+            const { error } =
+                await supabaseClient
+                    .from('visitors')
+                    .upsert(
+                        data.Pengunjung
+                    );
+
+            if (error) {
+                throw new Error(
+                    'Import Pengunjung: ' +
+                    error.message
+                );
+            }
+        }
+
+
+        // 5. Riwayat
+        if (data.Riwayat.length) {
+
+            const { error } =
+                await supabaseClient
+                    .from('history')
+                    .upsert(
+                        data.Riwayat
+                    );
+
+            if (error) {
+                throw new Error(
+                    'Import Riwayat: ' +
+                    error.message
+                );
+            }
+        }
+
+
+        // 6. Denda
+        if (data.Denda.length) {
+
+            const { error } =
+                await supabaseClient
+                    .from('fines')
+                    .upsert(
+                        data.Denda
+                    );
+
+            if (error) {
+                throw new Error(
+                    'Import Denda: ' +
+                    error.message
+                );
+            }
+        }
+
+
+        // 7. Pengaturan
+        if (data.Pengaturan.length) {
+
+            const { error } =
+                await supabaseClient
+                    .from('settings')
+                    .upsert(
+                        data.Pengaturan,
+                        {
+                            onConflict: 'key'
+                        }
+                    );
+
+            if (error) {
+                throw new Error(
+                    'Import Pengaturan: ' +
+                    error.message
+                );
+            }
+        }
+
+
+        // ==========================================
+        // REFRESH CACHE
+        // ==========================================
+
+        booksCache =
+            await getBooks(true);
+
+        studentsCache =
+            await getStudents(true);
+
+        borrowsCache =
+            await getBorrows(true);
+
+        visitorsCache =
+            await getVisitors(true);
+
+        historyCache =
+            await getHistory(true);
+
+        finesCache =
+            await getFines(true);
+
+
+        // ==========================================
+        // REFRESH TAMPILAN
+        // ==========================================
+
+        await renderSidebar();
+
+        await renderPage(
+            currentPage
+        );
+
+
+        await refreshDashboard();
+
+
+        toast(
+            'Database berhasil diimport dari Excel'
+        );
+
+    }
+
+    catch (err) {
+
+        console.error(
+            'Import Excel error:',
+            err
+        );
+
+        toast(
+            'Import gagal: ' +
+            err.message,
+            'error'
+        );
+
+    }
+
+    finally {
+
+        hideLoader();
+
+    }
+
+}
+
+function openChangePasswordModal() {
+
+openModal(
+    'Ganti Password',
+    `
+    <form onsubmit="changePassword(event)">
+
+        <div class="space-y-4">
+
+            <div>
+                <label class="text-xs font-medium text-gray-600 dark:text-gray-300">
+                    Password Saat Ini
+                </label>
+
+                <input
+                    type="password"
+                    name="currentPassword"
+                    required
+                    autocomplete="current-password"
+                    class="w-full mt-1 px-3 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"
+                    placeholder="Masukkan password saat ini"
+                >
+            </div>
+
+            <div>
+                <label class="text-xs font-medium text-gray-600 dark:text-gray-300">
+                    Password Baru
+                </label>
+
+                <input
+                    type="password"
+                    name="newPassword"
+                    required
+                    minlength="6"
+                    autocomplete="new-password"
+                    class="w-full mt-1 px-3 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"
+                    placeholder="Minimal 6 karakter"
+                >
+            </div>
+
+            <div>
+                <label class="text-xs font-medium text-gray-600 dark:text-gray-300">
+                    Konfirmasi Password Baru
+                </label>
+
+                <input
+                    type="password"
+                    name="confirmPassword"
+                    required
+                    minlength="6"
+                    autocomplete="new-password"
+                    class="w-full mt-1 px-3 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"
+                    placeholder="Ulangi password baru"
+                >
+            </div>
+
+            <div class="flex gap-2 pt-2">
+
+                <button
+                    type="submit"
+                    class="flex-1 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium"
+                >
+                    Simpan Password
+                </button>
+
+                <button
+                    type="button"
+                    onclick="closeModal()"
+                    class="flex-1 py-2.5 bg-gray-100 dark:bg-slate-700 rounded-lg text-sm font-medium"
+                >
+                    Batal
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+    `
+);
+
+lucide.createIcons();
+}
+
+function confirmReset(){openModal('Reset Data',`<p class="text-sm mb-4">Yakin ingin menghapus semua data? Tindakan ini tidak bisa dibatalkan.</p><div class="flex gap-2"><button onclick="localStorage.clear();location.reload()" class="flex-1 py-2 bg-red-600 text-white rounded-lg text-sm font-medium">Reset</button><button onclick="closeModal()" class="flex-1 py-2 bg-gray-100 dark:bg-slate-700 rounded-lg text-sm">Batal</button></div>`)}
+
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(data.books)save(KEYS.books,data.books);
+      if(data.students)save(KEYS.students,data.students);
+      if(data.borrows)save(KEYS.borrows,data.borrows);
+      if(data.visitors)save(KEYS.visitors,data.visitors);
+      if(data.settings)save(KEYS.settings,data.settings);
+      toast('Data berhasil diimport');renderSidebar();renderPage(currentPage);
+    }catch{toast('File tidak valid','error')}
+  };reader.readAsText(file);
+}
+
+// =============================== LOGIN =====================================
+
+function updateLandingLibraryName() {
+
+    const el =
+        document.getElementById(
+            'landing-library-name'
+        );
+
+    if (!el) return;
+
+
+    const name =
+        settingsCache?.libName ||
+        settingsCache?.NamaPerpustakaan ||
+        settingsCache?.namaPerpustakaan ||
+        'TAMAN BACA LENTERA SENJA';
+
+
+    el.textContent = name;
+}
+
+async function login(e) {
+
+    e.preventDefault();
+
+    const username =
+        document.getElementById('username').value.trim();
+
+    const password =
+        document.getElementById('password').value;
+
+
+    // ==========================================
+    // USERNAME
+    // ==========================================
+
+    const savedUsername =
+        localStorage.getItem('app_username') || 'admin';
+
+
+    // ==========================================
+    // PASSWORD
+    // ==========================================
+
+    const savedPassword =
+        localStorage.getItem('app_password') || 'admin123';
+
+
+    // ==========================================
+    // CEK LOGIN
+    // ==========================================
+
+    if (
+        username === savedUsername &&
+        password === savedPassword
+    ) {
+
+        localStorage.setItem(
+            'isLoggedIn',
+            'true'
+        );
+
+        document.getElementById(
+            'login-screen'
+        ).style.display = 'none';
+
+        document.getElementById(
+            'app-container'
+        ).style.display = '';
+
+    } else {
+
+        toast(
+            'Username atau password salah',
+            'error'
+        );
+
+    }
+}
+
+function openChangePasswordModal() {
+
+    openModal(
+        'Ganti Password',
+        `
+        <form onsubmit="changePassword(event)">
+
+            <div class="space-y-4">
+
+                <div>
+                    <label class="text-xs font-medium text-gray-600 dark:text-gray-300">
+                        Password Saat Ini
+                    </label>
+
+                    <input
+                        type="password"
+                        name="currentPassword"
+                        required
+                        autocomplete="current-password"
+                        class="w-full mt-1 px-3 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"
+                        placeholder="Masukkan password saat ini"
+                    >
+                </div>
+
+
+                <div>
+                    <label class="text-xs font-medium text-gray-600 dark:text-gray-300">
+                        Password Baru
+                    </label>
+
+                    <input
+                        type="password"
+                        name="newPassword"
+                        required
+                        minlength="6"
+                        autocomplete="new-password"
+                        class="w-full mt-1 px-3 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"
+                        placeholder="Minimal 6 karakter"
+                    >
+                </div>
+
+
+                <div>
+                    <label class="text-xs font-medium text-gray-600 dark:text-gray-300">
+                        Konfirmasi Password Baru
+                    </label>
+
+                    <input
+                        type="password"
+                        name="confirmPassword"
+                        required
+                        minlength="6"
+                        autocomplete="new-password"
+                        class="w-full mt-1 px-3 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700"
+                        placeholder="Ulangi password baru"
+                    >
+                </div>
+
+
+                <div class="flex gap-2 pt-2">
+
+                    <button
+                        type="submit"
+                        class="flex-1 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium"
+                    >
+                        Simpan Password
+                    </button>
+
+                    <button
+                        type="button"
+                        onclick="closeModal()"
+                        class="flex-1 py-2.5 bg-gray-100 dark:bg-slate-700 rounded-lg text-sm font-medium"
+                    >
+                        Batal
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+        `
+    );
+
+    lucide.createIcons();
+}
+
+function changePassword(e) {
+
+    e.preventDefault();
+
+    const form =
+        e.target;
+
+    const currentPassword =
+        form.currentPassword.value;
+
+    const newPassword =
+        form.newPassword.value;
+
+    const confirmPassword =
+        form.confirmPassword.value;
+
+
+    // ==========================================
+    // PASSWORD SAAT INI
+    // ==========================================
+
+    const savedPassword =
+        localStorage.getItem('app_password') ||
+        'admin123';
+
+
+    if (currentPassword !== savedPassword) {
+
+        toast(
+            'Password saat ini salah',
+            'error'
+        );
+
+        return;
+    }
+
+
+    // ==========================================
+    // VALIDASI PASSWORD BARU
+    // ==========================================
+
+    if (newPassword.length < 6) {
+
+        toast(
+            'Password baru minimal 6 karakter',
+            'error'
+        );
+
+        return;
+    }
+
+
+    // ==========================================
+    // KONFIRMASI
+    // ==========================================
+
+    if (newPassword !== confirmPassword) {
+
+        toast(
+            'Konfirmasi password tidak cocok',
+            'error'
+        );
+
+        return;
+    }
+
+
+    // ==========================================
+    // JANGAN BOLEH SAMA
+    // ==========================================
+
+    if (newPassword === currentPassword) {
+
+        toast(
+            'Password baru harus berbeda dari password lama',
+            'error'
+        );
+
+        return;
+    }
+
+
+    // ==========================================
+    // SIMPAN PASSWORD BARU
+    // ==========================================
+
+    localStorage.setItem(
+        'app_password',
+        newPassword
+    );
+
+
+    // ==========================================
+    // TUTUP MODAL
+    // ==========================================
+
+    closeModal();
+
+
+    toast(
+        'Password berhasil diubah'
+    );
+}
+
+
+// ===== GLOBAL SEARCH =====
+const searchInput = document.getElementById('global-search');
+const searchResults = document.getElementById('search-results');
+
+searchInput?.addEventListener('input', async function(){
+
+  const q = this.value.toLowerCase().trim();
+
+  if(!q){
+    searchResults.classList.add('hidden');
+    return;
+  }
+
+  const allBooks = await getBooks();
+  const allStudents = await getStudents();
+
+  const books = allBooks
+    .filter(b =>
+      b.title.toLowerCase().includes(q) ||
+      b.id.toLowerCase().includes(q)
+    )
+    .slice(0,5);
+
+  const students = allStudents
+    .filter(s =>
+      s.name.toLowerCase().includes(q) ||
+      s.nis.includes(q)
+    )
+    .slice(0,5);
+
+  let html = '';
+
+  if(books.length){
+    html +=
+      `<div class="p-2 text-[10px] text-gray-400 uppercase font-semibold">
+        Buku
+      </div>`
+      +
+      books.map(b=>`
+        <button
+          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-slate-700"
+          onclick="navigateTo('books');searchResults.classList.add('hidden');searchInput.value=''">
+          ${b.title}
+          <span class="text-xs text-gray-400">${b.id}</span>
+        </button>
+      `).join('');
+  }
+
+  if(students.length){
+    html +=
+      `<div class="p-2 text-[10px] text-gray-400 uppercase font-semibold">
+        Member
+      </div>`
+      +
+      students.map(s=>`
+        <button
+          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-slate-700"
+          onclick="navigateTo('students');searchResults.classList.add('hidden');searchInput.value=''">
+          ${s.name}
+          <span class="text-xs text-gray-400">${s.nis}</span>
+        </button>
+      `).join('');
+  }
+
+  if(!html){
+    html =
+      '<p class="p-3 text-sm text-gray-400">Tidak ditemukan</p>';
+  }
+
+  searchResults.innerHTML = html;
+  searchResults.classList.remove('hidden');
+
+});
+
+document.addEventListener('click',e=>{
+  if(
+    !e.target.closest('#global-search') &&
+    !e.target.closest('#search-results')
+  ){
+    searchResults?.classList.add('hidden');
+  }
+});
+// const searchInput=document.getElementById('global-search');const searchResults=document.getElementById('search-results');
+// searchInput?.addEventListener('input',function(){
+//   const q=this.value.toLowerCase().trim();if(!q){searchResults.classList.add('hidden');return}
+//   const books=getBooks().filter(b=>b.title.toLowerCase().includes(q)||b.id.toLowerCase().includes(q)).slice(0,5);
+//   const students=getStudents().filter(s=>s.name.toLowerCase().includes(q)||s.nis.includes(q)).slice(0,5);
+//   let html='';
+//   if(books.length)html+=`<div class="p-2 text-[10px] text-gray-400 uppercase font-semibold">Buku</div>`+books.map(b=>`<button class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-slate-700" onclick="navigateTo('books');searchResults.classList.add('hidden');searchInput.value=''">${b.title} <span class="text-xs text-gray-400">${b.id}</span></button>`).join('');
+//   if(students.length)html+=`<div class="p-2 text-[10px] text-gray-400 uppercase font-semibold">Member</div>`+students.map(s=>`<button class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-slate-700" onclick="navigateTo('students');searchResults.classList.add('hidden');searchInput.value=''">${s.name} <span class="text-xs text-gray-400">${s.nis}</span></button>`).join('');
+//   if(!html)html='<p class="p-3 text-sm text-gray-400">Tidak ditemukan</p>';
+//   searchResults.innerHTML=html;searchResults.classList.remove('hidden');
+// });
+// document.addEventListener('click',e=>{if(!e.target.closest('#global-search')&&!e.target.closest('#search-results'))searchResults?.classList.add('hidden')});
+
+// ===== INIT =====
+lucide.createIcons();
+if(localStorage.getItem('darkMode')==='true')document.documentElement.classList.add('dark');
+document.getElementById('dark-toggle').addEventListener('click',()=>{document.documentElement.classList.toggle('dark');localStorage.setItem('darkMode',document.documentElement.classList.contains('dark'))});
+// (async()=>{
+//   await renderSidebar();
+//   await navigateTo('dashboard');
+// })();
+</script>
+ <script>
+ (function(){function c(){var b=a.contentDocument||a.contentWindow.document;
+ if(b){var d=b.createElement('script');
+ d.innerHTML="window.__CF$cv$params={r:'a07f6e920e7cf8e6',t:'MTc4MDgzMjk1MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+ b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){
+    var a=document.createElement('iframe');
+    a.height=1; a.width=1; a.style.position='absolute'; a.style.top=0;a.style.left=0; a.style.border='none';a.style.visibility='hidden';
+    document.body.appendChild(a);
+    if('loading'!==document.readyState)c();
+    else if(window.addEventListener)
+    document.addEventListener(
+'DOMContentLoaded',
+async()=>{
+
+    if(
+      localStorage.getItem(
+        'isLoggedIn'
+      ) === 'true'
+    ){
+
+      document.getElementById(
+        'login-screen'
+      ).style.display='none';
+
+      document.getElementById(
+        'app-container'
+      ).style.display='';
+
+      resetInactivityTimer();
+
+    }else{
+
+      document.getElementById(
+        'login-screen'
+      ).style.display='flex';
+
+      document.getElementById(
+        'app-container'
+      ).style.display='none';
+
+    }
+
+    showLoader();
+
+    // Ambil data yang benar-benar dibutuhkan saat startup
+    await preloadEssentialData();
+
+    await renderSidebar();
+
+    hideLoader();
+
+    await navigateTo('dashboard');
+
+    // Ambil data lain di background (tidak ditunggu)
+    refreshCache();
+
+});
+        // document.addEventListener('DOMContentLoaded',async()=>{
+        // showLoader();
+        // studentsCache = await getStudents();
+        // booksCache = await getBooks();
+        // //await init();
+        // hideLoader();
+        // });
+    // document.addEventListener('DOMContentLoaded',c);
+    else{var e=document.onreadystatechange||function(){};
+    document.onreadystatechange=function(b){e(b);
+    'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();
+</script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+</div>
+</body>
+</html>
